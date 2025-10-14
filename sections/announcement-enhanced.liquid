@@ -87,25 +87,51 @@
   </script>
 {% endif %}
 
-{% stylesheet %}
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#000000'
+  assign text_color = section.settings.text_color | default: '#ffffff'
+  assign padding_vertical = section.settings.padding_vertical | default: 12
+  assign padding_horizontal = section.settings.padding_horizontal | default: 20
+  assign text_alignment = section.settings.text_alignment | default: 'center'
+  assign font_size = section.settings.font_size | default: 14
+  assign font_weight = section.settings.font_weight | default: 400
+  assign dismiss_position = section.settings.dismiss_position | default: 'right'
+  assign font_size_mobile = section.settings.font_size_mobile | default: 13
+  assign padding_vertical_mobile = section.settings.padding_vertical_mobile | default: 10
+  assign padding_horizontal_mobile = section.settings.padding_horizontal_mobile | default: 16
+-%}
+
+<style>
   .announcement-bar {
-    background: {{ section.settings.bg_color | default: '#000000' }};
-    color: {{ section.settings.text_color | default: '#ffffff' }};
-    padding: {{ section.settings.padding_vertical | default: 12 }}px {{ section.settings.padding_horizontal | default: 20 }}px;
-    text-align: {{ section.settings.text_alignment | default: 'center' }};
-    font-size: {{ section.settings.font_size | default: 14 }}px;
+    --bg-color: {{ bg_color }};
+    --text-color: {{ text_color }};
+    --padding-vertical: {{ padding_vertical }}px;
+    --padding-horizontal: {{ padding_horizontal }}px;
+    --text-alignment: {{ text_alignment }};
+    --font-size: {{ font_size }}px;
+    --font-weight: {{ font_weight }};
+    --dismiss-position-value: {{ padding_horizontal }}px;
+    --font-size-mobile: {{ font_size_mobile }}px;
+    --padding-vertical-mobile: {{ padding_vertical_mobile }}px;
+    --padding-horizontal-mobile: {{ padding_horizontal_mobile }}px;
+    
+    background: var(--bg-color);
+    color: var(--text-color);
+    padding: var(--padding-vertical) var(--padding-horizontal);
+    text-align: var(--text-alignment);
+    font-size: var(--font-size);
     position: relative;
     transition: opacity 0.3s ease;
   }
 
   .announcement-bar--dismissible {
-    padding-right: calc({{ section.settings.padding_horizontal | default: 20 }}px + 40px);
+    padding-right: calc(var(--padding-horizontal) + 40px);
   }
 
   .announcement-bar__content {
     display: flex;
     align-items: center;
-    justify-content: {{ section.settings.text_alignment | default: 'center' }};
+    justify-content: var(--text-alignment);
     gap: 1rem;
     flex-wrap: wrap;
   }
@@ -118,7 +144,7 @@
   .announcement-bar__text {
     color: inherit;
     text-decoration: none;
-    font-weight: {{ section.settings.font_weight | default: 400 }};
+    font-weight: var(--font-weight);
     transition: opacity 0.2s ease;
   }
 
@@ -130,7 +156,7 @@
   .announcement-bar__dismiss {
     position: absolute;
     top: 50%;
-    {{ section.settings.dismiss_position | default: 'right' }}: {{ section.settings.padding_horizontal | default: 20 }}px;
+    {{ dismiss_position }}: var(--dismiss-position-value);
     transform: translateY(-50%);
     background: none;
     border: none;
@@ -156,28 +182,42 @@
     outline-offset: 2px;
   }
 
-  /* Enhanced styling when enabled */
-  {% if section.settings.enable_enhanced_features %}
+  /* Mobile responsive */
+  @media (max-width: 768px) {
     .announcement-bar {
-      {% if section.settings.enable_gradient %}
-        background: linear-gradient({{ section.settings.gradient_direction | default: '90deg' }}, {{ section.settings.bg_color | default: '#000000' }}, {{ section.settings.gradient_color | default: '#333333' }});
-      {% endif %}
-      
-      {% if section.settings.enable_border %}
-        border-{{ section.settings.border_position | default: 'bottom' }}: {{ section.settings.border_width | default: 1 }}px solid {{ section.settings.border_color | default: '#333333' }};
-      {% endif %}
+      font-size: var(--font-size-mobile);
+      padding: var(--padding-vertical-mobile) var(--padding-horizontal-mobile);
     }
+
+    .announcement-bar--dismissible {
+      padding-right: calc(var(--padding-horizontal-mobile) + 36px);
+    }
+
+    .announcement-bar__dismiss {
+      {{ dismiss_position }}: var(--padding-horizontal-mobile);
+    }
+  }
+</style>
+
+{% if section.settings.enable_enhanced_features %}
+  <style>
+    {% if section.settings.enable_gradient %}
+      .announcement-bar {
+        background: linear-gradient({{ section.settings.gradient_direction | default: '90deg' }}, {{ bg_color }}, {{ section.settings.gradient_color | default: '#333333' }});
+      }
+    {% endif %}
+    
+    {% if section.settings.enable_border %}
+      .announcement-bar {
+        border-{{ section.settings.border_position | default: 'bottom' }}: {{ section.settings.border_width | default: 1 }}px solid {{ section.settings.border_color | default: '#333333' }};
+      }
+    {% endif %}
 
     {% if section.settings.custom_announcement_css != blank %}
       {{ section.settings.custom_announcement_css }}
     {% endif %}
-  {% endif %}
-
-  /* Mobile responsive */
-  @media (max-width: 768px) {
-    .announcement-bar {
-      font-size: {{ section.settings.font_size_mobile | default: 13 }}px;
-      padding: {{ section.settings.padding_vertical_mobile | default: 10 }}px {{ section.settings.padding_horizontal_mobile | default: 16 }}px;
+  </style>
+{% endif %}
     }
 
     .announcement-bar--dismissible {

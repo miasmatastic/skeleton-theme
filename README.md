@@ -1,346 +1,409 @@
-# PJM Skeleton Plus Theme<h1 align="center" style="position: relative;">
+# PJM Skeleton Plus Theme
 
+<h1 align="center">
   <br>
 
-**Pure Junk Media's Enhanced Shopify Theme Development Framework**    <img src="./assets/shoppy-x-ray.svg" alt="logo" width="200">
-
+<img src="https://purejunkmedia.com/wp-content/uploads/2024/12/Pure-Junk-Media-Logo-A-Digital-Marketing-Company-e1733424638525-300x146.webp" alt="logo" width="200">
   <br>
-
-Built on Shopify's official Skeleton theme foundation  Shopify Skeleton Theme
-
+  **Pure Junk Media's Enhanced Shopify Theme Development Framework**
+  <br>
 </h1>
 
-[Getting started](#getting-started) |
-
-[Custom features](#custom-features) |A minimal, carefully structured Shopify theme designed to help you quickly get started. Designed with modularity, maintainability, and Shopify's best practices in mind.
-
-[Migration status](#migration-status) |
-
-[Developer tools](#developer-tools) |<p align="center">
-
-[License](#license)  <a href="./LICENSE.md"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License"></a>
-
+<p align="left">
+  <a href="./LICENSE.md"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License"></a>
   <a href="./actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Shopify/skeleton-theme/actions/workflows/ci.yml/badge.svg"></a>
+</p>
 
-This is Pure Junk Media's enhanced Shopify theme built on the official Skeleton theme foundation. Unlike our previous Horizon-based theme, this version is **Theme Store eligible** and provides a cleaner, more maintainable foundation while preserving all our custom functionality.</p>
-
-
-
-## Overview## Getting started
+An advanced, feature-rich Shopify theme built on the official Skeleton foundation. **Theme Store eligible** with enterprise-level functionality, designed for high-performance e-commerce experiences.
 
 
+## Overview
 
-PJM Skeleton Plus extends the minimal Skeleton theme with our proven enhancements from the Horizon-based version. This migration ensures long-term compatibility and Theme Store eligibility while maintaining all advanced features.### Prerequisites
+PJM Skeleton Plus combines the lightweight, maintainable foundation of Shopify's Skeleton theme with advanced e-commerce features built for conversion optimization and merchant flexibility. Every component is designed with performance, accessibility, and Theme Store compliance in mind.
+
+### Why Choose PJM Skeleton Plus?
+
+- **🚀 Performance First**: Minimal JavaScript footprint with lazy loading and progressive enhancement
+- **🎯 Conversion Optimized**: Advanced product display options with proven UX patterns
+- **📱 Mobile Excellence**: Touch-optimized interfaces with swipe gestures and responsive design
+- **♿ Accessibility Ready**: WCAG compliant with full keyboard navigation and screen reader support
+- **🛍️ Theme Store Eligible**: Clean, compliant codebase ready for Shopify Theme Store submission
+- **🔧 Developer Friendly**: Modular architecture with comprehensive customization options
+
+## Features
+
+### 🏪 Enhanced Store Experience
+
+**Advanced Header System**
+- Multi-row layout support with flexible positioning
+- Transparent header options for landing pages
+- Sticky navigation with hide-on-scroll functionality
+- Integrated search with predictive results
+- Mobile-optimized drawer navigation
+
+**Dynamic Product Displays**
+- **Dynamic Product Grid**: 4 preset layouts (Conversion Spotlight, Cinematic Carousel, Editorial Focus, Essential Showcase)
+- **Custom Showcase**: Flexible product presentation with multiple layout options
+- **Enhanced Collection Lists**: Tabbed collections with advanced filtering
+- Smart badge system with up to 3 customizable badges per product
+- AJAX quick-add functionality with variant selection
+
+**Interactive Components**
+- **Dismissible Announcements**: Persistent storage for user preferences
+- **Collection Tabs**: Dynamic content switching without page reloads
+- **Touch-Enabled Carousels**: Native swipe support with responsive breakpoints
+- **Quick Add Overlays**: Streamlined purchase flow directly from product cards
+
+### 🎨 Advanced Customization
+
+**CSS Variables Architecture**
+- Real-time customization through Shopify admin
+- Consistent theming across all components
+- Responsive scaling and adaptation
+- No inline styles for better performance
+
+**Spacing & Layout System**
+- **Gap Styles**: Consistent spacing with CSS Grid and Flexbox
+- **Spacing Utilities**: Modular padding and margin controls
+- **Responsive Breakpoints**: Mobile-first design with flexible layouts
+- **Color Schemes**: Comprehensive color system with accessibility compliance
+
+**Typography & Branding**
+- Adobe Fonts integration support
+- Custom font loading with display: swap
+- Flexible logo positioning and sizing
+- Brand-consistent styling across all components
+
+### 🛠️ Developer Experience
+
+**Modern Development Stack**
+- Liquid template optimization
+- Custom elements for interactive features
+- Event-driven JavaScript architecture
+- Local storage for user preferences
+- Progressive enhancement patterns
+
+**Performance Optimization**
+- Critical CSS separation
+- Lazy loading for images and components
+- Minimal JavaScript bundles
+- Efficient asset loading strategies
+- Mobile-first responsive images
 
 
+## Components
 
-## Migration StatusBefore starting, ensure you have the latest Shopify CLI installed:
+### Dynamic Product Grid Section
 
+**File:** `sections/dynamic-product-grid.liquid`
 
+A versatile, high-conversion product display system with four professionally designed presets:
 
-**🚀 Phase 1: Core Components** *(In Progress)*- [Shopify CLI](https://shopify.dev/docs/api/shopify-cli) – helps you download, upload, preview themes, and streamline your workflows
+#### Conversion Spotlight
+- 3-column layout optimized for sales conversion
+- Prominent badge placement for promotions
+- Always-visible quick-add buttons
+- Enhanced product information display
 
+#### Cinematic Carousel
+- 4-column full-bleed image layout
+- Minimal UI for image-focused presentation
+- Touch/swipe navigation with smooth transitions
+- Perfect for visual product categories
 
+#### Editorial Focus
+- 2-column minimal layout for curated selections
+- Typography-focused design
+- Ideal for premium or featured collections
+- Clean, magazine-style presentation
 
-- ✅ **Dynamic Product Grid Section** - Fully migrated with all 4 presetsIf you use VS Code:
+#### Essential Showcase
+- 3-column balanced layout
+- Quick-add overlays on hover/tap
+- Optimal for general product browsing
+- Best balance of information and imagery
 
-  - Conversion Spotlight preset
+**Key Features:**
+- Custom badge system (up to 3 badges per product)
+- Color-coded badges with admin customization
+- AJAX quick-add with variant selection
+- Responsive carousel with touch support
+- Secondary image display on hover
+- Color swatch variant preview
+- Mobile-optimized with always-visible CTAs
+- Full accessibility and reduced motion support
 
-  - Cinematic Carousel preset- [Shopify Liquid VS Code Extension](https://shopify.dev/docs/storefronts/themes/tools/shopify-liquid-vscode) – provides syntax highlighting, linting, inline documentation, and auto-completion specifically designed for Liquid templates
+### Enhanced Header System
 
-  - Editorial Focus preset
+**Files:** `sections/header-enhanced-plus.liquid`, `sections/header-enhanced.liquid`
 
-  - Essential Showcase preset### Clone
+Professional header component with enterprise features:
 
-- ✅ **Supporting Snippets** - Core dependencies migrated
+- **Multi-Row Layout**: Primary and secondary header rows
+- **Transparent Mode**: Overlay headers for landing pages
+- **Sticky Navigation**: Smart scroll behavior with hide-on-scroll
+- **Advanced Positioning**: Flexible logo and menu placement
+- **Search Integration**: Predictive search with results preview
+- **Mobile Navigation**: Drawer-style mobile menu
+- **Localization Support**: Multi-language and currency switching
 
-  - card-product-dynamic.liquidClone this repository using Git or Shopify CLI:
+### Collection Components
 
-  - spacing-style.liquid
+**Enhanced Collection Lists** (`sections/collection-list-enhanced.liquid`)
+- Tabbed interface for multiple collections
+- Grid and carousel layout options
+- Custom overlay effects
+- Featured image optimization
+- Dynamic content loading
 
-  - gap-style.liquid```bash
+**Custom Collection Tabs** (integrated in collection lists)
+- Up to 5 collection tabs per section
+- Smooth transitions between collections
+- Local storage for tab preferences
+- Keyboard navigation support
 
-  - price.liquidgit clone git@github.com:Shopify/skeleton-theme.git
+### Announcement System
 
-# or
+**File:** `sections/announcement-enhanced.liquid`
 
-**📋 Phase 2: Planned Components**shopify theme init
+Smart announcement bar with advanced features:
 
-```
+- **Dismissible Functionality**: Persistent user preferences
+- **Multiple Announcements**: Rotating or static display
+- **Custom Styling**: Text or icon close buttons
+- **Link Integration**: Clickable announcements
+- **Local Storage**: Remembers dismissed state across sessions
 
-- ⏳ Enhanced Header System
+### Custom Showcase
 
-- ⏳ Collection List Enhancements  ### Preview
+**File:** `sections/custom-showcase.liquid`
 
-- ⏳ Custom Showcase Section
+Flexible product presentation system:
 
-- ⏳ Dismissible Announcement BannerPreview this theme using Shopify CLI:
+- Multiple layout options (grid, carousel, masonry)
+- Advanced filtering and sorting
+- Custom product card styling
+- Responsive breakpoint management
+- Integration with resource list system
 
-- ⏳ Adobe Fonts Integration
+## Getting started
 
-- ⏳ Custom Collection Tabs```bash
+### Prerequisites
 
-shopify theme dev
+Before starting, ensure you have the latest tools installed:
 
-## Custom Features```
+- [Shopify CLI](https://shopify.dev/docs/api/shopify-cli) – theme development and deployment
+- [Git](https://git-scm.com/) – version control
+- [Node.js](https://nodejs.org/) – for build tools (if needed)
 
+If you use VS Code:
+- [Shopify Liquid VS Code Extension](https://shopify.dev/docs/storefronts/themes/tools/shopify-liquid-vscode) – syntax highlighting and auto-completion
 
+### Clone
 
-### 🎯 **Dynamic Product Grid Section** ✅ **MIGRATED**## Theme architecture
-
-**File:** `sections/dynamic-product-grid.liquid` + `snippets/card-product-dynamic.liquid`
+Clone this repository using Git or Shopify CLI:
 
 ```bash
+git clone git@github.com:miasmatastic/skeleton-theme.git
+# or
+shopify theme init --clone-url=git@github.com:miasmatastic/skeleton-theme.git
+```
 
-A versatile, high-conversion product display section with four preset layouts:.
+### Preview
 
-├── assets          # Stores static assets (CSS, JS, images, fonts, etc.)
+Preview this theme using Shopify CLI:
 
-- **Conversion Spotlight**: 3-column layout with prominent badges and quick-add functionality├── blocks          # Reusable, nestable, customizable UI components
-
-- **Cinematic Carousel**: 4-column full-bleed images with minimal UI elements├── config          # Global theme settings and customization options
-
-- **Editorial Focus**: 2-column minimal layout for curated collections├── layout          # Top-level wrappers for pages (layout templates)
-
-- **Essential Showcase**: 3-column with quick-add overlays directly on product images├── locales         # Translation files for theme internationalization
-
-├── sections        # Modular full-width page components
-
-**Key Features:**├── snippets        # Reusable Liquid code or HTML fragments
-
-- Custom badge system (up to 3 badges per product with configurable colors)└── templates       # Templates combining sections to define page structures
-
-- AJAX quick-add functionality with smart variant handling```
-
-- Responsive carousel with touch/swipe support
-
-- Advanced hover effects including secondary image displayTo learn more, refer to the [theme architecture documentation](https://shopify.dev/docs/storefronts/themes/architecture).
-
-- Color swatch display for variant options
-
-- Mobile-optimized layouts with always-visible CTAs### Templates
-
-- Full accessibility support and reduced motion preferences
-
-[Templates](https://shopify.dev/docs/storefronts/themes/architecture/templates#template-types) control what's rendered on each type of page in a theme.
-
-## Benefits of Skeleton Foundation
-
-The Skeleton Theme scaffolds [JSON templates](https://shopify.dev/docs/storefronts/themes/architecture/templates/json-templates) to make it easy for merchants to customize their store.
-
-**vs. Horizon-based version:**
-
-None of the template types are required, and not all of them are included in the Skeleton Theme. Refer to the [template types reference](https://shopify.dev/docs/storefronts/themes/architecture/templates#template-types) for a full list.
-
-- ✅ **Theme Store Eligible** - Can be submitted to Shopify Theme Store
-
-- ✅ **Cleaner Codebase** - Minimal foundation, easier to maintain### Sections
-
-- ✅ **Better Performance** - Smaller base theme, faster loading
-
-- ✅ **Enhanced Compatibility** - Official Shopify foundation ensures better app compatibility[Sections](https://shopify.dev/docs/storefronts/themes/architecture/sections) are Liquid files that allow you to create reusable modules of content that can be customized by merchants. They can also include blocks which allow merchants to add, remove, and reorder content within a section.
-
-- ✅ **Future-Proof** - Official theme receives ongoing Shopify support
-
-- ✅ **Industry Standard** - Built on the recommended starting point for custom themesSections are made customizable by including a `{% schema %}` in the body. For more information, refer to the [section schema documentation](https://shopify.dev/docs/storefronts/themes/architecture/sections/section-schema).
-
-
-
-## Getting started### Blocks
-
-
-
-This theme requires Shopify CLI and basic knowledge of Liquid templating.[Blocks](https://shopify.dev/docs/storefronts/themes/architecture/blocks) let developers create flexible layouts by breaking down sections into smaller, reusable pieces of Liquid. Each block has its own set of settings, and can be added, removed, and reordered within a section.
-
-
-
-### PrerequisitesBlocks are made customizable by including a `{% schema %}` in the body. For more information, refer to the [block schema documentation](https://shopify.dev/docs/storefronts/themes/architecture/blocks/theme-blocks/schema).
-
-
-
-- Shopify CLI## Schemas
-
-- Git
-
-- Understanding of Shopify theme developmentWhen developing components defined by schema settings, we recommend these guidelines to simplify your code:
-
-- Node.js (for build tools if needed)
-
-- **Single property settings**: For settings that correspond to a single CSS property, use CSS variables:
-
-### Installation
-
-  ```liquid
-
-1. Clone this repository to your local machine  <div class="collection" style="--gap: {{ block.settings.gap }}px">
-
-2. Navigate to the theme directory    ...
-
-3. Use Shopify CLI to connect to your development store  </div>
-
-4. Deploy and test the enhanced features
-
-  {% stylesheet %}
-
-```bash    .collection {
-
-shopify theme dev      gap: var(--gap);
-
-```    }
-
-  {% endstylesheet %}
+```bash
+shopify theme dev
+```
 
 ### Development Workflow
 
-  {% schema %}
+```bash
+# Start development server
+shopify theme dev
 
-```bash  {
+# Deploy to staging
+shopify theme push --store your-dev-store.myshopify.com
 
-# Start development server    "settings": [{
+# Pull changes from live theme
+shopify theme pull
+```
 
-shopify theme dev      "type": "range",
+## Theme Architecture
 
-      "label": "gap",
+```bash
+PJM-skeleton-plus-theme/
+├── assets/          # Static assets (CSS, JS, images, fonts)
+├── blocks/          # Reusable, nestable UI components
+├── config/          # Global theme settings and customization
+├── layout/          # Top-level page wrappers
+├── locales/         # Translation files for internationalization
+├── sections/        # Modular full-width page components
+├── snippets/        # Reusable Liquid code fragments
+└── templates/       # Page templates combining sections
+```
 
-# Deploy to staging      "id": "gap",
+To learn more, refer to the [theme architecture documentation](https://shopify.dev/docs/storefronts/themes/architecture).
 
-shopify theme push --store your-dev-store.myshopify.com      "min": 0,
+### Templates
 
-      "max": 100,
+[Templates](https://shopify.dev/docs/storefronts/themes/architecture/templates#template-types) control what's rendered on each type of page. The theme scaffolds [JSON templates](https://shopify.dev/docs/storefronts/themes/architecture/templates/json-templates) for easy merchant customization.
 
-# Pull changes from live theme      "unit": "px",
+### Sections
 
-shopify theme pull      "default": 0,
+[Sections](https://shopify.dev/docs/storefronts/themes/architecture/sections) are modular content blocks customizable through the admin interface. All enhanced sections include comprehensive `{% schema %}` definitions for merchant control.
 
-```    }]
+### Blocks
 
-  }
+[Blocks](https://shopify.dev/docs/storefronts/themes/architecture/blocks) create flexible layouts within sections. Each block has its own settings and can be reordered by merchants.
 
-## Migration Progress  {% endschema %}
+## Developer Tools
 
-  ```
+### Enhanced Customization System
 
-**Completed:**
+**CSS Variables Integration**: All sections utilize CSS variables for dynamic styling:
+- Real-time customization through Shopify admin
+- Consistent theming across components
+- Responsive scaling and adaptation
+- Easy maintenance and updates
 
-- ✅ Repository setup and Skeleton foundation- **Multiple property settings**: For settings that control multiple CSS properties, use CSS classes:
-
-- ✅ Dynamic Product Grid section (full feature parity)
-
-- ✅ Supporting snippet infrastructure  ```liquid
-
-- ✅ Documentation foundation  <div class="collection {{ block.settings.layout }}">
-
-    ...
-
-**Next Steps:**  </div>
-
-1. Adobe Fonts integration in layout/theme.liquid
-
-2. Enhanced header system migration  {% stylesheet %}
-
-3. Collection list enhancements    .collection--full-width {
-
-4. Dismissible announcement functionality      /* multiple styles */
-
-5. Custom showcase section    }
-
-6. Collection tabs system    .collection--narrow {
-
-      /* multiple styles */
-
-**Timeline:** Expected completion within 1-2 weeks for full feature parity.    }
-
-  {% endstylesheet %}
-
-## Developer Features
-
-  {% schema %}
-
-### Enhanced Customization System  {
-
-    "settings": [{
-
-**CSS Variables Integration:** All custom sections utilize CSS variables for dynamic styling, enabling:      "type": "select",
-
-- Real-time customization through Shopify admin      "id": "layout",
-
-- Consistent theming across components      "label": "layout",
-
-- Responsive scaling and adaptation      "values": [
-
-- Easy maintenance and updates        { "value": "collection--full-width", "label": "t:options.full" },
-
-        { "value": "collection--narrow", "label": "t:options.narrow" }
-
-**JavaScript Enhancement:** Modern JavaScript implementation featuring:      ]
-
-- Custom elements for interactive components    }]
-
-- Event-driven architecture  }
-
-- Local storage for user preferences  {% endschema %}
-
-- Touch/swipe support for mobile  ```
-
+**JavaScript Enhancement**: Modern JavaScript implementation:
+- Custom elements for interactive components
+- Event-driven architecture
+- Local storage for user preferences
+- Touch/swipe support for mobile
 - Accessibility-first design
 
-## CSS & JavaScript
-
-**Liquid Architecture:** Advanced Liquid templating including:
-
-- Modular snippet systemFor CSS and JavaScript, we recommend using the [`{% stylesheet %}`](https://shopify.dev/docs/api/liquid/tags#stylesheet) and [`{% javascript %}`](https://shopify.dev/docs/api/liquid/tags/javascript) tags. They can be included multiple times, but the code will only appear once.
-
+**Liquid Architecture**: Advanced templating features:
+- Modular snippet system
 - Conditional feature rendering
-
-- Dynamic preset application### `critical.css`
-
+- Dynamic preset application
 - Schema-driven customization
-
-The Skeleton Theme explicitly separates essential CSS necessary for every page into a dedicated `critical.css` file.
 
 ### Performance Optimization
 
-## Contributing
-
 - **Lazy Loading**: Optimized image loading with responsive srcsets
-
-- **Progressive Enhancement**: Features degrade gracefullyWe're excited for your contributions to the Skeleton Theme! This repository aims to remain as lean, lightweight, and fundamental as possible, and we kindly ask your contributions to align with this intention.
-
+- **Progressive Enhancement**: Features degrade gracefully
 - **Mobile-First**: Responsive design prioritizes mobile experience
-
-- **Minimal JavaScript**: Essential functionality onlyVisit our [CONTRIBUTING.md](./CONTRIBUTING.md) for a detailed overview of our process, guidelines, and recommendations.
-
+- **Minimal JavaScript**: Essential functionality only
 - **CSS Variables**: Dynamic styling without inline styles
+- **Critical CSS**: Essential styles loaded first
 
-## License
+### CSS & JavaScript
+
+We recommend using the [`{% stylesheet %}`](https://shopify.dev/docs/api/liquid/tags#stylesheet) and [`{% javascript %}`](https://shopify.dev/docs/api/liquid/tags/javascript) tags for optimal performance. Code is automatically deduplicated across multiple includes.
+
+#### `critical.css`
+
+The theme separates essential CSS into a dedicated `critical.css` file for faster initial page loads.
+
+### Schemas
+
+When developing schema-driven components, follow these guidelines:
+
+**Single property settings**: Use CSS variables for direct CSS property mapping:
+
+```liquid
+<div class="collection" style="--gap: {{ block.settings.gap }}px">
+  ...
+</div>
+
+{% stylesheet %}
+  .collection {
+    gap: var(--gap);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "settings": [{
+    "type": "range",
+    "label": "Gap",
+    "id": "gap",
+    "min": 0,
+    "max": 100,
+    "unit": "px",
+    "default": 0
+  }]
+}
+{% endschema %}
+```
+
+**Multiple property settings**: Use CSS classes for complex styling:
+
+```liquid
+<div class="collection {{ block.settings.layout }}">
+  ...
+</div>
+
+{% stylesheet %}
+  .collection--full-width {
+    /* multiple styles */
+  }
+  .collection--narrow {
+    /* multiple styles */
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "settings": [{
+    "type": "select",
+    "id": "layout",
+    "label": "Layout",
+    "options": [
+      { "value": "collection--full-width", "label": "Full Width" },
+      { "value": "collection--narrow", "label": "Narrow" }
+    ]
+  }]
+}
+{% endschema %}
+```
 
 ## File Structure
 
-Skeleton Theme is open-sourced under the [MIT](./LICENSE.md) License.
-
 ```
-PJM-skeleton-plus-theme/
+Enhanced Sections:
 ├── sections/
-│   ├── dynamic-product-grid.liquid     ✅ Migrated
-│   └── [other skeleton sections]       ⏳ Core Skeleton
+│   ├── dynamic-product-grid.liquid      ✅ 4 preset layouts
+│   ├── header-enhanced-plus.liquid      ✅ Multi-row header
+│   ├── header-enhanced.liquid           ✅ Standard enhanced header
+│   ├── announcement-enhanced.liquid     ✅ Dismissible announcements
+│   ├── collection-list-enhanced.liquid  ✅ Tabbed collections
+│   ├── custom-showcase.liquid           ✅ Flexible product display
+│   └── custom-collection.liquid         ✅ Collection customization
+
+Enhanced Snippets:
 ├── snippets/
-│   ├── card-product-dynamic.liquid     ✅ Migrated
-│   ├── spacing-style.liquid            ✅ Migrated  
-│   ├── gap-style.liquid                ✅ Migrated
-│   ├── price.liquid                    ✅ Migrated
-│   └── [other snippets]                ⏳ Core/Enhanced
-├── layout/
-│   └── theme.liquid                    ⏳ To be enhanced
-├── assets/
-│   └── [Enhanced CSS and JS files]     ⏳ To be added
-└── README.md                           ✅ This documentation
+│   ├── card-product-dynamic.liquid      ✅ Advanced product cards
+│   ├── css-variables.liquid             ✅ Dynamic styling system
+│   ├── spacing-style.liquid             ✅ Consistent spacing
+│   ├── gap-style.liquid                 ✅ Grid/flexbox gaps
+│   ├── price.liquid                     ✅ Enhanced price display
+│   └── resource-list.liquid             ✅ Flexible list layouts
+
+Core Architecture:
+├── layout/theme.liquid                   ✅ Enhanced with custom features
+├── assets/critical.css                  ✅ Performance-optimized CSS
+└── config/settings_schema.json          ✅ Comprehensive theme settings
 ```
 
 ## Contributing
 
-This is Pure Junk Media's internal development framework. All contributions are managed internally.
+This is Pure Junk Media's internal development framework. For team members:
 
-**⚠️ PowerShell Note:** When using git commands in Windows PowerShell, use `Select-Object -First` instead of `head`:
+### Development Guidelines
+
+- Follow Shopify's theme development best practices
+- Maintain Theme Store compliance standards
+- Test all features across devices and browsers
+- Document new components in this README
+- Use semantic versioning for releases
+
+### PowerShell Notes
+
+When using git commands in Windows PowerShell, use PowerShell-specific syntax:
 
 ```powershell
 # ✅ Correct for PowerShell
@@ -352,18 +415,21 @@ git log --oneline | head -10
 
 ## Support & Maintenance
 
-For internal Pure Junk Media team members:
+For Pure Junk Media team members:
 - Report issues through internal ticketing system
 - Feature requests should be discussed with development team
 - Emergency fixes follow standard deployment procedures
+- Documentation updates required for all new features
 
 ## License
 
-**Skeleton Base:** Copyright (c) 2023-present Shopify Inc. See [LICENSE](/LICENSE.md) for further details.
+**Skeleton Base**: Copyright (c) 2023-present Shopify Inc. See [LICENSE](/LICENSE.md) for details.
 
-**PJM Enhancements:** Pure Junk Media proprietary enhancements for internal use.
+**PJM Enhancements**: Pure Junk Media proprietary enhancements for internal use.
 
 ---
 
 **Built with ❤️ by Pure Junk Media Development Team**
-**Migration from Horizon to Skeleton - Phase 1 Complete** ✅
+
+*A comprehensive e-commerce theme solution built on Shopify's best practices*
+

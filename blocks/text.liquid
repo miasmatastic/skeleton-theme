@@ -48,6 +48,34 @@
       "default": "text--title"
     },
     {
+      "type": "select",
+      "id": "type_preset",
+      "label": "Typography Preset",
+      "default": "body",
+      "options": [
+        { "value": "h1", "label": "Heading 1" },
+        { "value": "h2", "label": "Heading 2" },
+        { "value": "h3", "label": "Heading 3" },
+        { "value": "h4", "label": "Heading 4" },
+        { "value": "h5", "label": "Heading 5" },
+        { "value": "h6", "label": "Heading 6" },
+        { "value": "body", "label": "Body Text" },
+        { "value": "small", "label": "Small Text" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "case",
+      "label": "Text Case",
+      "default": "none",
+      "options": [
+        { "value": "none", "label": "Normal" },
+        { "value": "uppercase", "label": "UPPERCASE" },
+        { "value": "lowercase", "label": "lowercase" },
+        { "value": "capitalize", "label": "Capitalize" }
+      ]
+    },
+    {
       "type": "text_alignment",
       "id": "alignment",
       "label": "t:labels.alignment",
@@ -57,3 +85,4 @@
   "presets": [{ "name": "t:general.text" }]
 }
 {% endschema %}
+

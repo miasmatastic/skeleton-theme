@@ -1,0 +1,89 @@
+{% doc %}
+  Renders a spacer block for adding vertical or horizontal space.
+  
+  @example
+  {% content_for 'block', type: 'spacer', id: 'spacer' %}
+{% enddoc %}
+
+{%- liquid
+  assign spacer_height = block.settings.spacer_height | default: 32
+  assign spacer_width = block.settings.spacer_width | default: 100
+  assign spacer_type = block.settings.spacer_type | default: 'vertical'
+-%}
+
+<div 
+  class="spacer-block spacer-block--{{ spacer_type }}"
+  style="
+    {% if spacer_type == 'vertical' %}
+      --spacer-size: {{ spacer_height }}px;
+    {% else %}
+      --spacer-size: {{ spacer_width }}px;
+    {% endif %}
+  "
+  {{ block.shopify_attributes }}
+>
+  {% comment %} Invisible spacer content {% endcomment %}
+</div>
+
+{% stylesheet %}
+  .spacer-block--vertical {
+    width: 100%;
+    height: var(--spacer-size);
+    display: block;
+  }
+
+  .spacer-block--horizontal {
+    height: 100%;
+    width: var(--spacer-size);
+    display: inline-block;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Spacer",
+  "settings": [
+    {
+      "type": "select",
+      "id": "spacer_type",
+      "label": "Spacer Type",
+      "default": "vertical",
+      "options": [
+        { "value": "vertical", "label": "Vertical (Height)" },
+        { "value": "horizontal", "label": "Horizontal (Width)" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "spacer_height",
+      "label": "Height",
+      "min": 8,
+      "max": 200,
+      "step": 4,
+      "default": 32,
+      "unit": "px",
+      "info": "Used for vertical spacers"
+    },
+    {
+      "type": "range",
+      "id": "spacer_width",
+      "label": "Width",
+      "min": 8,
+      "max": 200,
+      "step": 4,
+      "default": 100,
+      "unit": "px",
+      "info": "Used for horizontal spacers"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Spacer",
+      "settings": {
+        "spacer_type": "vertical",
+        "spacer_height": 32
+      }
+    }
+  ]
+}
+{% endschema %}

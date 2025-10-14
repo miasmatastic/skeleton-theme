@@ -60,6 +60,16 @@
       ]
     },
     {
+      "type": "select",
+      "id": "content_direction",
+      "label": "Content Direction", 
+      "default": "column",
+      "options": [
+        { "value": "row", "label": "Row" },
+        { "value": "column", "label": "Column" }
+      ]
+    },
+    {
       "visible_if": "{{ block.settings.layout_direction == 'group--vertical' }}",
       "type": "select",
       "id": "alignment",
@@ -72,6 +82,66 @@
       ]
     },
     {
+      "type": "select",
+      "id": "horizontal_alignment",
+      "label": "Horizontal Alignment",
+      "default": "center",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Right" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "vertical_alignment",
+      "label": "Vertical Alignment",
+      "default": "center",
+      "options": [
+        { "value": "flex-start", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Bottom" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "horizontal_alignment_flex_direction_column",
+      "label": "Horizontal Alignment (Column)",
+      "default": "center",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Right" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "vertical_alignment_flex_direction_column",
+      "label": "Vertical Alignment (Column)",
+      "default": "center",
+      "options": [
+        { "value": "flex-start", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Bottom" }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "vertical_on_mobile",
+      "label": "Vertical on Mobile",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Gap",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 16,
+      "unit": "px"
+    },
+    {
       "type": "range",
       "id": "padding",
       "label": "t:labels.padding",
@@ -79,6 +149,76 @@
       "min": 0,
       "max": 200,
       "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom Padding",
+      "default": 0,
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "default": "fill",
+      "options": [
+        { "value": "fill", "label": "Fill" },
+        { "value": "custom", "label": "Custom" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "custom_width",
+      "label": "Custom Width",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "default": 100,
+      "unit": "%"
+    },
+    {
+      "type": "select",
+      "id": "width_mobile",
+      "label": "Mobile Width",
+      "default": "fill",
+      "options": [
+        { "value": "fill", "label": "Fill" },
+        { "value": "custom", "label": "Custom" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "custom_width_mobile",
+      "label": "Custom Mobile Width",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "default": 100,
+      "unit": "%"
+    },
+    {
+      "type": "select",
+      "id": "height",
+      "label": "Height",
+      "default": "fit",
+      "options": [
+        { "value": "fit", "label": "Fit Content" },
+        { "value": "custom", "label": "Custom" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "custom_height",
+      "label": "Custom Height",
+      "min": 50,
+      "max": 800,
+      "step": 10,
+      "default": 100,
       "unit": "px"
     }
   ],
@@ -103,3 +243,4 @@
   ]
 }
 {% endschema %}
+

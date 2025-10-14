@@ -1,0 +1,147 @@
+{% doc %}
+  Renders a button block with customizable styling.
+  
+  @example
+  {% content_for 'block', type: 'button', id: 'button' %}
+{% enddoc %}
+
+{%- liquid
+  assign button_text = block.settings.button_text | default: 'Click here'
+  assign button_url = block.settings.button_url
+  assign button_style = block.settings.button_style | default: 'primary'
+  assign button_size = block.settings.button_size | default: 'medium'
+  assign open_in_new_tab = block.settings.open_in_new_tab | default: false
+-%}
+
+<div class="button-block" {{ block.shopify_attributes }}>
+  {% if button_url %}
+    <a 
+      href="{{ button_url }}"
+      class="button-block__link button-block__link--{{ button_style }} button-block__link--{{ button_size }}"
+      {% if open_in_new_tab %}target="_blank" rel="noopener"{% endif %}
+    >
+      {{ button_text }}
+    </a>
+  {% else %}
+    <span class="button-block__text button-block__text--{{ button_style }} button-block__text--{{ button_size }}">
+      {{ button_text }}
+    </span>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .button-block {
+    display: inline-block;
+  }
+
+  .button-block__link,
+  .button-block__text {
+    display: inline-block;
+    padding: 12px 24px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+    cursor: pointer;
+  }
+
+  .button-block__link--primary,
+  .button-block__text--primary {
+    background: #007acc;
+    color: white;
+    border-color: #007acc;
+  }
+
+  .button-block__link--primary:hover {
+    background: #005a99;
+    border-color: #005a99;
+  }
+
+  .button-block__link--secondary,
+  .button-block__text--secondary {
+    background: transparent;
+    color: #007acc;
+    border-color: #007acc;
+  }
+
+  .button-block__link--secondary:hover {
+    background: #007acc;
+    color: white;
+  }
+
+  .button-block__link--small,
+  .button-block__text--small {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
+  .button-block__link--medium,
+  .button-block__text--medium {
+    padding: 12px 24px;
+    font-size: 16px;
+  }
+
+  .button-block__link--large,
+  .button-block__text--large {
+    padding: 16px 32px;
+    font-size: 18px;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Button",
+  "settings": [
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Click here"
+    },
+    {
+      "type": "url",
+      "id": "button_url",
+      "label": "Button URL"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button Style",
+      "default": "primary",
+      "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "button_size",
+      "label": "Button Size",
+      "default": "medium",
+      "options": [
+        { "value": "small", "label": "Small" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "large", "label": "Large" }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "open_in_new_tab",
+      "label": "Open in new tab",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "Button",
+      "settings": {
+        "button_text": "Click here",
+        "button_style": "primary",
+        "button_size": "medium"
+      }
+    }
+  ]
+}
+{% endschema %}

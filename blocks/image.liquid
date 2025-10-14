@@ -1,0 +1,115 @@
+{% doc %}
+  Renders an image block with responsive settings.
+  
+  @example
+  {% content_for 'block', type: 'image', id: 'image' %}
+{% enddoc %}
+
+{%- liquid
+  assign image = block.settings.image
+  assign image_width = block.settings.image_width | default: 300
+  assign image_height = block.settings.image_height | default: 200
+  assign alt_text = block.settings.alt_text | default: image.alt
+-%}
+
+<div 
+  class="image-block"
+  style="
+    --image-width: {{ image_width }}px;
+    --image-height: {{ image_height }}px;
+  "
+  {{ block.shopify_attributes }}
+>
+  {% if image %}
+    <img 
+      src="{{ image | image_url: width: image_width }}"
+      alt="{{ alt_text | escape }}"
+      loading="lazy"
+      width="{{ image_width }}"
+      height="{{ image_height }}"
+      class="image-block__img"
+    >
+  {% else %}
+    <div class="image-block__placeholder">
+      <span>Image placeholder</span>
+    </div>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .image-block {
+    display: block;
+    max-width: var(--image-width);
+    max-height: var(--image-height);
+  }
+
+  .image-block__img {
+    width: 100%;
+    height: auto;
+    max-width: var(--image-width);
+    max-height: var(--image-height);
+    object-fit: cover;
+    border-radius: 4px;
+  }
+
+  .image-block__placeholder {
+    width: var(--image-width);
+    height: var(--image-height);
+    background: #f5f5f5;
+    border: 2px dashed #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    font-size: 14px;
+    border-radius: 4px;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Image",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "alt_text",
+      "label": "Alt Text",
+      "info": "Describe the image for accessibility"
+    },
+    {
+      "type": "range",
+      "id": "image_width",
+      "label": "Max Width",
+      "min": 100,
+      "max": 800,
+      "step": 10,
+      "default": 300,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "image_height",
+      "label": "Max Height",
+      "min": 100,
+      "max": 600,
+      "step": 10,
+      "default": 200,
+      "unit": "px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image",
+      "settings": {
+        "image_width": 300,
+        "image_height": 200
+      }
+    }
+  ]
+}
+{% endschema %}

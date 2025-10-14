@@ -1,0 +1,186 @@
+{% doc %}
+  Renders a video block with various video sources.
+  
+  @example
+  {% content_for 'block', type: 'video', id: 'video' %}
+{% enddoc %}
+
+{%- liquid
+  assign video_url = block.settings.video_url
+  assign video_file = block.settings.video_file
+  assign poster_image = block.settings.poster_image
+  assign autoplay = block.settings.autoplay | default: false
+  assign muted = block.settings.muted | default: true
+  assign loop = block.settings.loop | default: false
+  assign controls = block.settings.controls | default: true
+  assign video_width = block.settings.video_width | default: 600
+  assign video_height = block.settings.video_height | default: 400
+-%}
+
+<div 
+  class="video-block"
+  style="
+    --video-width: {{ video_width }}px;
+    --video-height: {{ video_height }}px;
+  "
+  {{ block.shopify_attributes }}
+>
+  {% if video_file %}
+    <!-- Uploaded video file -->
+    <video 
+      class="video-block__player"
+      width="{{ video_width }}"
+      height="{{ video_height }}"
+      {% if poster_image %}poster="{{ poster_image | image_url: width: video_width }}"{% endif %}
+      {% if autoplay %}autoplay{% endif %}
+      {% if muted %}muted{% endif %}
+      {% if loop %}loop{% endif %}
+      {% if controls %}controls{% endif %}
+      preload="metadata"
+    >
+      <source src="{{ video_file | asset_url }}" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  {% elsif video_url %}
+    <!-- YouTube or Vimeo embed -->
+    {% assign video_id = video_url | split: 'v=' | last | split: '&' | first %}
+    {% if video_url contains 'youtube' or video_url contains 'youtu.be' %}
+      <iframe 
+        class="video-block__iframe"
+        width="{{ video_width }}"
+        height="{{ video_height }}"
+        src="https://www.youtube.com/embed/{{ video_id }}{% if autoplay %}?autoplay=1{% endif %}"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+      ></iframe>
+    {% elsif video_url contains 'vimeo' %}
+      {% assign vimeo_id = video_url | split: '/' | last %}
+      <iframe 
+        class="video-block__iframe"
+        width="{{ video_width }}"
+        height="{{ video_height }}"
+        src="https://player.vimeo.com/video/{{ vimeo_id }}{% if autoplay %}?autoplay=1{% endif %}"
+        frameborder="0"
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowfullscreen
+      ></iframe>
+    {% endif %}
+  {% else %}
+    <div class="video-block__placeholder">
+      <span>Video placeholder</span>
+    </div>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .video-block {
+    display: block;
+    max-width: var(--video-width);
+  }
+
+  .video-block__player,
+  .video-block__iframe {
+    width: 100%;
+    height: auto;
+    max-width: var(--video-width);
+    aspect-ratio: 16/9;
+    border-radius: 4px;
+  }
+
+  .video-block__placeholder {
+    width: var(--video-width);
+    height: var(--video-height);
+    background: #f5f5f5;
+    border: 2px dashed #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    font-size: 14px;
+    border-radius: 4px;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Video",
+  "settings": [
+    {
+      "type": "video",
+      "id": "video_file",
+      "label": "Video File",
+      "info": "Upload a video file (MP4 recommended)"
+    },
+    {
+      "type": "url",
+      "id": "video_url",
+      "label": "Video URL",
+      "info": "YouTube or Vimeo URL (used if no file uploaded)"
+    },
+    {
+      "type": "image_picker",
+      "id": "poster_image",
+      "label": "Poster Image",
+      "info": "Thumbnail shown before video plays"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Autoplay",
+      "default": false,
+      "info": "Video will play automatically when page loads"
+    },
+    {
+      "type": "checkbox",
+      "id": "muted",
+      "label": "Muted",
+      "default": true,
+      "info": "Required for autoplay in most browsers"
+    },
+    {
+      "type": "checkbox",
+      "id": "loop",
+      "label": "Loop",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "controls",
+      "label": "Show Controls",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "video_width",
+      "label": "Max Width",
+      "min": 300,
+      "max": 1200,
+      "step": 50,
+      "default": 600,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "video_height",
+      "label": "Max Height",
+      "min": 200,
+      "max": 800,
+      "step": 50,
+      "default": 400,
+      "unit": "px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Video",
+      "settings": {
+        "controls": true,
+        "muted": true,
+        "video_width": 600,
+        "video_height": 400
+      }
+    }
+  ]
+}
+{% endschema %}
