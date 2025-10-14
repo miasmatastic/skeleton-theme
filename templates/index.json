@@ -1,5 +1,13 @@
 {
   "sections": {
+    "hero": {
+      "type": "custom-hero",
+      "settings": {
+        "title": "Welcome to Our Store",
+        "subtitle": "Discover your favorites today",
+        "button_text": "Shop Now"
+      }
+    },
     "main": {
       "type": "hello-world",
       "settings": {}
@@ -10,6 +18,7 @@
     }
   },
   "order": [
+    "hero",
     "main",
     "lifestyle"
   ]
