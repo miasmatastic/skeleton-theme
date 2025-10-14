@@ -132,10 +132,7 @@ Features: Multi-row layout, advanced positioning, search integration, localizati
     </div>
   {% endif %}
 
-  <!-- Search Modal (when search_style is 'modal') -->
-  {% if section.settings.search_style == 'modal' %}
-    {% render 'header-search-modal' %}
-  {% endif %}
+  <!-- Search Modal is handled within header-search snippet -->
 
   <!-- Mobile Navigation Drawer -->
   {% render 'header-mobile-drawer',
@@ -233,6 +230,21 @@ Features: Multi-row layout, advanced positioning, search integration, localizati
     {% endunless %}
   }
 
+  /* Mobile Responsive for Row 2 */
+  @media (max-width: 768px) {
+    :root { 
+      --header-height-row1: {{ section.settings.row1_height_mobile | default: 60 }}px;
+      --header-spacing: {{ section.settings.element_spacing_mobile | default: 12 }}px;
+      --header-padding-x: {{ section.settings.padding_horizontal_mobile | default: 16 }}px;
+    }
+
+    {% unless section.settings.show_row2_mobile %}
+      .header-row-2 {
+        display: none;
+      }
+    {% endunless %}
+  }
+
   {% if section.settings.custom_header_css != blank %}
     {{ section.settings.custom_header_css }}
   {% endif %}
@@ -316,12 +328,6 @@ Features: Multi-row layout, advanced positioning, search integration, localizati
 
   /* Mobile Responsive */
   @media (max-width: 768px) {
-    :root {
-      --header-height-row1: {{ section.settings.row1_height_mobile | default: 60 }}px;
-      --header-spacing: {{ section.settings.element_spacing_mobile | default: 12 }}px;
-      --header-padding-x: {{ section.settings.padding_horizontal_mobile | default: 16 }}px;
-    }
-
     .header__primary-nav,
     .header__secondary-nav {
       display: none;
@@ -330,7 +336,6 @@ Features: Multi-row layout, advanced positioning, search integration, localizati
     .header__mobile-toggle {
       display: flex;
     }
-
 
     .header__utilities {
       gap: calc(var(--header-spacing) * 0.5);
@@ -677,6 +682,31 @@ document.addEventListener('DOMContentLoaded', () => {
         { "value": "right", "label": "Right" }
       ],
       "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "utilities_position_row1",
+      "label": "Utilities Position (Row 1)",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "right",
+      "info": "Position of search, cart, and account icons"
+    },
+    {
+      "type": "select",
+      "id": "utilities_position_row2",
+      "label": "Utilities Position (Row 2)",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "right",
+      "info": "Position of utilities in row 2 when enabled",
+      "visible_if": "{{ section.settings.enable_row_2 }}"
     },
     {
       "type": "select",
