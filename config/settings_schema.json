@@ -97,6 +97,77 @@
     ]
   },
   {
+    "name": "Color Schemes",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Color Scheme 1"
+      },
+      {
+        "type": "color",
+        "id": "scheme1_background",
+        "default": "#FFFFFF",
+        "label": "Background"
+      },
+      {
+        "type": "color",
+        "id": "scheme1_text",
+        "default": "#333333",
+        "label": "Text"
+      },
+      {
+        "type": "color",
+        "id": "scheme1_accent",
+        "default": "#007bff",
+        "label": "Accent"
+      },
+      {
+        "type": "header",
+        "content": "Color Scheme 2"
+      },
+      {
+        "type": "color",
+        "id": "scheme2_background",
+        "default": "#F8F9FA",
+        "label": "Background"
+      },
+      {
+        "type": "color",
+        "id": "scheme2_text",
+        "default": "#212529",
+        "label": "Text"
+      },
+      {
+        "type": "color",
+        "id": "scheme2_accent",
+        "default": "#28A745",
+        "label": "Accent"
+      },
+      {
+        "type": "header",
+        "content": "Color Scheme 3"
+      },
+      {
+        "type": "color",
+        "id": "scheme3_background",
+        "default": "#343A40",
+        "label": "Background"
+      },
+      {
+        "type": "color",
+        "id": "scheme3_text",
+        "default": "#FFFFFF",
+        "label": "Text"
+      },
+      {
+        "type": "color",
+        "id": "scheme3_accent",
+        "default": "#FFC107",
+        "label": "Accent"
+      }
+    ]
+  },
+  {
     "name": "Enhanced Features",
     "settings": [
       {

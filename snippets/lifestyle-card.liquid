@@ -330,32 +330,88 @@
     outline-offset: 4px;
   }
   
-  /* Responsive adjustments */
+  /* Responsive adjustments - Scale content instead of breaking layout */
   @media screen and (max-width: 768px) {
     .lifestyle-card {
-      min-height: 220px;
+      min-height: calc(var(--card-height) * 0.85);
     }
     
     .lifestyle-card__content {
-      padding: 1.5rem;
+      padding: 1.5rem 1rem;
     }
     
     .lifestyle-card__title {
       font-size: calc(var(--title-size) * 0.8);
+      line-height: 1.1;
+    }
+    
+    .lifestyle-card__button {
+      padding: 0.6rem 1.2rem;
+      font-size: 0.8rem;
     }
   }
   
   @media screen and (max-width: 480px) {
     .lifestyle-card {
-      min-height: 200px;
+      min-height: calc(var(--card-height) * 0.7);
     }
     
     .lifestyle-card__content {
-      padding: 1rem;
+      padding: 1rem 0.5rem;
     }
     
     .lifestyle-card__title {
-      font-size: calc(var(--title-size) * 0.7);
+      font-size: calc(var(--title-size) * 0.65);
+      line-height: 1.0;
+      margin-bottom: 0.5rem;
+    }
+    
+    .lifestyle-card__subtitle {
+      font-size: 0.7rem;
+      margin-bottom: 0.25rem;
+    }
+    
+    .lifestyle-card__description {
+      font-size: 0.7rem;
+      margin-bottom: 0.75rem;
+    }
+    
+    .lifestyle-card__button {
+      padding: 0.5rem 1rem;
+      font-size: 0.7rem;
+    }
+  }
+  
+  /* Ultra small screens - minimum viable content */
+  @media screen and (max-width: 360px) {
+    .lifestyle-card {
+      min-height: calc(var(--card-height) * 0.6);
+    }
+    
+    .lifestyle-card__content {
+      padding: 0.75rem 0.25rem;
+    }
+    
+    .lifestyle-card__title {
+      font-size: calc(var(--title-size) * 0.5);
+      line-height: 0.9;
+      margin-bottom: 0.25rem;
+    }
+    
+    .lifestyle-card__subtitle {
+      font-size: 0.6rem;
+      margin-bottom: 0.1rem;
+    }
+    
+    .lifestyle-card__description {
+      font-size: 0.6rem;
+      margin-bottom: 0.5rem;
+      display: none; /* Hide description on very small screens */
+    }
+    
+    .lifestyle-card__button {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.6rem;
     }
   }
   

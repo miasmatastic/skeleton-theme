@@ -278,6 +278,7 @@ Features: Multi-row layout, advanced positioning, search integration, localizati
     align-items: center;
     gap: var(--header-spacing);
     height: var(--header-height-row1);
+    position: relative; /* Needed for absolute positioning of centered logo */
   }
 
   /* Header Rows */
@@ -288,9 +289,21 @@ Features: Multi-row layout, advanced positioning, search integration, localizati
     flex-shrink: 0;
   }
 
-  .header__logo--left { order: 1; }
-  .header__logo--center { order: 2; flex: 1; text-align: center; }
-  .header__logo--right { order: 3; margin-left: auto; }
+  .header__logo--left { 
+    order: 1; 
+    margin-right: auto; 
+  }
+  .header__logo--center { 
+    order: 2; 
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+  }
+  .header__logo--right { 
+    order: 3; 
+    margin-left: auto; 
+  }
 
   /* Navigation Positioning */
   .header__primary-nav,

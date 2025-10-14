@@ -169,6 +169,14 @@
     grid-template-columns: repeat(5, 1fr);
     gap: var(--gap-size);
     align-items: stretch;
+    /* Ensure grid never wraps and cards scale down instead */
+    min-width: 0; /* Allow grid items to shrink below their content size */
+  }
+  
+  /* Ensure cards can shrink properly */
+  .lifestyle-card {
+    min-width: 0; /* Allow cards to shrink below their content size */
+    overflow: hidden; /* Prevent content overflow on small screens */
   }
   
   /* Placeholder Cards */
@@ -239,10 +247,11 @@
     transform: translateY(-2px);
   }
   
-  /* Responsive Design */
+  /* Responsive Design - Scale down instead of dropping cards */
   @media screen and (max-width: 1200px) {
     .lifestyle-showcase__grid {
-      grid-template-columns: repeat(4, 1fr);
+      /* Keep 5 columns but allow smaller gap */
+      gap: calc(var(--gap-size) * 0.75);
     }
     
     .lifestyle-showcase .container {
@@ -252,7 +261,8 @@
   
   @media screen and (max-width: 990px) {
     .lifestyle-showcase__grid {
-      grid-template-columns: repeat(3, 1fr);
+      /* Keep 5 columns but with smaller gap */
+      gap: calc(var(--gap-size) * 0.5);
     }
     
     .lifestyle-showcase__header {
@@ -262,11 +272,12 @@
   
   @media screen and (max-width: 768px) {
     .lifestyle-showcase__grid {
-      grid-template-columns: repeat(var(--mobile-columns), 1fr);
+      /* Still keep 5 columns on mobile, with minimal gap */
+      gap: calc(var(--gap-size) * 0.4);
     }
     
     .lifestyle-showcase .container {
-      padding: 0 1rem;
+      padding: 0 0.75rem;
     }
     
     .lifestyle-showcase__header {
@@ -276,12 +287,27 @@
   
   @media screen and (max-width: 480px) {
     .lifestyle-showcase__grid {
-      grid-template-columns: 1fr;
-      gap: calc(var(--gap-size) * 0.75);
+      /* Force minimum viable size while keeping 5 columns */
+      gap: calc(var(--gap-size) * 0.25);
+    }
+    
+    .lifestyle-showcase .container {
+      padding: 0 0.5rem;
     }
     
     .lifestyle-showcase {
       padding: calc(var(--section-padding-top) * 0.7) 0 calc(var(--section-padding-bottom) * 0.7);
+    }
+  }
+  
+  /* Ultra small screens - absolute minimum */
+  @media screen and (max-width: 360px) {
+    .lifestyle-showcase__grid {
+      gap: 4px; /* Minimum gap */
+    }
+    
+    .lifestyle-showcase .container {
+      padding: 0 0.25rem;
     }
   }
   

@@ -1,0 +1,588 @@
+{% comment %}
+  Custom Hero Section
+  Enhanced hero section with advanced customization options
+  
+  Features:
+  - Responsive background images (desktop/mobile)
+  - Overlay system with color and gradient support
+  - Advanced typography controls with custom fonts
+  - Drop shadow effects for all text elements
+  - Flexible alignment options
+  - Custom button styling
+{% endcomment %}
+
+{% style %}
+  {{ section.settings.title_font_family | font_face: font_display: 'swap' }}
+  {{ section.settings.subtitle_font_family | font_face: font_display: 'swap' }}
+  {{ section.settings.paragraph_font_family | font_face: font_display: 'swap' }}
+  {{ section.settings.button_font_family | font_face: font_display: 'swap' }}
+
+  .custom-hero-section {
+    min-height: {{ section.settings.min_height }};
+    display: flex;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: {{ section.settings.text_color }};
+    position: relative;
+    flex-direction: column;
+    {% if section.settings.vertical_alignment == 'top' %}
+      justify-content: flex-start;
+    {% elsif section.settings.vertical_alignment == 'center' %}
+      justify-content: center;
+    {% elsif section.settings.vertical_alignment == 'bottom' %}
+      justify-content: flex-end;
+    {% endif %}
+  }
+
+  @media (max-width: 749px) {
+    .custom-hero-section {
+      {% if section.settings.bg_image_mobile %}
+        background-image: url('{{ section.settings.bg_image_mobile | image_url: width: 1500 }}');
+      {% elsif section.settings.bg_image_desktop %}
+        background-image: url('{{ section.settings.bg_image_desktop | image_url: width: 1500 }}');
+      {% endif %}
+    }
+  }
+
+  @media (min-width: 750px) {
+    .custom-hero-section {
+      {% if section.settings.bg_image_desktop %}
+        background-image: url('{{ section.settings.bg_image_desktop | image_url: width: 2000 }}');
+      {% endif %}
+    }
+  }
+
+  .custom-hero-overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .custom-hero-overlay__color {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: {{ section.settings.overlay_color }};
+    opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  {% if section.settings.gradient_overlay != blank %}
+    .custom-hero-overlay__gradient {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: {{ section.settings.gradient_overlay }};
+      opacity: {{ section.settings.gradient_opacity | divided_by: 100.0 }};
+      z-index: 3;
+      pointer-events: none;
+    }
+  {% endif %}
+
+  .custom-hero-content {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 10;
+    {% if section.settings.content_alignment == 'left' %}
+      align-items: flex-start;
+      text-align: left;
+    {% elsif section.settings.content_alignment == 'center' %}
+      align-items: center;
+      text-align: center;
+    {% elsif section.settings.content_alignment == 'right' %}
+      align-items: flex-end;
+      text-align: right;
+    {% endif %}
+    padding: {{ section.settings.text_padding | default: '2rem' }};
+    margin: {{ section.settings.text_margin | default: '0' }};
+  }
+
+  .custom-hero-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: {{ section.settings.text_color }};
+    {% if section.settings.title_font_family %}
+      font-family: {{ section.settings.title_font_family.family }}, {{ section.settings.title_font_family.fallback_families }};
+      font-weight: {{ section.settings.title_font_family.weight }};
+      font-style: {{ section.settings.title_font_family.style }};
+    {% endif %}
+    filter: drop-shadow({{ section.settings.title_shadow_x | default: '1px' }} {{ section.settings.title_shadow_y | default: '1px' }} {{ section.settings.title_shadow_blur | default: '5px' }} {{ section.settings.title_shadow_color | default: '#000000' }});
+    line-height: 1.2;
+  }
+
+  .custom-hero-subtitle {
+    font-size: clamp(1.2rem, 3vw, 1.8rem);
+    margin-bottom: 1rem;
+    color: {{ section.settings.text_color }};
+    {% if section.settings.subtitle_font_family %}
+      font-family: {{ section.settings.subtitle_font_family.family }}, {{ section.settings.subtitle_font_family.fallback_families }};
+      font-weight: {{ section.settings.subtitle_font_family.weight }};
+      font-style: {{ section.settings.subtitle_font_family.style }};
+    {% endif %}
+    filter: drop-shadow({{ section.settings.subtitle_shadow_x | default: '1px' }} {{ section.settings.subtitle_shadow_y | default: '1px' }} {{ section.settings.subtitle_shadow_blur | default: '5px' }} {{ section.settings.subtitle_shadow_color | default: '#000000' }});
+    line-height: 1.3;
+  }
+
+  .custom-hero-paragraph {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    margin-bottom: 2rem;
+    color: {{ section.settings.text_color }};
+    max-width: 600px;
+    {% if section.settings.paragraph_font_family %}
+      font-family: {{ section.settings.paragraph_font_family.family }}, {{ section.settings.paragraph_font_family.fallback_families }};
+      font-weight: {{ section.settings.paragraph_font_family.weight }};
+      font-style: {{ section.settings.paragraph_font_family.style }};
+    {% endif %}
+    filter: drop-shadow({{ section.settings.paragraph_shadow_x | default: '1px' }} {{ section.settings.paragraph_shadow_y | default: '1px' }} {{ section.settings.paragraph_shadow_blur | default: '5px' }} {{ section.settings.paragraph_shadow_color | default: '#000000' }});
+    line-height: 1.5;
+  }
+
+  .custom-hero-btn {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background: {{ section.settings.button_bg_color }};
+    color: {{ section.settings.button_text_color }};
+    border-radius: 3rem;
+    font-size: 1.1rem;
+    text-decoration: none;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+    {% if section.settings.button_font_family %}
+      font-family: {{ section.settings.button_font_family.family }}, {{ section.settings.button_font_family.fallback_families }};
+      font-weight: {{ section.settings.button_font_family.weight }};
+      font-style: {{ section.settings.button_font_family.style }};
+    {% endif %}
+    filter: drop-shadow({{ section.settings.button_shadow_x | default: '1px' }} {{ section.settings.button_shadow_y | default: '1px' }} {{ section.settings.button_shadow_blur | default: '5px' }} {{ section.settings.button_shadow_color | default: '#000000' }});
+    {{ section.settings.button_custom_style }}
+  }
+
+  .custom-hero-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .custom-hero-content {
+      padding: 1.5rem;
+    }
+
+    .custom-hero-title {
+      margin-bottom: 0.75rem;
+    }
+
+    .custom-hero-subtitle {
+      margin-bottom: 1rem;
+    }
+
+    .custom-hero-paragraph {
+      margin-bottom: 1.5rem;
+    }
+
+    .custom-hero-btn {
+      padding: 0.875rem 2rem;
+      font-size: 1rem;
+    }
+  }
+
+  /* Accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    .custom-hero-btn {
+      transition: none;
+    }
+    
+    .custom-hero-btn:hover {
+      transform: none;
+    }
+  }
+
+  /* High contrast mode */
+  @media (prefers-contrast: high) {
+    .custom-hero-btn {
+      border: 2px solid currentColor;
+    }
+  }
+{% endstyle %}
+
+<section class="custom-hero-section" id="custom-hero-{{ section.id }}">
+  <div class="custom-hero-overlay">
+    <div class="custom-hero-overlay__color"></div>
+    {% if section.settings.gradient_overlay != blank %}
+      <div class="custom-hero-overlay__gradient"></div>
+    {% endif %}
+  </div>
+  
+  <div class="custom-hero-content">
+    {% if section.settings.title != blank %}
+      <h1 class="custom-hero-title">{{ section.settings.title }}</h1>
+    {% endif %}
+    
+    {% if section.settings.subtitle != blank %}
+      <div class="custom-hero-subtitle">{{ section.settings.subtitle }}</div>
+    {% endif %}
+    
+    {% if section.settings.paragraph != blank %}
+      <div class="custom-hero-paragraph">{{ section.settings.paragraph }}</div>
+    {% endif %}
+    
+    {% if section.settings.button_text != blank and section.settings.button_url != blank %}
+      <a class="custom-hero-btn" 
+         href="{{ section.settings.button_url }}" 
+         {% if section.settings.button_url contains 'http' %}target="_blank" rel="noopener"{% endif %}
+         style="{{ section.settings.button_custom_style }}">
+        {{ section.settings.button_text }}
+      </a>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Custom Hero",
+  "class": "custom-hero-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "🖼️ Background Images"
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image_desktop",
+      "label": "Background Image (Desktop)"
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image_mobile",
+      "label": "Background Image (Mobile)"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Overlay Effects"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay Color",
+      "default": "#000000",
+      "info": "Solid color overlay that sits above the background image."
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay Opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 40,
+      "info": "0 = fully transparent, 100 = fully opaque"
+    },
+    {
+      "type": "text",
+      "id": "gradient_overlay",
+      "label": "Gradient Overlay CSS",
+      "default": "",
+      "info": "CSS gradient above overlay color, e.g. linear-gradient(135deg, #000000 0%, #ffffff 100%). Leave blank for none."
+    },
+    {
+      "type": "range",
+      "id": "gradient_opacity",
+      "label": "Gradient Overlay Opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 50,
+      "info": "0 = fully transparent, 100 = fully opaque"
+    },
+    {
+      "type": "header",
+      "content": "📐 Layout & Alignment"
+    },
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "label": "Content Alignment (Horizontal)",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "vertical_alignment",
+      "label": "Content Alignment (Vertical)",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "text",
+      "id": "min_height",
+      "label": "Section Min Height",
+      "default": "60vh",
+      "info": "e.g. 60vh, 400px, 100%"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Colors"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "Button Background Color",
+      "default": "#1db954"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "✏️ Typography"
+    },
+    {
+      "type": "font_picker",
+      "id": "title_font_family",
+      "label": "Title Font",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "font_picker",
+      "id": "subtitle_font_family",
+      "label": "Subtitle Font",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "font_picker",
+      "id": "paragraph_font_family",
+      "label": "Paragraph Font",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "font_picker",
+      "id": "button_font_family",
+      "label": "Button Font",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "header",
+      "content": "📝 Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Welcome to Our Store"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Discover your favorites today."
+    },
+    {
+      "type": "textarea",
+      "id": "paragraph",
+      "label": "Paragraph",
+      "default": "Shop our collection and find something you'll love. Great deals and new arrivals every week."
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "button_url",
+      "label": "Button URL"
+    },
+    {
+      "type": "text",
+      "id": "button_custom_style",
+      "label": "Button Custom CSS",
+      "default": "",
+      "info": "Any extra CSS for the button, including hover styles. Example: transition: background 0.3s;"
+    },
+    {
+      "type": "header",
+      "content": "🌟 Drop Shadows - Title"
+    },
+    {
+      "type": "text",
+      "id": "title_shadow_x",
+      "label": "Title Drop Shadow X Distance",
+      "default": "1px"
+    },
+    {
+      "type": "text",
+      "id": "title_shadow_y",
+      "label": "Title Drop Shadow Y Distance",
+      "default": "1px"
+    },
+    {
+      "type": "text",
+      "id": "title_shadow_blur",
+      "label": "Title Drop Shadow Blur",
+      "default": "5px"
+    },
+    {
+      "type": "color",
+      "id": "title_shadow_color",
+      "label": "Title Drop Shadow Color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "🌟 Drop Shadows - Subtitle"
+    },
+    {
+      "type": "text",
+      "id": "subtitle_shadow_x",
+      "label": "Subtitle Drop Shadow X Distance",
+      "default": "1px"
+    },
+    {
+      "type": "text",
+      "id": "subtitle_shadow_y",
+      "label": "Subtitle Drop Shadow Y Distance",
+      "default": "1px"
+    },
+    {
+      "type": "text",
+      "id": "subtitle_shadow_blur",
+      "label": "Subtitle Drop Shadow Blur",
+      "default": "5px"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_shadow_color",
+      "label": "Subtitle Drop Shadow Color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "🌟 Drop Shadows - Paragraph"
+    },
+    {
+      "type": "text",
+      "id": "paragraph_shadow_x",
+      "label": "Paragraph Drop Shadow X Distance",
+      "default": "1px"
+    },
+    {
+      "type": "text",
+      "id": "paragraph_shadow_y",
+      "label": "Paragraph Drop Shadow Y Distance",
+      "default": "1px"
+    },
+    {
+      "type": "text",
+      "id": "paragraph_shadow_blur",
+      "label": "Paragraph Drop Shadow Blur",
+      "default": "5px"
+    },
+    {
+      "type": "color",
+      "id": "paragraph_shadow_color",
+      "label": "Paragraph Drop Shadow Color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "🌟 Drop Shadows - Button"
+    },
+    {
+      "type": "text",
+      "id": "button_shadow_x",
+      "label": "Button Drop Shadow X Distance",
+      "default": "1px"
+    },
+    {
+      "type": "text",
+      "id": "button_shadow_y",
+      "label": "Button Drop Shadow Y Distance",
+      "default": "1px"
+    },
+    {
+      "type": "text",
+      "id": "button_shadow_blur",
+      "label": "Button Drop Shadow Blur",
+      "default": "5px"
+    },
+    {
+      "type": "color",
+      "id": "button_shadow_color",
+      "label": "Button Drop Shadow Color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "📏 Spacing"
+    },
+    {
+      "type": "text",
+      "id": "text_padding",
+      "label": "Text Padding",
+      "default": "2rem",
+      "info": "e.g. 2rem 0 2rem 0"
+    },
+    {
+      "type": "text",
+      "id": "text_margin",
+      "label": "Text Margin",
+      "default": "0",
+      "info": "e.g. 0 auto 0 auto"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Hero",
+      "category": "Hero",
+      "settings": {
+        "title": "Welcome to Our Store",
+        "subtitle": "Discover your favorites today.",
+        "paragraph": "Shop our collection and find something you'll love. Great deals and new arrivals every week.",
+        "button_text": "Shop Now",
+        "bg_image_desktop": "",
+        "overlay_color": "#000000",
+        "overlay_opacity": 40,
+        "text_color": "#ffffff",
+        "button_bg_color": "#1db954",
+        "button_text_color": "#ffffff",
+        "content_alignment": "center",
+        "vertical_alignment": "center",
+        "min_height": "60vh"
+      }
+    }
+  ]
+}
+{% endschema %}

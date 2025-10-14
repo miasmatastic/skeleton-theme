@@ -102,12 +102,14 @@
     line-height: 1.1;
     color: inherit;
     {% if use_custom_font %}
-      font-family: var(--font-heading-family, inherit);
+      font-family: var(--font-primary--family, inherit);
+    {% else %}
+      font-family: inherit;
     {% endif %}
   }
 
   .logo-text--custom {
-    font-family: var(--font-body-family, inherit);
+    font-family: var(--font-primary--family, inherit);
   }
 
   /* Mobile Responsive */

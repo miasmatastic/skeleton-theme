@@ -20,6 +20,19 @@
     --color-foreground: {{ settings.foreground_color }};
     --color-accent: {{ settings.accent_color | default: '#007bff' }};
     
+    /* Color Schemes */
+    --scheme-1-bg: {{ settings.scheme1_background | default: '#FFFFFF' }};
+    --scheme-1-text: {{ settings.scheme1_text | default: '#333333' }};
+    --scheme-1-accent: {{ settings.scheme1_accent | default: '#007bff' }};
+    
+    --scheme-2-bg: {{ settings.scheme2_background | default: '#F8F9FA' }};
+    --scheme-2-text: {{ settings.scheme2_text | default: '#212529' }};
+    --scheme-2-accent: {{ settings.scheme2_accent | default: '#28A745' }};
+    
+    --scheme-3-bg: {{ settings.scheme3_background | default: '#343A40' }};
+    --scheme-3-text: {{ settings.scheme3_text | default: '#FFFFFF' }};
+    --scheme-3-accent: {{ settings.scheme3_accent | default: '#FFC107' }};
+    
     /* Computed color variations */
     --color-foreground-rgb: {{ settings.foreground_color | color_extract: 'red' }}, {{ settings.foreground_color | color_extract: 'green' }}, {{ settings.foreground_color | color_extract: 'blue' }};
     --color-background-rgb: {{ settings.background_color | color_extract: 'red' }}, {{ settings.background_color | color_extract: 'green' }}, {{ settings.background_color | color_extract: 'blue' }};
@@ -68,5 +81,49 @@
     :root {
       --color-scheme: dark;
     }
+  }
+
+  /* Color Scheme Classes */
+  .color-scheme-1 {
+    background-color: var(--scheme-1-bg);
+    color: var(--scheme-1-text);
+  }
+  
+  .color-scheme-1 .accent {
+    color: var(--scheme-1-accent);
+  }
+  
+  .color-scheme-2 {
+    background-color: var(--scheme-2-bg);
+    color: var(--scheme-2-text);
+  }
+  
+  .color-scheme-2 .accent {
+    color: var(--scheme-2-accent);
+  }
+  
+  .color-scheme-3 {
+    background-color: var(--scheme-3-bg);
+    color: var(--scheme-3-text);
+  }
+  
+  .color-scheme-3 .accent {
+    color: var(--scheme-3-accent);
+  }
+
+  /* Scheme classes for sections */
+  .scheme-1 {
+    background-color: var(--scheme-1-bg);
+    color: var(--scheme-1-text);
+  }
+  
+  .scheme-2 {
+    background-color: var(--scheme-2-bg);
+    color: var(--scheme-2-text);
+  }
+  
+  .scheme-3 {
+    background-color: var(--scheme-3-bg);
+    color: var(--scheme-3-text);
   }
 {% endstyle %}
