@@ -143,6 +143,100 @@
           </div>
         {%- endif -%}
         
+        <!-- Badge Image Overlays -->
+        {%- comment -%} Sale Badge Image Overlay {%- endcomment -%}
+        {%- if badge_image_sale and badge_image_sale != blank -%}
+          {% render 'badge-overlay',
+             product: product_card_product,
+             badge_image: badge_image_sale,
+             badge_size: badge_image_sale_size | default: 'medium',
+             badge_position: badge_image_sale_position | default: 'top-right',
+             badge_opacity: badge_image_sale_opacity | default: 100,
+             badge_border_radius: badge_image_sale_border_radius | default: 0,
+             badge_shadow: badge_image_sale_shadow | default: 'subtle',
+             badge_animation: badge_image_sale_animation | default: 'none',
+             condition: 'sale',
+             alt_text: 'Sale Badge',
+             mobile_size: badge_image_sale_mobile_size | default: badge_image_sale_size,
+             z_index: 12
+          %}
+        {%- endif -%}
+        
+        {%- comment -%} New Product Badge Image Overlay {%- endcomment -%}
+        {%- if badge_image_new and badge_image_new != blank -%}
+          {% render 'badge-overlay',
+             product: product_card_product,
+             badge_image: badge_image_new,
+             badge_size: badge_image_new_size | default: 'medium',
+             badge_position: badge_image_new_position | default: 'top-left',
+             badge_opacity: badge_image_new_opacity | default: 100,
+             badge_border_radius: badge_image_new_border_radius | default: 0,
+             badge_shadow: badge_image_new_shadow | default: 'subtle',
+             badge_animation: badge_image_new_animation | default: 'fade-in',
+             condition: 'new',
+             new_days: badge_image_new_days | default: 30,
+             alt_text: 'New Product',
+             mobile_size: badge_image_new_mobile_size | default: badge_image_new_size,
+             z_index: 11
+          %}
+        {%- endif -%}
+        
+        {%- comment -%} Featured Product Badge Image Overlay {%- endcomment -%}
+        {%- if badge_image_featured and badge_image_featured != blank -%}
+          {% render 'badge-overlay',
+             product: product_card_product,
+             badge_image: badge_image_featured,
+             badge_size: badge_image_featured_size | default: 'medium',
+             badge_position: badge_image_featured_position | default: 'bottom-right',
+             badge_opacity: badge_image_featured_opacity | default: 100,
+             badge_border_radius: badge_image_featured_border_radius | default: 0,
+             badge_shadow: badge_image_featured_shadow | default: 'subtle',
+             badge_animation: badge_image_featured_animation | default: 'none',
+             condition: 'featured',
+             alt_text: 'Featured Product',
+             mobile_size: badge_image_featured_mobile_size | default: badge_image_featured_size,
+             z_index: 10
+          %}
+        {%- endif -%}
+        
+        {%- comment -%} Low Stock Badge Image Overlay {%- endcomment -%}
+        {%- if badge_image_low_stock and badge_image_low_stock != blank -%}
+          {% render 'badge-overlay',
+             product: product_card_product,
+             badge_image: badge_image_low_stock,
+             badge_size: badge_image_low_stock_size | default: 'small',
+             badge_position: badge_image_low_stock_position | default: 'bottom-left',
+             badge_opacity: badge_image_low_stock_opacity | default: 90,
+             badge_border_radius: badge_image_low_stock_border_radius | default: 0,
+             badge_shadow: badge_image_low_stock_shadow | default: 'medium',
+             badge_animation: badge_image_low_stock_animation | default: 'pulse',
+             condition: 'low-stock',
+             alt_text: 'Low Stock',
+             mobile_size: badge_image_low_stock_mobile_size | default: badge_image_low_stock_size,
+             z_index: 13
+          %}
+        {%- endif -%}
+        
+        {%- comment -%} Custom Badge Image Overlay (Always Show) {%- endcomment -%}
+        {%- if badge_image_custom and badge_image_custom != blank -%}
+          {% render 'badge-overlay',
+             product: product_card_product,
+             badge_image: badge_image_custom,
+             badge_size: badge_image_custom_size | default: 'medium',
+             badge_position: badge_image_custom_position | default: 'center',
+             badge_opacity: badge_image_custom_opacity | default: 100,
+             badge_border_radius: badge_image_custom_border_radius | default: 0,
+             badge_shadow: badge_image_custom_shadow | default: 'subtle',
+             badge_animation: badge_image_custom_animation | default: 'none',
+             condition: 'always',
+             alt_text: badge_image_custom_alt | default: 'Custom Badge',
+             mobile_size: badge_image_custom_mobile_size | default: badge_image_custom_size,
+             custom_width: badge_image_custom_width,
+             custom_height: badge_image_custom_height,
+             z_index: 9
+          %}
+        {%- endif -%}
+        
         <!-- Default Sale/Sold Out Badges -->
         {%- if on_sale and settings.badge_sale -%}
           <span class="card-product-dynamic__badge card-product-dynamic__badge--sale">

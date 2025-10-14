@@ -1,0 +1,383 @@
+{% comment %}
+  Lifestyle Card Component
+  
+  Renders an individual card for the 5-up lifestyle showcase section.
+  Supports custom backgrounds, overlay images, flexible linking, and comprehensive styling.
+  
+  Parameters:
+  - card_settings: Object containing all card configuration
+  - card_index: Number for unique identification
+  - section_settings: Global section settings
+  
+  Usage:
+  {% render 'lifestyle-card', card_settings: block.settings, card_index: forloop.index, section_settings: section.settings %}
+{% endcomment %}
+
+{% liquid
+  assign card_id = 'lifestyle-card-' | append: card_index
+  assign card_class = 'lifestyle-card lifestyle-card--' | append: card_index
+  
+  # Determine link URL based on link type
+  case card_settings.link_type
+    when 'product'
+      assign card_url = card_settings.link_product.url
+    when 'collection'
+      assign card_url = card_settings.link_collection.url
+    when 'page'
+      assign card_url = card_settings.link_page.url
+    when 'url'
+      assign card_url = card_settings.link_url
+    else
+      assign card_url = '#'
+  endcase
+  
+  # Background type handling
+  assign background_style = ''
+  case card_settings.background_type
+    when 'color'
+      assign background_style = 'background-color: ' | append: card_settings.background_color | append: ';'
+    when 'gradient'
+      assign gradient_direction = card_settings.gradient_direction | default: 'diagonal'
+      case gradient_direction
+        when 'horizontal'
+          assign gradient_angle = 'to right'
+        when 'vertical'
+          assign gradient_angle = 'to bottom'
+        when 'radial'
+          assign gradient_angle = 'radial-gradient(circle'
+        else
+          assign gradient_angle = '135deg'
+      endcase
+      
+      if gradient_direction == 'radial'
+        assign background_style = 'background: radial-gradient(circle, ' | append: card_settings.gradient_color_1 | append: ', ' | append: card_settings.gradient_color_2 | append: ');'
+      else
+        assign background_style = 'background: linear-gradient(' | append: gradient_angle | append: ', ' | append: card_settings.gradient_color_1 | append: ', ' | append: card_settings.gradient_color_2 | append: ');'
+      endif
+    when 'image'
+      if card_settings.background_image != blank
+        assign bg_position = card_settings.background_position | default: 'center'
+        assign background_style = 'background-image: url(' | append: card_settings.background_image | image_url: width: 800 | append: '); background-size: cover; background-position: ' | append: bg_position | append: '; background-repeat: no-repeat;'
+      endif
+  endcase
+  
+  # Overlay styling
+  assign overlay_style = ''
+  if card_settings.overlay_image != blank
+    assign overlay_position = card_settings.overlay_position | default: 'center'
+    assign overlay_size = card_settings.overlay_size | default: 50
+    assign overlay_opacity = card_settings.overlay_opacity | default: 100
+    
+    assign overlay_style = 'background-image: url(' | append: card_settings.overlay_image | image_url: width: 400 | append: '); opacity: ' | append: overlay_opacity | divided_by: 100.0 | append: '; background-size: ' | append: overlay_size | append: '%; background-position: '
+    
+    case overlay_position
+      when 'top-left'
+        assign overlay_style = overlay_style | append: 'top left'
+      when 'top-right'
+        assign overlay_style = overlay_style | append: 'top right'
+      when 'bottom-left'
+        assign overlay_style = overlay_style | append: 'bottom left'
+      when 'bottom-right'
+        assign overlay_style = overlay_style | append: 'bottom right'
+      else
+        assign overlay_style = overlay_style | append: 'center'
+    endcase
+    
+    assign overlay_style = overlay_style | append: '; background-repeat: no-repeat;'
+  endif
+  
+  # Text styling
+  assign text_alignment = card_settings.text_alignment | default: 'center'
+  assign title_size = card_settings.title_size | default: 24
+  assign title_weight = card_settings.title_weight | default: 700
+  assign text_color = card_settings.text_color | default: '#ffffff'
+  
+  # Border and shadow styling
+  assign border_style = ''
+  if card_settings.border_style != 'none' and card_settings.border_width > 0
+    assign border_width = card_settings.border_width | default: 1
+    assign border_color = card_settings.border_color | default: '#e0e0e0'
+    assign border_style = 'border: ' | append: border_width | append: 'px ' | append: card_settings.border_style | append: ' ' | append: border_color | append: ';'
+  endif
+  
+  assign border_radius = card_settings.border_radius | default: 8
+  assign shadow_blur = card_settings.shadow_blur | default: 0
+  assign shadow_color = card_settings.shadow_color | default: 'rgba(0,0,0,0.1)'
+  
+  assign box_shadow = ''
+  if shadow_blur > 0
+    assign box_shadow = 'box-shadow: 0 4px ' | append: shadow_blur | append: 'px ' | append: shadow_color | append: ';'
+  endif
+%}
+
+<div 
+  id="{{ card_id }}"
+  class="{{ card_class }}"
+  data-card-index="{{ card_index }}"
+  style="
+    {{ background_style }}
+    {{ border_style }}
+    border-radius: {{ border_radius }}px;
+    {{ box_shadow }}
+    --text-color: {{ text_color }};
+    --text-alignment: {{ text_alignment }};
+    --title-size: {{ title_size }}px;
+    --title-weight: {{ title_weight }};
+  "
+  role="article"
+  aria-labelledby="{{ card_id }}-title"
+>
+  {% comment %} Overlay Image Layer {% endcomment %}
+  {% if card_settings.overlay_image != blank %}
+    <div 
+      class="lifestyle-card__overlay-image"
+      style="{{ overlay_style }}"
+      aria-hidden="true"
+    ></div>
+  {% endif %}
+  
+  {% comment %} Gradient Overlay Layer {% endcomment %}
+  {% if card_settings.gradient_overlay %}
+    <div 
+      class="lifestyle-card__gradient-overlay"
+      style="
+        background: {{ card_settings.gradient_overlay_color | default: 'rgba(0,0,0,0.3)' }};
+        opacity: {{ card_settings.gradient_overlay_opacity | default: 50 | divided_by: 100.0 }};
+      "
+      aria-hidden="true"
+    ></div>
+  {% endif %}
+  
+  {% comment %} Content Layer {% endcomment %}
+  <div class="lifestyle-card__content">
+    {% if card_settings.title != blank %}
+      <h3 
+        id="{{ card_id }}-title"
+        class="lifestyle-card__title"
+      >
+        {{ card_settings.title }}
+      </h3>
+    {% endif %}
+    
+    {% if card_settings.subtitle != blank %}
+      <p class="lifestyle-card__subtitle">
+        {{ card_settings.subtitle }}
+      </p>
+    {% endif %}
+    
+    {% if card_settings.description != blank %}
+      <div class="lifestyle-card__description">
+        {{ card_settings.description }}
+      </div>
+    {% endif %}
+    
+    {% if card_settings.button_text != blank and card_url != '#' %}
+      <div class="lifestyle-card__button-wrapper">
+        <span class="lifestyle-card__button">
+          {{ card_settings.button_text }}
+          <svg class="lifestyle-card__button-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8.146 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.793 8 8.146 5.354a.5.5 0 0 1 0-.708z"/>
+            <path d="M4.146 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L6.793 8 4.146 5.354a.5.5 0 0 1 0-.708z"/>
+          </svg>
+        </span>
+      </div>
+    {% endif %}
+  </div>
+  
+  {% comment %} Link Overlay {% endcomment %}
+  {% if card_url != '#' %}
+    <a 
+      href="{{ card_url }}"
+      class="lifestyle-card__link"
+      aria-label="{% if card_settings.title != blank %}{{ card_settings.title | escape }}{% else %}View more{% endif %}"
+      {% if card_settings.link_type == 'url' and card_settings.link_url contains 'http' %}
+        target="_blank"
+        rel="noopener noreferrer"
+      {% endif %}
+    >
+      <span class="visually-hidden">
+        {% if card_settings.title != blank %}
+          {{ card_settings.title | escape }}
+        {% else %}
+          View more
+        {% endif %}
+      </span>
+    </a>
+  {% endif %}
+</div>
+
+<style>
+  .lifestyle-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 280px;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: {% if card_url != '#' %}pointer{% else %}default{% endif %};
+  }
+  
+  .lifestyle-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+  }
+  
+  .lifestyle-card__overlay-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+  
+  .lifestyle-card__gradient-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    pointer-events: none;
+  }
+  
+  .lifestyle-card__content {
+    position: relative;
+    z-index: 3;
+    text-align: var(--text-alignment);
+    color: var(--text-color);
+    padding: 2rem;
+    width: 100%;
+  }
+  
+  .lifestyle-card__title {
+    font-size: var(--title-size);
+    font-weight: var(--title-weight);
+    color: inherit;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .lifestyle-card__subtitle {
+    font-size: 0.9em;
+    color: inherit;
+    opacity: 0.9;
+    margin: 0 0 1rem 0;
+    line-height: 1.4;
+  }
+  
+  .lifestyle-card__description {
+    font-size: 0.85em;
+    color: inherit;
+    opacity: 0.8;
+    margin: 0 0 1.5rem 0;
+    line-height: 1.5;
+  }
+  
+  .lifestyle-card__button-wrapper {
+    margin-top: auto;
+  }
+  
+  .lifestyle-card__button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255,255,255,0.2);
+    color: inherit;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+  
+  .lifestyle-card:hover .lifestyle-card__button {
+    background: rgba(255,255,255,0.3);
+    border-color: rgba(255,255,255,0.5);
+    transform: translateX(4px);
+  }
+  
+  .lifestyle-card__button-icon {
+    transition: transform 0.3s ease;
+  }
+  
+  .lifestyle-card:hover .lifestyle-card__button-icon {
+    transform: translateX(2px);
+  }
+  
+  .lifestyle-card__link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 4;
+    color: transparent;
+    text-decoration: none;
+  }
+  
+  .lifestyle-card__link:focus {
+    outline: 2px solid var(--text-color);
+    outline-offset: 4px;
+  }
+  
+  /* Responsive adjustments */
+  @media screen and (max-width: 768px) {
+    .lifestyle-card {
+      min-height: 220px;
+    }
+    
+    .lifestyle-card__content {
+      padding: 1.5rem;
+    }
+    
+    .lifestyle-card__title {
+      font-size: calc(var(--title-size) * 0.8);
+    }
+  }
+  
+  @media screen and (max-width: 480px) {
+    .lifestyle-card {
+      min-height: 200px;
+    }
+    
+    .lifestyle-card__content {
+      padding: 1rem;
+    }
+    
+    .lifestyle-card__title {
+      font-size: calc(var(--title-size) * 0.7);
+    }
+  }
+  
+  /* Accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    .lifestyle-card,
+    .lifestyle-card__button,
+    .lifestyle-card__button-icon {
+      transition: none;
+    }
+    
+    .lifestyle-card:hover {
+      transform: none;
+    }
+  }
+  
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .lifestyle-card__button {
+      border-width: 3px;
+      background: rgba(255,255,255,0.9);
+      color: #000;
+    }
+  }
+</style>

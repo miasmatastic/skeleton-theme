@@ -1,0 +1,283 @@
+{% doc %}
+  Renders a customizable badge image overlay for product cards.
+
+  @param {object} product - The product object
+  @param {string} badge_image - Badge image URL or object
+  @param {string} badge_size - Size option: 'small', 'medium', 'large', 'custom'
+  @param {string} badge_position - Position: 'top-left', 'top-right', 'bottom-left', 'bottom-right', 'center'
+  @param {number} badge_opacity - Opacity percentage (0-100)
+  @param {number} badge_border_radius - Border radius percentage (0-50)
+  @param {string} badge_shadow - Shadow intensity: 'none', 'subtle', 'medium', 'strong'
+  @param {string} badge_animation - Animation type: 'none', 'fade-in', 'slide-in', 'pulse'
+  @param {string} condition - Display condition: 'always', 'sale', 'new', 'featured', 'low-stock'
+  @param {number} new_days - Days to consider product "new" (default: 30)
+  @param {number} custom_width - Custom width in pixels (when badge_size is 'custom')
+  @param {number} custom_height - Custom height in pixels (when badge_size is 'custom')
+  @param {string} alt_text - Alternative text for accessibility
+  @param {string} mobile_size - Mobile-specific size override
+  @param {number} z_index - Z-index for layering (default: 10)
+
+  @example
+  {% render 'badge-overlay',
+     product: product,
+     badge_image: section.settings.sale_badge,
+     badge_size: 'medium',
+     badge_position: 'top-right',
+     condition: 'sale',
+     alt_text: 'On Sale'
+  %}
+{% enddoc %}
+
+{%- liquid
+  # Set default values
+  assign badge_size = badge_size | default: 'medium'
+  assign badge_position = badge_position | default: 'top-right'
+  assign badge_opacity = badge_opacity | default: 100
+  assign badge_border_radius = badge_border_radius | default: 0
+  assign badge_shadow = badge_shadow | default: 'subtle'
+  assign badge_animation = badge_animation | default: 'none'
+  assign condition = condition | default: 'always'
+  assign new_days = new_days | default: 30
+  assign z_index = z_index | default: 10
+  assign mobile_size = mobile_size | default: badge_size
+  
+  # Check if badge should be displayed based on condition
+  assign show_badge = false
+  
+  case condition
+    when 'always'
+      assign show_badge = true
+    when 'sale'
+      if product.compare_at_price > product.price
+        assign show_badge = true
+      endif
+    when 'new'
+      assign days_since_created = 'now' | date: '%s' | minus: product.created_at | date: '%s' | divided_by: 86400
+      if days_since_created <= new_days
+        assign show_badge = true
+      endif
+    when 'featured'
+      if product.tags contains 'featured' or product.metafields.custom.featured == true
+        assign show_badge = true
+      endif
+    when 'low-stock'
+      assign total_inventory = 0
+      for variant in product.variants
+        assign total_inventory = total_inventory | plus: variant.inventory_quantity
+      endfor
+      if total_inventory <= 5 and total_inventory > 0
+        assign show_badge = true
+      endif
+  endcase
+  
+  # Exit early if badge shouldn't be shown or no image provided
+  unless show_badge and badge_image != blank
+    break
+  endunless
+  
+  # Size calculations
+  assign size_map = '{"small": {"width": 24, "height": 24}, "medium": {"width": 32, "height": 32}, "large": {"width": 48, "height": 48}}'
+  assign size_data = size_map | parse_json
+  
+  if badge_size == 'custom'
+    assign badge_width = custom_width | default: 32
+    assign badge_height = custom_height | default: 32
+  else
+    assign badge_width = size_data[badge_size].width
+    assign badge_height = size_data[badge_size].height
+  endif
+  
+  # Mobile size calculations
+  if mobile_size != badge_size
+    if mobile_size == 'custom'
+      assign mobile_width = custom_width | default: 24
+      assign mobile_height = custom_height | default: 24
+    else
+      assign mobile_width = size_data[mobile_size].width
+      assign mobile_height = size_data[mobile_size].height
+    endif
+  else
+    assign mobile_width = badge_width
+    assign mobile_height = badge_height
+  endif
+  
+  # Position calculations
+  assign position_styles = ''
+  case badge_position
+    when 'top-left'
+      assign position_styles = 'top: 8px; left: 8px;'
+    when 'top-right'
+      assign position_styles = 'top: 8px; right: 8px;'
+    when 'bottom-left'
+      assign position_styles = 'bottom: 8px; left: 8px;'
+    when 'bottom-right'
+      assign position_styles = 'bottom: 8px; right: 8px;'
+    when 'center'
+      assign position_styles = 'top: 50%; left: 50%; transform: translate(-50%, -50%);'
+  endcase
+  
+  # Shadow styles
+  assign shadow_styles = ''
+  case badge_shadow
+    when 'subtle'
+      assign shadow_styles = 'box-shadow: 0 2px 4px rgba(0,0,0,0.1);'
+    when 'medium'
+      assign shadow_styles = 'box-shadow: 0 4px 8px rgba(0,0,0,0.15);'
+    when 'strong'
+      assign shadow_styles = 'box-shadow: 0 6px 12px rgba(0,0,0,0.2);'
+    when 'none'
+      assign shadow_styles = ''
+  endcase
+  
+  # Animation classes
+  assign animation_class = ''
+  case badge_animation
+    when 'fade-in'
+      assign animation_class = 'badge-fade-in'
+    when 'slide-in'
+      assign animation_class = 'badge-slide-in'
+    when 'pulse'
+      assign animation_class = 'badge-pulse'
+  endcase
+  
+  # Generate alt text if not provided
+  unless alt_text
+    case condition
+      when 'sale'
+        assign alt_text = 'Sale'
+      when 'new'
+        assign alt_text = 'New Product'
+      when 'featured'
+        assign alt_text = 'Featured'
+      when 'low-stock'
+        assign alt_text = 'Low Stock'
+      else
+        assign alt_text = 'Product Badge'
+    endcase
+  endunless
+-%}
+
+<div class="product-badge-overlay {{ animation_class }}"
+     style="
+       position: absolute;
+       {{ position_styles }}
+       width: {{ badge_width }}px;
+       height: {{ badge_height }}px;
+       opacity: {{ badge_opacity | divided_by: 100.0 }};
+       border-radius: {{ badge_border_radius }}%;
+       {{ shadow_styles }}
+       z-index: {{ z_index }};
+       pointer-events: none;
+     "
+     aria-hidden="true">
+  
+  {% if badge_image.url %}
+    <img src="{{ badge_image | image_url: width: badge_width, height: badge_height }}"
+         alt="{{ alt_text | escape }}"
+         width="{{ badge_width }}"
+         height="{{ badge_height }}"
+         loading="lazy"
+         style="
+           width: 100%;
+           height: 100%;
+           object-fit: contain;
+           border-radius: inherit;
+         ">
+  {% elsif badge_image %}
+    <img src="{{ badge_image | image_url: width: badge_width, height: badge_height }}"
+         alt="{{ alt_text | escape }}"
+         width="{{ badge_width }}"
+         height="{{ badge_height }}"
+         loading="lazy"
+         style="
+           width: 100%;
+           height: 100%;
+           object-fit: contain;
+           border-radius: inherit;
+         ">
+  {% endif %}
+</div>
+
+{% comment %} Mobile-specific sizing {% endcomment %}
+{% if mobile_width != badge_width or mobile_height != badge_height %}
+  <style>
+    @media screen and (max-width: 767px) {
+      .product-badge-overlay {
+        width: {{ mobile_width }}px !important;
+        height: {{ mobile_height }}px !important;
+      }
+    }
+  </style>
+{% endif %}
+
+{% stylesheet %}
+  .product-badge-overlay {
+    transition: opacity 0.3s ease;
+  }
+  
+  .badge-fade-in {
+    animation: badgeFadeIn 0.5s ease-out;
+  }
+  
+  .badge-slide-in {
+    animation: badgeSlideIn 0.5s ease-out;
+  }
+  
+  .badge-pulse {
+    animation: badgePulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes badgeFadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: var(--badge-opacity, 1);
+    }
+  }
+  
+  @keyframes badgeSlideIn {
+    from {
+      transform: translateX(-10px) translateY(-10px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0) translateY(0);
+      opacity: var(--badge-opacity, 1);
+    }
+  }
+  
+  @keyframes badgePulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+  
+  /* Ensure badge container positioning */
+  .product-card {
+    position: relative;
+  }
+  
+  .product-card__image-container {
+    position: relative;
+  }
+  
+  /* Accessibility improvements */
+  @media (prefers-reduced-motion: reduce) {
+    .badge-fade-in,
+    .badge-slide-in,
+    .badge-pulse {
+      animation: none;
+    }
+  }
+  
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .product-badge-overlay {
+      border: 2px solid currentColor;
+    }
+  }
+{% endstylesheet %}

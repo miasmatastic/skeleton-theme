@@ -799,6 +799,141 @@
     },
     {
       "type": "header",
+      "content": "🖼️ Badge Image Overlays"
+    },
+    {
+      "type": "paragraph",
+      "content": "Add custom image badges that overlay on product cards based on conditions."
+    },
+    {
+      "type": "image_picker",
+      "id": "badge_image_sale",
+      "label": "Sale Badge Image",
+      "info": "Shows on products with compare_at_price"
+    },
+    {
+      "type": "select",
+      "id": "badge_image_sale_size",
+      "label": "Sale Badge Size",
+      "options": [
+        { "value": "small", "label": "Small (24px)" },
+        { "value": "medium", "label": "Medium (32px)" },
+        { "value": "large", "label": "Large (48px)" }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "select",
+      "id": "badge_image_sale_position",
+      "label": "Sale Badge Position",
+      "options": [
+        { "value": "top-left", "label": "Top Left" },
+        { "value": "top-right", "label": "Top Right" },
+        { "value": "bottom-left", "label": "Bottom Left" },
+        { "value": "bottom-right", "label": "Bottom Right" }
+      ],
+      "default": "top-right"
+    },
+    {
+      "type": "image_picker",
+      "id": "badge_image_new",
+      "label": "New Product Badge Image",
+      "info": "Shows on products created within specified days"
+    },
+    {
+      "type": "select",
+      "id": "badge_image_new_size",
+      "label": "New Badge Size",
+      "options": [
+        { "value": "small", "label": "Small (24px)" },
+        { "value": "medium", "label": "Medium (32px)" },
+        { "value": "large", "label": "Large (48px)" }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "select",
+      "id": "badge_image_new_position",
+      "label": "New Badge Position",
+      "options": [
+        { "value": "top-left", "label": "Top Left" },
+        { "value": "top-right", "label": "Top Right" },
+        { "value": "bottom-left", "label": "Bottom Left" },
+        { "value": "bottom-right", "label": "Bottom Right" }
+      ],
+      "default": "top-left"
+    },
+    {
+      "type": "range",
+      "id": "badge_image_new_days",
+      "label": "New Product Days",
+      "min": 7,
+      "max": 90,
+      "step": 1,
+      "default": 30,
+      "info": "Days since creation to consider product 'new'"
+    },
+    {
+      "type": "image_picker",
+      "id": "badge_image_featured",
+      "label": "Featured Product Badge Image",
+      "info": "Shows on products tagged 'featured' or with featured metafield"
+    },
+    {
+      "type": "select",
+      "id": "badge_image_featured_size",
+      "label": "Featured Badge Size",
+      "options": [
+        { "value": "small", "label": "Small (24px)" },
+        { "value": "medium", "label": "Medium (32px)" },
+        { "value": "large", "label": "Large (48px)" }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "select",
+      "id": "badge_image_featured_position",
+      "label": "Featured Badge Position",
+      "options": [
+        { "value": "top-left", "label": "Top Left" },
+        { "value": "top-right", "label": "Top Right" },
+        { "value": "bottom-left", "label": "Bottom Left" },
+        { "value": "bottom-right", "label": "Bottom Right" }
+      ],
+      "default": "bottom-right"
+    },
+    {
+      "type": "image_picker",
+      "id": "badge_image_custom",
+      "label": "Custom Badge Image",
+      "info": "Always shows when image is selected"
+    },
+    {
+      "type": "select",
+      "id": "badge_image_custom_size",
+      "label": "Custom Badge Size",
+      "options": [
+        { "value": "small", "label": "Small (24px)" },
+        { "value": "medium", "label": "Medium (32px)" },
+        { "value": "large", "label": "Large (48px)" }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "select",
+      "id": "badge_image_custom_position",
+      "label": "Custom Badge Position",
+      "options": [
+        { "value": "top-left", "label": "Top Left" },
+        { "value": "top-right", "label": "Top Right" },
+        { "value": "bottom-left", "label": "Bottom Left" },
+        { "value": "bottom-right", "label": "Bottom Right" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
       "content": "Section Layout"
     },
     {

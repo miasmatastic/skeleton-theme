@@ -49,9 +49,30 @@
     "no_results_html": "No results found for {{ terms }}",
     "results_for_html": "{{ count }} results found for {{ terms }}"
   },
+  "products": {
+    "product": {
+      "on_sale": "Sale",
+      "sold_out": "Sold out",
+      "color_swatch_trigger": "color"
+    }
+  },
+  "accessibility": {
+    "star_reviews_info": "{{ rating_value }} out of {{ rating_max }} stars",
+    "view_more": "View more"
+  },
+  "general": {
+    "accessibility": {
+      "view_more": "View more"
+    }
+  },
   "sections": {
     "collection_list": {
       "empty": "No collections found"
+    },
+    "lifestyle_showcase": {
+      "add_card": "Add card",
+      "configure_card": "Configure this card in the theme editor",
+      "card_number": "Card {{ number }}"
     }
   },
   "content": {
