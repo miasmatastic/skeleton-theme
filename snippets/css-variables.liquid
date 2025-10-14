@@ -21,17 +21,17 @@
     --color-accent: {{ settings.accent_color | default: '#007bff' }};
     
     /* Color Schemes */
-    --scheme-1-bg: {{ settings.scheme1_background | default: '#FFFFFF' }};
-    --scheme-1-text: {{ settings.scheme1_text | default: '#333333' }};
-    --scheme-1-accent: {{ settings.scheme1_accent | default: '#007bff' }};
+    --scheme-1-bg: {{ settings.color_scheme_1_background | default: '#ffffff' }};
+    --scheme-1-text: {{ settings.color_scheme_1_text | default: '#1a1a1a' }};
+    --scheme-1-accent: {{ settings.color_scheme_1_accent | default: '#3b82f6' }};
     
-    --scheme-2-bg: {{ settings.scheme2_background | default: '#F8F9FA' }};
-    --scheme-2-text: {{ settings.scheme2_text | default: '#212529' }};
-    --scheme-2-accent: {{ settings.scheme2_accent | default: '#28A745' }};
+    --scheme-2-bg: {{ settings.color_scheme_2_background | default: '#f8fafc' }};
+    --scheme-2-text: {{ settings.color_scheme_2_text | default: '#334155' }};
+    --scheme-2-accent: {{ settings.color_scheme_2_accent | default: '#10b981' }};
     
-    --scheme-3-bg: {{ settings.scheme3_background | default: '#343A40' }};
-    --scheme-3-text: {{ settings.scheme3_text | default: '#FFFFFF' }};
-    --scheme-3-accent: {{ settings.scheme3_accent | default: '#FFC107' }};
+    --scheme-3-bg: {{ settings.color_scheme_3_background | default: '#1e293b' }};
+    --scheme-3-text: {{ settings.color_scheme_3_text | default: '#f8fafc' }};
+    --scheme-3-accent: {{ settings.color_scheme_3_accent | default: '#f59e0b' }};
     
     /* Computed color variations */
     --color-foreground-rgb: {{ settings.foreground_color | color_extract: 'red' }}, {{ settings.foreground_color | color_extract: 'green' }}, {{ settings.foreground_color | color_extract: 'blue' }};

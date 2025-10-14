@@ -450,9 +450,14 @@
       "default": 24
     },
     {
-      "type": "color_scheme",
+      "type": "select",
       "id": "color_scheme",
       "label": "Color Scheme",
+      "options": [
+        { "value": "scheme-1", "label": "Light" },
+        { "value": "scheme-2", "label": "Neutral" },
+        { "value": "scheme-3", "label": "Dark" }
+      ],
       "default": "scheme-1"
     },
     {
@@ -904,8 +909,7 @@
               "settings": {
                 "text": "<h1>EARLY HOLIDAY DEALS</h1>",
                 "type_preset": "rte",
-                "font": "var(--font-heading--family)",
-                "font_size": "",
+                "font_size": 48,
                 "line_height": "normal",
                 "letter_spacing": "normal",
                 "case": "uppercase",

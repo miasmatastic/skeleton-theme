@@ -101,68 +101,68 @@
     "settings": [
       {
         "type": "header",
-        "content": "Color Scheme 1"
+        "content": "Scheme 1 - Light"
       },
       {
         "type": "color",
-        "id": "scheme1_background",
-        "default": "#FFFFFF",
+        "id": "color_scheme_1_background",
+        "default": "#ffffff",
         "label": "Background"
       },
       {
         "type": "color",
-        "id": "scheme1_text",
-        "default": "#333333",
+        "id": "color_scheme_1_text",
+        "default": "#1a1a1a",
         "label": "Text"
       },
       {
         "type": "color",
-        "id": "scheme1_accent",
-        "default": "#007bff",
+        "id": "color_scheme_1_accent",
+        "default": "#3b82f6",
         "label": "Accent"
       },
       {
         "type": "header",
-        "content": "Color Scheme 2"
+        "content": "Scheme 2 - Neutral"
       },
       {
         "type": "color",
-        "id": "scheme2_background",
-        "default": "#F8F9FA",
+        "id": "color_scheme_2_background",
+        "default": "#f8fafc",
         "label": "Background"
       },
       {
         "type": "color",
-        "id": "scheme2_text",
-        "default": "#212529",
+        "id": "color_scheme_2_text",
+        "default": "#334155",
         "label": "Text"
       },
       {
         "type": "color",
-        "id": "scheme2_accent",
-        "default": "#28A745",
+        "id": "color_scheme_2_accent",
+        "default": "#10b981",
         "label": "Accent"
       },
       {
         "type": "header",
-        "content": "Color Scheme 3"
+        "content": "Scheme 3 - Dark"
       },
       {
         "type": "color",
-        "id": "scheme3_background",
-        "default": "#343A40",
+        "id": "color_scheme_3_background",
+        "default": "#1e293b",
         "label": "Background"
       },
       {
         "type": "color",
-        "id": "scheme3_text",
-        "default": "#FFFFFF",
+        "id": "color_scheme_3_text",
+        "default": "#f8fafc",
         "label": "Text"
       },
       {
         "type": "color",
-        "id": "scheme3_accent",
-        "default": "#FFC107",
+        "id": "color_scheme_3_accent",
+        "default": "#f59e0b",
         "label": "Accent"
       }
     ]
