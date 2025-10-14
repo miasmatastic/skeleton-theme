@@ -1,0 +1,850 @@
+{% liquid
+  assign selected_collection = collections[section.settings.collection]
+  assign products_limit = section.settings.products_limit | default: 12
+  assign columns_desktop = section.settings.columns_desktop | default: 3
+  assign columns_mobile = section.settings.columns_mobile | default: 2
+  assign card_background_style = section.settings.card_background_style | default: 'solid-color'
+  assign enable_quick_add = section.settings.enable_quick_add | default: true
+  assign show_vendor = section.settings.show_vendor | default: false
+  assign show_rating = section.settings.show_rating | default: false
+%}
+
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+
+<div
+  class="
+    section
+    section--{{ section.settings.section_width }}
+    color-{{ section.settings.color_scheme }}
+    dynamic-product-grid
+    spacing-style
+    gap-style
+  "
+  style="
+    {% render 'spacing-style', settings: section.settings %}
+    {% render 'gap-style', value: section.settings.gap %}
+    --columns-desktop: {{ columns_desktop }};
+    --columns-mobile: {{ columns_mobile }};
+    --card-gap: {{ section.settings.card_gap | default: 16 }}px;
+  "
+  data-section-id="{{ section.id }}"
+  data-section-type="dynamic-product-grid"
+>
+  <!-- Section Header -->
+  <div class="dynamic-product-grid__header">
+    {%- content_for 'blocks' -%}
+  </div>
+
+  <!-- Product Grid -->
+  {% if selected_collection != blank and selected_collection.products.size > 0 %}
+    <div 
+      class="dynamic-product-grid__container{% if selected_collection.products.size > products_limit %} dynamic-product-grid--carousel{% endif %}"
+      data-products-count="{{ selected_collection.products.size }}"
+      data-products-limit="{{ products_limit }}"
+    >
+      <div class="dynamic-product-grid__grid" id="ProductGrid-{{ section.id }}">
+        {% for product in selected_collection.products limit: products_limit %}
+          <div class="dynamic-product-grid__item">
+            {% render 'card-product-dynamic',
+              product: product,
+              section_settings: section.settings,
+              card_background_style: card_background_style,
+              enable_quick_add: enable_quick_add,
+              show_vendor: show_vendor,
+              show_rating: show_rating,
+              badge_1_text: section.settings.badge_1_text,
+              badge_1_bg: section.settings.badge_1_bg_color,
+              badge_1_text_color: section.settings.badge_1_text_color,
+              badge_2_text: section.settings.badge_2_text,
+              badge_2_bg: section.settings.badge_2_bg_color,
+              badge_2_text_color: section.settings.badge_2_text_color,
+              badge_3_text: section.settings.badge_3_text,
+              badge_3_bg: section.settings.badge_3_bg_color,
+              badge_3_text_color: section.settings.badge_3_text_color,
+              section_id: section.id,
+              forloop: forloop
+            %}
+          </div>
+        {% endfor %}
+      </div>
+      
+      <!-- Carousel Controls (if needed) -->
+      {% if selected_collection.products.size > products_limit %}
+        <div class="dynamic-product-grid__carousel-controls">
+          <button class="carousel-btn carousel-btn--prev" data-carousel-direction="prev" aria-label="Previous products">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button class="carousel-btn carousel-btn--next" data-carousel-direction="next" aria-label="Next products">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      {% endif %}
+    </div>
+  {% else %}
+    <div class="dynamic-product-grid__placeholder">
+      <div class="placeholder-content">
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+          <rect x="8" y="8" width="48" height="48" rx="4" stroke="currentColor" stroke-width="2"/>
+          <circle cx="32" cy="26" r="6" stroke="currentColor" stroke-width="2"/>
+          <path d="M16 44L24 36L32 44L40 36L48 44" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        <h3>No products found</h3>
+        <p>{{ 'sections.collection_list.empty' | t }}</p>
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Dynamic Product Grid JavaScript -->
+<script>
+  class DynamicProductGrid extends HTMLElement {
+    constructor() {
+      super();
+      this.grid = this.querySelector('.dynamic-product-grid__grid');
+      this.carouselBtns = this.querySelectorAll('.carousel-btn');
+      this.currentSlide = 0;
+      this.productsPerPage = parseInt(this.dataset.productsLimit);
+      this.totalProducts = parseInt(this.dataset.productsCount);
+      
+      this.init();
+    }
+    
+    init() {
+      this.setupQuickAdd();
+      this.setupCarousel();
+    }
+    
+    setupQuickAdd() {
+      this.addEventListener('click', (e) => {
+        const quickAddBtn = e.target.closest('.quick-add-btn');
+        if (quickAddBtn && !quickAddBtn.disabled) {
+          e.preventDefault();
+          this.handleQuickAdd(quickAddBtn);
+        }
+      });
+    }
+    
+    async handleQuickAdd(button) {
+      const productId = button.dataset.productId;
+      const variantId = button.dataset.variantId;
+      
+      if (!variantId) {
+        // Product has variants, open quick view or redirect to product page
+        window.location.href = button.dataset.productUrl;
+        return;
+      }
+      
+      button.disabled = true;
+      button.classList.add('loading');
+      
+      try {
+        const response = await fetch('/cart/add.js', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: variantId,
+            quantity: 1
+          })
+        });
+        
+        if (response.ok) {
+          // Success - update cart and show notification
+          button.textContent = 'Added!';
+          this.dispatchEvent(new CustomEvent('cart:updated', {
+            bubbles: true,
+            detail: { variantId, quantity: 1 }
+          }));
+          
+          // Reset button after 2 seconds
+          setTimeout(() => {
+            button.textContent = button.dataset.originalText;
+            button.disabled = false;
+            button.classList.remove('loading');
+          }, 2000);
+        } else {
+          throw new Error('Failed to add to cart');
+        }
+      } catch (error) {
+        console.error('Quick add error:', error);
+        button.textContent = 'Error';
+        button.disabled = false;
+        button.classList.remove('loading');
+        
+        setTimeout(() => {
+          button.textContent = button.dataset.originalText;
+        }, 2000);
+      }
+    }
+    
+    setupCarousel() {
+      if (this.carouselBtns.length === 0) return;
+      
+      this.carouselBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const direction = btn.dataset.carouselDirection;
+          this.moveCarousel(direction);
+        });
+      });
+      
+      // Touch/swipe support for mobile
+      let startX = 0;
+      let currentX = 0;
+      let isDragging = false;
+      
+      this.grid.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        isDragging = true;
+      });
+      
+      this.grid.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        currentX = e.touches[0].clientX;
+      });
+      
+      this.grid.addEventListener('touchend', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        
+        const diff = startX - currentX;
+        if (Math.abs(diff) > 50) {
+          if (diff > 0) {
+            this.moveCarousel('next');
+          } else {
+            this.moveCarousel('prev');
+          }
+        }
+      });
+    }
+    
+    moveCarousel(direction) {
+      const maxSlides = Math.ceil(this.totalProducts / this.productsPerPage) - 1;
+      
+      if (direction === 'next' && this.currentSlide < maxSlides) {
+        this.currentSlide++;
+      } else if (direction === 'prev' && this.currentSlide > 0) {
+        this.currentSlide--;
+      }
+      
+      const translateX = -(this.currentSlide * 100);
+      this.grid.style.transform = `translateX(${translateX}%)`;
+      
+      // Update button states
+      const prevBtn = this.querySelector('.carousel-btn--prev');
+      const nextBtn = this.querySelector('.carousel-btn--next');
+      
+      if (prevBtn) prevBtn.disabled = this.currentSlide === 0;
+      if (nextBtn) nextBtn.disabled = this.currentSlide === maxSlides;
+    }
+  }
+  
+  customElements.define('dynamic-product-grid', DynamicProductGrid);
+  
+  // Initialize the grid
+  document.addEventListener('DOMContentLoaded', () => {
+    const gridElement = document.querySelector('[data-section-type="dynamic-product-grid"]');
+    if (gridElement) {
+      gridElement.outerHTML = `<dynamic-product-grid ${gridElement.getAttributeNames().map(name => `${name}="${gridElement.getAttribute(name)}"`).join(' ')}>${gridElement.innerHTML}</dynamic-product-grid>`;
+    }
+  });
+</script>
+
+{% stylesheet %}
+  .dynamic-product-grid {
+    --grid-gap: var(--card-gap, 16px);
+  }
+  
+  .dynamic-product-grid__header {
+    margin-bottom: var(--grid-gap);
+  }
+  
+  .dynamic-product-grid__container {
+    position: relative;
+  }
+  
+  .dynamic-product-grid__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--columns-desktop), 1fr);
+    gap: var(--grid-gap);
+    transition: transform 0.3s ease;
+  }
+  
+  .dynamic-product-grid--carousel .dynamic-product-grid__grid {
+    display: flex;
+    overflow: hidden;
+  }
+  
+  .dynamic-product-grid--carousel .dynamic-product-grid__item {
+    flex: 0 0 calc(100% / var(--columns-desktop));
+    padding-right: var(--grid-gap);
+  }
+  
+  .dynamic-product-grid__carousel-controls {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+    z-index: 2;
+  }
+  
+  .carousel-btn {
+    pointer-events: all;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .carousel-btn:hover {
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .carousel-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .carousel-btn--prev {
+    left: -24px;
+  }
+  
+  .carousel-btn--next {
+    right: -24px;
+  }
+  
+  .dynamic-product-grid__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    color: rgba(var(--color-foreground), 0.6);
+  }
+  
+  .placeholder-content {
+    text-align: center;
+  }
+  
+  .placeholder-content svg {
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+  
+  .placeholder-content h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.2em;
+  }
+  
+  .placeholder-content p {
+    margin: 0;
+    opacity: 0.8;
+  }
+  
+  /* Mobile Responsive */
+  @media screen and (max-width: 768px) {
+    .dynamic-product-grid__grid {
+      grid-template-columns: repeat(var(--columns-mobile), 1fr);
+    }
+    
+    .dynamic-product-grid--carousel .dynamic-product-grid__item {
+      flex: 0 0 calc(100% / var(--columns-mobile));
+    }
+    
+    .carousel-btn {
+      width: 40px;
+      height: 40px;
+    }
+    
+    .carousel-btn--prev {
+      left: -20px;
+    }
+    
+    .carousel-btn--next {
+      right: -20px;
+    }
+  }
+  
+  @media screen and (max-width: 480px) {
+    .dynamic-product-grid__grid {
+      gap: calc(var(--grid-gap) * 0.75);
+    }
+    
+    .carousel-btn {
+      width: 36px;
+      height: 36px;
+    }
+    
+    .carousel-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Dynamic Product Grid",
+  "class": "dynamic-product-grid-section",
+  "blocks": [
+    {
+      "type": "@theme"
+    },
+    {
+      "type": "@app"
+    },
+    {
+      "type": "text"
+    },
+    {
+      "type": "icon"
+    },
+    {
+      "type": "image"
+    },
+    {
+      "type": "button"
+    },
+    {
+      "type": "video"
+    },
+    {
+      "type": "group"
+    },
+    {
+      "type": "spacer"
+    }
+  ],
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Data Source"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection",
+      "info": "Select the collection to display products from"
+    },
+    {
+      "type": "range",
+      "id": "products_limit",
+      "label": "Number of Products",
+      "min": 2,
+      "max": 50,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Layout & Display"
+    },
+    {
+      "type": "select",
+      "id": "columns_desktop",
+      "label": "Desktop Columns",
+      "options": [
+        {
+          "value": "2",
+          "label": "2 Columns"
+        },
+        {
+          "value": "3",
+          "label": "3 Columns"
+        },
+        {
+          "value": "4",
+          "label": "4 Columns"
+        },
+        {
+          "value": "5",
+          "label": "5 Columns"
+        }
+      ],
+      "default": "3"
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Mobile Columns",
+      "options": [
+        {
+          "value": "1",
+          "label": "1 Column"
+        },
+        {
+          "value": "2",
+          "label": "2 Columns"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "select",
+      "id": "card_background_style",
+      "label": "Card Background Style",
+      "options": [
+        {
+          "value": "solid-color",
+          "label": "Solid Color"
+        },
+        {
+          "value": "full-bleed-image",
+          "label": "Full Bleed Image"
+        }
+      ],
+      "default": "solid-color"
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "Card Spacing",
+      "min": 8,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Product Display Options"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_quick_add",
+      "label": "Enable Quick Add",
+      "default": true,
+      "info": "Show quick add button on product cards"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show Vendor",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show Product Rating",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Badge Customization"
+    },
+    {
+      "type": "text",
+      "id": "badge_1_text",
+      "label": "Badge 1 Text",
+      "placeholder": "e.g. New!"
+    },
+    {
+      "type": "color",
+      "id": "badge_1_bg_color",
+      "label": "Badge 1 Background",
+      "default": "#ff6b6b"
+    },
+    {
+      "type": "color",
+      "id": "badge_1_text_color",
+      "label": "Badge 1 Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "badge_2_text",
+      "label": "Badge 2 Text",
+      "placeholder": "e.g. Best Seller"
+    },
+    {
+      "type": "color",
+      "id": "badge_2_bg_color",
+      "label": "Badge 2 Background",
+      "default": "#4ecdc4"
+    },
+    {
+      "type": "color",
+      "id": "badge_2_text_color",
+      "label": "Badge 2 Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "badge_3_text",
+      "label": "Badge 3 Text",
+      "placeholder": "e.g. Save 30%"
+    },
+    {
+      "type": "color",
+      "id": "badge_3_bg_color",
+      "label": "Badge 3 Background",
+      "default": "#ffa726"
+    },
+    {
+      "type": "color",
+      "id": "badge_3_text_color",
+      "label": "Badge 3 Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Section Layout"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section Width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "Page Width"
+        },
+        {
+          "value": "full-width",
+          "label": "Full Width"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Section Gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top Padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom Padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "presets": [
+    {
+      "name": "Conversion Spotlight",
+      "category": "Products",
+      "settings": {
+        "columns_desktop": "3",
+        "columns_mobile": "2",
+        "card_background_style": "solid-color",
+        "enable_quick_add": true,
+        "products_limit": 9,
+        "badge_1_text": "New!",
+        "badge_1_bg_color": "#ff6b6b",
+        "badge_1_text_color": "#ffffff",
+        "badge_2_text": "Holiday Exclusive",
+        "badge_2_bg_color": "#4ecdc4",
+        "badge_2_text_color": "#ffffff",
+        "card_gap": 20,
+        "color_scheme": "scheme-1",
+        "section_width": "page-width",
+        "padding-block-start": 60,
+        "padding-block-end": 60
+      },
+      "blocks": {
+        "header_group": {
+          "type": "group",
+          "name": "Header",
+          "settings": {
+            "content_direction": "column",
+            "horizontal_alignment": "center",
+            "vertical_alignment": "center",
+            "gap": 16,
+            "padding-block-end": 32
+          },
+          "blocks": {
+            "title": {
+              "type": "text",
+              "settings": {
+                "text": "<h2>Featured Products</h2>",
+                "alignment": "center",
+                "type_preset": "h2"
+              }
+            }
+          },
+          "block_order": ["title"]
+        }
+      },
+      "block_order": ["header_group"]
+    },
+    {
+      "name": "Cinematic Carousel",
+      "category": "Products",
+      "settings": {
+        "columns_desktop": "4",
+        "columns_mobile": "1",
+        "card_background_style": "full-bleed-image",
+        "enable_quick_add": false,
+        "products_limit": 16,
+        "badge_1_text": "",
+        "badge_2_text": "",
+        "badge_3_text": "",
+        "card_gap": 24,
+        "color_scheme": "scheme-1",
+        "section_width": "full-width",
+        "padding-block-start": 80,
+        "padding-block-end": 80
+      },
+      "blocks": {
+        "header_group": {
+          "type": "group",
+          "name": "Header",
+          "settings": {
+            "content_direction": "column",
+            "horizontal_alignment": "center",
+            "vertical_alignment": "center",
+            "gap": 20,
+            "padding-block-end": 48
+          },
+          "blocks": {
+            "title": {
+              "type": "text",
+              "settings": {
+                "text": "<h1>EARLY HOLIDAY DEALS</h1>",
+                "alignment": "center",
+                "type_preset": "h1",
+                "case": "uppercase"
+              }
+            }
+          },
+          "block_order": ["title"]
+        }
+      },
+      "block_order": ["header_group"]
+    },
+    {
+      "name": "Editorial Focus",
+      "category": "Products",
+      "settings": {
+        "columns_desktop": "2",
+        "columns_mobile": "1",
+        "card_background_style": "solid-color",
+        "enable_quick_add": false,
+        "products_limit": 6,
+        "badge_1_text": "",
+        "badge_2_text": "",
+        "badge_3_text": "",
+        "card_gap": 32,
+        "color_scheme": "scheme-1",
+        "section_width": "page-width",
+        "padding-block-start": 60,
+        "padding-block-end": 60
+      },
+      "blocks": {
+        "header_group": {
+          "type": "group",
+          "name": "Header",
+          "settings": {
+            "content_direction": "column",
+            "horizontal_alignment": "flex-start",
+            "vertical_alignment": "center",
+            "gap": 12,
+            "padding-block-end": 40
+          },
+          "blocks": {
+            "title": {
+              "type": "text",
+              "settings": {
+                "text": "<h2>Curated Collection</h2>",
+                "alignment": "left",
+                "type_preset": "h2"
+              }
+            }
+          },
+          "block_order": ["title"]
+        }
+      },
+      "block_order": ["header_group"]
+    },
+    {
+      "name": "Essential Showcase",
+      "category": "Products",
+      "settings": {
+        "columns_desktop": "3",
+        "columns_mobile": "2",
+        "card_background_style": "full-bleed-image",
+        "enable_quick_add": true,
+        "products_limit": 12,
+        "badge_1_text": "",
+        "badge_2_text": "",
+        "badge_3_text": "",
+        "card_gap": 16,
+        "color_scheme": "scheme-1",
+        "section_width": "page-width",
+        "padding-block-start": 48,
+        "padding-block-end": 48
+      },
+      "blocks": {
+        "header_group": {
+          "type": "group",
+          "name": "Header",
+          "settings": {
+            "content_direction": "column",
+            "horizontal_alignment": "center",
+            "vertical_alignment": "center",
+            "gap": 16,
+            "padding-block-end": 32
+          },
+          "blocks": {
+            "title": {
+              "type": "text",
+              "settings": {
+                "text": "<h2>Shop Our Essentials</h2>",
+                "alignment": "center",
+                "type_preset": "h2"
+              }
+            }
+          },
+          "block_order": ["title"]
+        }
+      },
+      "block_order": ["header_group"]
+    }
+  ]
+}
+{% endschema %}
