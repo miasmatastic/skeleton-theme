@@ -1,0 +1,513 @@
+{% if section.blocks.size > 0 %}
+  <div class="announcement-bar{% if section.settings.enable_dismissible %} announcement-bar--dismissible{% endif %}" 
+       data-announcement-bar
+       {% if section.settings.enable_dismissible %}data-dismissible-key="announcement-{{ section.id }}"{% endif %}>
+    
+    {% if section.settings.enable_dismissible %}
+      <button type="button" 
+              class="announcement-bar__dismiss" 
+              data-dismiss-announcement
+              aria-label="Dismiss announcement">
+        {% if section.settings.dismiss_style == 'text' %}
+          {{ section.settings.dismiss_text | default: '×' }}
+        {% else %}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        {% endif %}
+      </button>
+    {% endif %}
+
+    <div class="announcement-bar__content">
+      {% for block in section.blocks %}
+        <div class="announcement-bar__item" {{ block.shopify_attributes }}>
+          {% if block.settings.link != blank %}
+            <a href="{{ block.settings.link }}" class="announcement-bar__link">
+              {{ block.settings.text }}
+            </a>
+          {% else %}
+            <span class="announcement-bar__text">{{ block.settings.text }}</span>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <script>
+    class DismissibleAnnouncement extends HTMLElement {
+      constructor() {
+        super();
+        this.key = this.dataset.dismissibleKey;
+        this.dismissBtn = this.querySelector('[data-dismiss-announcement]');
+        
+        this.init();
+      }
+      
+      init() {
+        // Check if announcement was previously dismissed
+        if (this.key && localStorage.getItem(this.key) === 'dismissed') {
+          this.style.display = 'none';
+          return;
+        }
+        
+        // Add dismiss functionality
+        if (this.dismissBtn) {
+          this.dismissBtn.addEventListener('click', () => this.dismiss());
+        }
+      }
+      
+      dismiss() {
+        if (this.key) {
+          localStorage.setItem(this.key, 'dismissed');
+        }
+        
+        this.style.opacity = '0';
+        setTimeout(() => {
+          this.style.display = 'none';
+        }, 300);
+      }
+    }
+
+    // Initialize dismissible announcements
+    document.addEventListener('DOMContentLoaded', () => {
+      const announcements = document.querySelectorAll('[data-announcement-bar][data-dismissible-key]');
+      announcements.forEach(el => {
+        const wrapper = document.createElement('dismissible-announcement');
+        el.parentNode.insertBefore(wrapper, el);
+        wrapper.appendChild(el);
+        
+        // Copy data attributes
+        Object.keys(el.dataset).forEach(key => {
+          wrapper.dataset[key] = el.dataset[key];
+        });
+        
+        new DismissibleAnnouncement.call(wrapper);
+      });
+    });
+  </script>
+{% endif %}
+
+{% stylesheet %}
+  .announcement-bar {
+    background: {{ section.settings.bg_color | default: '#000000' }};
+    color: {{ section.settings.text_color | default: '#ffffff' }};
+    padding: {{ section.settings.padding_vertical | default: 12 }}px {{ section.settings.padding_horizontal | default: 20 }}px;
+    text-align: {{ section.settings.text_alignment | default: 'center' }};
+    font-size: {{ section.settings.font_size | default: 14 }}px;
+    position: relative;
+    transition: opacity 0.3s ease;
+  }
+
+  .announcement-bar--dismissible {
+    padding-right: calc({{ section.settings.padding_horizontal | default: 20 }}px + 40px);
+  }
+
+  .announcement-bar__content {
+    display: flex;
+    align-items: center;
+    justify-content: {{ section.settings.text_alignment | default: 'center' }};
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .announcement-bar__item {
+    margin: 0;
+  }
+
+  .announcement-bar__link,
+  .announcement-bar__text {
+    color: inherit;
+    text-decoration: none;
+    font-weight: {{ section.settings.font_weight | default: 400 }};
+    transition: opacity 0.2s ease;
+  }
+
+  .announcement-bar__link:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+  }
+
+  .announcement-bar__dismiss {
+    position: absolute;
+    top: 50%;
+    {{ section.settings.dismiss_position | default: 'right' }}: {{ section.settings.padding_horizontal | default: 20 }}px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 2px;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    min-height: 24px;
+  }
+
+  .announcement-bar__dismiss:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .announcement-bar__dismiss:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.5);
+    outline-offset: 2px;
+  }
+
+  /* Enhanced styling when enabled */
+  {% if section.settings.enable_enhanced_features %}
+    .announcement-bar {
+      {% if section.settings.enable_gradient %}
+        background: linear-gradient({{ section.settings.gradient_direction | default: '90deg' }}, {{ section.settings.bg_color | default: '#000000' }}, {{ section.settings.gradient_color | default: '#333333' }});
+      {% endif %}
+      
+      {% if section.settings.enable_border %}
+        border-{{ section.settings.border_position | default: 'bottom' }}: {{ section.settings.border_width | default: 1 }}px solid {{ section.settings.border_color | default: '#333333' }};
+      {% endif %}
+    }
+
+    {% if section.settings.custom_announcement_css != blank %}
+      {{ section.settings.custom_announcement_css }}
+    {% endif %}
+  {% endif %}
+
+  /* Mobile responsive */
+  @media (max-width: 768px) {
+    .announcement-bar {
+      font-size: {{ section.settings.font_size_mobile | default: 13 }}px;
+      padding: {{ section.settings.padding_vertical_mobile | default: 10 }}px {{ section.settings.padding_horizontal_mobile | default: 16 }}px;
+    }
+
+    .announcement-bar--dismissible {
+      padding-right: calc({{ section.settings.padding_horizontal_mobile | default: 16 }}px + 36px);
+    }
+
+    .announcement-bar__dismiss {
+      {{ section.settings.dismiss_position | default: 'right' }}: {{ section.settings.padding_horizontal_mobile | default: 16 }}px;
+      min-width: 20px;
+      min-height: 20px;
+      font-size: 16px;
+    }
+
+    .announcement-bar__content {
+      justify-content: center;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Enhanced Announcement Bar",
+  "class": "announcement-section",
+  "max_blocks": 3,
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "Announcement",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Announcement Text",
+          "default": "Welcome to our store!"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link (optional)",
+          "info": "Make the announcement clickable"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Basic Settings"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "Font Size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "font_size_mobile",
+      "label": "Font Size (Mobile)",
+      "min": 11,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "select",
+      "id": "font_weight",
+      "label": "Font Weight",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi Bold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_vertical",
+      "label": "Vertical Padding",
+      "min": 6,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "padding_horizontal",
+      "label": "Horizontal Padding",
+      "min": 12,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_vertical_mobile",
+      "label": "Vertical Padding (Mobile)",
+      "min": 6,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "padding_horizontal_mobile",
+      "label": "Horizontal Padding (Mobile)",
+      "min": 8,
+      "max": 32,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Dismissible Features"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_dismissible",
+      "label": "Enable Dismissible",
+      "default": false,
+      "info": "Allow users to dismiss the announcement"
+    },
+    {
+      "type": "select",
+      "id": "dismiss_position",
+      "label": "Dismiss Button Position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "right",
+      "visible_if": "{{ section.settings.enable_dismissible }}"
+    },
+    {
+      "type": "select",
+      "id": "dismiss_style",
+      "label": "Dismiss Button Style",
+      "options": [
+        { "value": "icon", "label": "Icon (×)" },
+        { "value": "text", "label": "Custom Text" }
+      ],
+      "default": "icon",
+      "visible_if": "{{ section.settings.enable_dismissible }}"
+    },
+    {
+      "type": "text",
+      "id": "dismiss_text",
+      "label": "Dismiss Button Text",
+      "default": "×",
+      "visible_if": "{{ section.settings.enable_dismissible and section.settings.dismiss_style == 'text' }}"
+    },
+    {
+      "type": "header",
+      "content": "Enhanced Features"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_enhanced_features",
+      "label": "Enable Enhanced Features",
+      "default": false,
+      "info": "Unlock additional styling options"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_gradient",
+      "label": "Enable Gradient Background",
+      "default": false,
+      "visible_if": "{{ section.settings.enable_enhanced_features }}"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color",
+      "label": "Gradient End Color",
+      "default": "#333333",
+      "visible_if": "{{ section.settings.enable_enhanced_features and section.settings.enable_gradient }}"
+    },
+    {
+      "type": "select",
+      "id": "gradient_direction",
+      "label": "Gradient Direction",
+      "options": [
+        { "value": "90deg", "label": "Left to Right" },
+        { "value": "180deg", "label": "Top to Bottom" },
+        { "value": "45deg", "label": "Diagonal" }
+      ],
+      "default": "90deg",
+      "visible_if": "{{ section.settings.enable_enhanced_features and section.settings.enable_gradient }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_border",
+      "label": "Enable Border",
+      "default": false,
+      "visible_if": "{{ section.settings.enable_enhanced_features }}"
+    },
+    {
+      "type": "select",
+      "id": "border_position",
+      "label": "Border Position",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "bottom",
+      "visible_if": "{{ section.settings.enable_enhanced_features and section.settings.enable_border }}"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "label": "Border Width",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "default": 1,
+      "visible_if": "{{ section.settings.enable_enhanced_features and section.settings.enable_border }}"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#333333",
+      "visible_if": "{{ section.settings.enable_enhanced_features and section.settings.enable_border }}"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_announcement_css",
+      "label": "Custom CSS",
+      "placeholder": ".announcement-bar { ... }",
+      "info": "Add custom CSS for announcement styling",
+      "visible_if": "{{ section.settings.enable_enhanced_features }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Enhanced Announcement Bar",
+      "blocks": {
+        "announcement": {
+          "type": "announcement",
+          "settings": {
+            "text": "Welcome to our store! Free shipping on orders over $50.",
+            "link": "/collections/all"
+          }
+        }
+      },
+      "block_order": ["announcement"]
+    },
+    {
+      "name": "Dismissible Sale Banner",
+      "category": "Promotional",
+      "settings": {
+        "bg_color": "#dc3545",
+        "text_color": "#ffffff",
+        "enable_dismissible": true,
+        "font_weight": "600",
+        "padding_vertical": 14
+      },
+      "blocks": {
+        "sale_announcement": {
+          "type": "announcement",
+          "settings": {
+            "text": "🔥 Flash Sale: 25% OFF Everything! Use code FLASH25",
+            "link": "/collections/sale"
+          }
+        }
+      },
+      "block_order": ["sale_announcement"]
+    },
+    {
+      "name": "Gradient Info Bar",
+      "category": "Informational",
+      "settings": {
+        "bg_color": "#6c5ce7",
+        "text_color": "#ffffff",
+        "enable_enhanced_features": true,
+        "enable_gradient": true,
+        "gradient_color": "#a29bfe",
+        "gradient_direction": "45deg",
+        "text_alignment": "center",
+        "font_weight": "500"
+      },
+      "blocks": {
+        "info_announcement": {
+          "type": "announcement",
+          "settings": {
+            "text": "New collection launching this Friday! Get notified →",
+            "link": "/pages/newsletter"
+          }
+        }
+      },
+      "block_order": ["info_announcement"]
+    }
+  ]
+}
+{% endschema %}
