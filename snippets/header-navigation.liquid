@@ -1,0 +1,330 @@
+{% comment %}
+  Header Navigation Component
+  Renders primary or secondary navigation menus
+  
+  Parameters:
+  - menu: link_list - Navigation menu object
+  - menu_style: string - Menu style ('horizontal', 'dropdown', 'mega')
+  - show_icons: boolean - Show icons next to menu items
+{% endcomment %}
+
+{%- liquid
+  assign navigation_menu = menu
+  assign style = menu_style | default: 'horizontal'
+  assign show_menu_icons = show_icons | default: false
+-%}
+
+{% if navigation_menu != blank and navigation_menu.links.size > 0 %}
+  <ul class="header__nav-list header__nav-list--{{ style }}" 
+      role="menubar" 
+      data-nav-menu="{{ style }}">
+    {% for link in navigation_menu.links %}
+      <li class="header__nav-item{% if link.links.size > 0 %} has-dropdown{% endif %}" 
+          role="none">
+        <a href="{{ link.url }}" 
+           class="header__nav-link{% if link.active %} header__nav-link--active{% endif %}"
+           role="menuitem"
+           {% if link.links.size > 0 %}
+             aria-haspopup="true" 
+             aria-expanded="false"
+             data-nav-dropdown-trigger
+           {% endif %}
+           {% if link.current %}aria-current="page"{% endif %}>
+          
+          {% if show_menu_icons and link.object.featured_image != blank %}
+            <img src="{{ link.object.featured_image | image_url: width: 20 }}" 
+                 alt="" 
+                 class="nav-icon" 
+                 width="20" 
+                 height="20">
+          {% endif %}
+          
+          <span class="nav-link-text">{{ link.title }}</span>
+          
+          {% if link.links.size > 0 %}
+            <svg class="nav-dropdown-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          {% endif %}
+        </a>
+
+        {% if link.links.size > 0 %}
+          <ul class="header__dropdown" 
+              role="menu" 
+              aria-label="{{ link.title }} submenu"
+              data-nav-dropdown>
+            {% for child_link in link.links %}
+              <li class="header__dropdown-item" role="none">
+                <a href="{{ child_link.url }}" 
+                   class="header__dropdown-link{% if child_link.active %} header__dropdown-link--active{% endif %}"
+                   role="menuitem"
+                   {% if child_link.current %}aria-current="page"{% endif %}>
+                  {{ child_link.title }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<style>
+  .header__nav-list {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: calc(var(--header-spacing, 20px) * 1.2);
+  }
+
+  .header__nav-item {
+    position: relative;
+  }
+
+  .header__nav-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    color: inherit;
+    font-size: var(--menu-font-size, 16px);
+    font-weight: var(--menu-font-weight, 400);
+    padding: 8px 0;
+    transition: color 0.2s ease;
+    position: relative;
+  }
+
+  .header__nav-link:hover,
+  .header__nav-link--active {
+    color: var(--menu-hover, #007acc);
+  }
+
+  .header__nav-link:focus {
+    outline: 2px solid var(--color-accent, #007acc);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Navigation Icons */
+  .nav-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 2px;
+    object-fit: cover;
+  }
+
+  .nav-link-text {
+    white-space: nowrap;
+  }
+
+  .nav-dropdown-arrow {
+    transition: transform 0.2s ease;
+    margin-left: 2px;
+  }
+
+  /* Dropdown Styles */
+  .has-dropdown .nav-dropdown-arrow {
+    opacity: 0.7;
+  }
+
+  .has-dropdown:hover .nav-dropdown-arrow {
+    transform: rotate(180deg);
+  }
+
+  .header__dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: var(--header-bg, white);
+    border: 1px solid var(--header-border, #e5e5e5);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    list-style: none;
+    margin: 0;
+    padding: 8px 0;
+    min-width: 200px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.2s ease;
+  }
+
+  .has-dropdown:hover .header__dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .header__dropdown-item {
+    margin: 0;
+  }
+
+  .header__dropdown-link {
+    display: block;
+    padding: 10px 20px;
+    text-decoration: none;
+    color: inherit;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+  }
+
+  .header__dropdown-link:hover,
+  .header__dropdown-link--active {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--menu-hover, #007acc);
+  }
+
+  .header__dropdown-link:focus {
+    outline: 2px solid var(--color-accent, #007acc);
+    outline-offset: -2px;
+  }
+
+  /* Mega Menu Style */
+  .header__nav-list--mega .header__dropdown {
+    left: 50%;
+    transform: translateX(-50%) translateY(-8px);
+    min-width: 400px;
+  }
+
+  .header__nav-list--mega .has-dropdown:hover .header__dropdown {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* Mobile Navigation - Hidden by default */
+  @media (max-width: 768px) {
+    .header__nav-list {
+      display: none;
+    }
+  }
+
+  /* Tablet adjustments */
+  @media (max-width: 1024px) {
+    .header__nav-list {
+      gap: calc(var(--header-spacing, 20px) * 0.8);
+    }
+
+    .nav-link-text {
+      font-size: 14px;
+    }
+
+    .header__dropdown {
+      min-width: 180px;
+    }
+  }
+
+  /* High contrast mode */
+  @media (prefers-contrast: high) {
+    .header__dropdown {
+      border-width: 2px;
+    }
+
+    .header__dropdown-link:hover {
+      background: rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .header__nav-link,
+    .nav-dropdown-arrow,
+    .header__dropdown,
+    .header__dropdown-link {
+      transition: none;
+    }
+
+    .has-dropdown:hover .nav-dropdown-arrow {
+      transform: none;
+    }
+
+    .header__dropdown {
+      transform: none;
+    }
+
+    .has-dropdown:hover .header__dropdown {
+      transform: none;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    .header__nav-list {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+// Enhanced keyboard navigation for dropdowns
+document.addEventListener('DOMContentLoaded', function() {
+  const dropdownTriggers = document.querySelectorAll('[data-nav-dropdown-trigger]');
+  
+  dropdownTriggers.forEach(trigger => {
+    const dropdown = trigger.parentElement.querySelector('[data-nav-dropdown]');
+    if (!dropdown) return;
+
+    // Keyboard navigation
+    trigger.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleDropdown(trigger, dropdown);
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        openDropdown(trigger, dropdown);
+        focusFirstDropdownItem(dropdown);
+      }
+    });
+
+    // Arrow key navigation within dropdown
+    dropdown.addEventListener('keydown', function(e) {
+      const dropdownLinks = dropdown.querySelectorAll('.header__dropdown-link');
+      const currentIndex = Array.from(dropdownLinks).indexOf(document.activeElement);
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const nextIndex = (currentIndex + 1) % dropdownLinks.length;
+        dropdownLinks[nextIndex].focus();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const prevIndex = currentIndex > 0 ? currentIndex - 1 : dropdownLinks.length - 1;
+        dropdownLinks[prevIndex].focus();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        closeDropdown(trigger, dropdown);
+        trigger.focus();
+      }
+    });
+  });
+
+  function toggleDropdown(trigger, dropdown) {
+    const isExpanded = trigger.getAttribute('aria-expanded') === 'true';
+    if (isExpanded) {
+      closeDropdown(trigger, dropdown);
+    } else {
+      openDropdown(trigger, dropdown);
+    }
+  }
+
+  function openDropdown(trigger, dropdown) {
+    trigger.setAttribute('aria-expanded', 'true');
+    dropdown.style.opacity = '1';
+    dropdown.style.visibility = 'visible';
+    dropdown.style.transform = 'translateY(0)';
+  }
+
+  function closeDropdown(trigger, dropdown) {
+    trigger.setAttribute('aria-expanded', 'false');
+    dropdown.style.opacity = '0';
+    dropdown.style.visibility = 'hidden';
+    dropdown.style.transform = 'translateY(-8px)';
+  }
+
+  function focusFirstDropdownItem(dropdown) {
+    const firstLink = dropdown.querySelector('.header__dropdown-link');
+    if (firstLink) firstLink.focus();
+  }
+});
+</script>

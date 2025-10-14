@@ -1,0 +1,183 @@
+{% comment %}
+  Header Icons Component
+  Renders header utility icons like account, cart, and custom icons
+  
+  Parameters:
+  - show_account: boolean - Show account icon
+  - show_cart: boolean - Show cart icon  
+  - cart_style: string - Cart link style ('link' or 'drawer')
+  - custom_icons: string - JSON array of custom icons
+{% endcomment %}
+
+{%- liquid
+  assign show_account = show_account | default: true
+  assign show_cart = show_cart | default: true
+  assign cart_style = cart_style | default: 'link'
+  assign cart_count = cart.item_count
+-%}
+
+<div class="header__icons" data-header-icons>
+  <!-- Custom Icons (if provided) -->
+  {% if custom_icons != blank %}
+    {% assign custom_icons_array = custom_icons | split: ',' %}
+    {% for custom_icon in custom_icons_array %}
+      {% assign icon_data = custom_icon | split: '|' %}
+      {% if icon_data.size >= 3 %}
+        <a href="{{ icon_data[1] | strip }}" 
+           class="header__icon header__icon--custom"
+           aria-label="{{ icon_data[2] | strip }}"
+           {% if icon_data[1] contains 'http' %}target="_blank" rel="noopener"{% endif %}>
+          {{ icon_data[0] | strip }}
+        </a>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+  <!-- Account Icon -->
+  {% if show_account %}
+    <a href="{{ routes.account_url }}" 
+       class="header__icon header__icon--account"
+       aria-label="{{ 'customer.account.title' | t }}">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="10" cy="6.5" r="2.75" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        <path d="M4 18.5c0-4.142 2.686-7.5 6-7.5s6 3.358 6 7.5" stroke="currentColor" stroke-width="1.5" fill="none"/>
+      </svg>
+      <span class="visually-hidden">{{ 'customer.account.title' | t }}</span>
+    </a>
+  {% endif %}
+
+  <!-- Cart Icon -->
+  {% if show_cart %}
+    <a href="{{ routes.cart_url }}" 
+       class="header__icon header__icon--cart"
+       aria-label="{{ 'templates.cart.cart' | t }} ({{ cart_count }})"
+       {% if cart_style == 'drawer' %}data-cart-drawer-trigger data-cart-style="drawer"{% endif %}>
+      <div class="cart-icon-wrapper">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 16a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM16 16a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM2 2h1l.4 2M7 13h7l4-8H5.4" 
+                stroke="currentColor" 
+                stroke-width="1.5" 
+                stroke-linecap="round" 
+                stroke-linejoin="round" 
+                fill="none"/>
+        </svg>
+        
+        {% if cart_count > 0 %}
+          <span class="cart-count-bubble" aria-hidden="true">
+            {% if cart_count > 99 %}99+{% else %}{{ cart_count }}{% endif %}
+          </span>
+        {% endif %}
+      </div>
+      <span class="visually-hidden">{{ 'templates.cart.cart' | t }}</span>
+    </a>
+  {% endif %}
+</div>
+
+<style>
+  .header__icons {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--header-spacing, 20px) * 0.75);
+  }
+
+  .header__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    color: inherit;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .header__icon:hover {
+    color: var(--menu-hover, #007acc);
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .header__icon svg {
+    width: var(--icon-size, 20px);
+    height: var(--icon-size, 20px);
+    stroke-width: 1.5;
+  }
+
+  .header__icon--custom svg {
+    width: calc(var(--icon-size, 20px) * 1.1);
+    height: calc(var(--icon-size, 20px) * 1.1);
+  }
+
+  /* Cart Icon Specific Styles */
+  .cart-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cart-count-bubble {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: var(--color-accent, #ff6b6b);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    padding: 2px 5px;
+    border-radius: 10px;
+    min-width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Accessibility */
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Mobile Optimization */
+  @media (max-width: 768px) {
+    .header__icons {
+      gap: calc(var(--header-spacing, 12px) * 0.5);
+    }
+
+    .header__icon {
+      padding: 6px;
+    }
+
+    .cart-count-bubble {
+      font-size: 10px;
+      min-width: 14px;
+      height: 14px;
+      top: -3px;
+      right: -3px;
+    }
+  }
+
+  /* High contrast mode */
+  @media (prefers-contrast: high) {
+    .header__icon:hover {
+      background: rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .header__icon {
+      transition: none;
+    }
+  }
+</style>

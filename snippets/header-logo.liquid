@@ -1,0 +1,163 @@
+{% comment %}
+  Header Logo Component
+  Renders the store logo with responsive sizing and font options
+  
+  Parameters:
+  - logo: image object - Logo image
+  - logo_mobile: image object - Mobile-specific logo (optional)
+  - logo_max_width: number - Maximum logo width
+  - logo_max_width_mobile: number - Mobile logo width
+  - custom_font: boolean - Use custom font for text logo
+  - font_weight: string - Logo font weight
+  - font_size: number - Logo font size
+{% endcomment %}
+
+{%- liquid
+  assign logo_image = logo
+  assign logo_mobile_image = logo_mobile
+  assign max_width = logo_max_width | default: 160
+  assign max_width_mobile = logo_max_width_mobile | default: 120
+  assign use_custom_font = custom_font | default: false
+  assign logo_font_weight = font_weight | default: '600'
+  assign logo_font_size = font_size | default: 24
+-%}
+
+<div class="header__logo" data-logo>
+  <a href="{{ routes.root_url }}" 
+     class="logo-link"
+     aria-label="{{ shop.name }} - {{ 'accessibility.homepage' | t | default: 'Homepage' }}">
+    
+    {% if logo_image != blank %}
+      <!-- Desktop Logo -->
+      <img class="logo-image logo-image--desktop"
+           src="{{ logo_image | image_url: width: max_width }}"
+           alt="{{ shop.name }}"
+           width="{{ max_width }}"
+           height="{{ logo_image.height | divided_by: logo_image.width | times: max_width | round }}"
+           loading="eager">
+      
+      <!-- Mobile Logo (if different) -->
+      {% if logo_mobile_image != blank %}
+        <img class="logo-image logo-image--mobile"
+             src="{{ logo_mobile_image | image_url: width: max_width_mobile }}"
+             alt="{{ shop.name }}"
+             width="{{ max_width_mobile }}"
+             height="{{ logo_mobile_image.height | divided_by: logo_mobile_image.width | times: max_width_mobile | round }}"
+             loading="eager">
+      {% else %}
+        <img class="logo-image logo-image--mobile"
+             src="{{ logo_image | image_url: width: max_width_mobile }}"
+             alt="{{ shop.name }}"
+             width="{{ max_width_mobile }}"
+             height="{{ logo_image.height | divided_by: logo_image.width | times: max_width_mobile | round }}"
+             loading="eager">
+      {% endif %}
+    {% else %}
+      <!-- Text Logo Fallback -->
+      <span class="logo-text{% if use_custom_font %} logo-text--custom{% endif %}">
+        {{ shop.name }}
+      </span>
+    {% endif %}
+  </a>
+</div>
+
+<style>
+  .header__logo {
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  .logo-link {
+    display: inline-block;
+    text-decoration: none;
+    color: inherit;
+    transition: opacity 0.2s ease;
+  }
+
+  .logo-link:hover {
+    opacity: 0.8;
+  }
+
+  /* Logo Images */
+  .logo-image {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .logo-image--desktop {
+    max-width: {{ max_width }}px;
+  }
+
+  .logo-image--mobile {
+    display: none;
+    max-width: {{ max_width_mobile }}px;
+  }
+
+  /* Text Logo */
+  .logo-text {
+    font-size: {{ logo_font_size }}px;
+    font-weight: {{ logo_font_weight }};
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    color: inherit;
+    {% if use_custom_font %}
+      font-family: var(--font-heading-family, inherit);
+    {% endif %}
+  }
+
+  .logo-text--custom {
+    font-family: var(--font-body-family, inherit);
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .logo-image--desktop {
+      {% if logo_mobile_image != blank %}
+        display: none;
+      {% else %}
+        max-width: {{ max_width_mobile }}px;
+      {% endif %}
+    }
+
+    .logo-image--mobile {
+      display: block;
+    }
+
+    .logo-text {
+      font-size: calc({{ logo_font_size }}px * 0.85);
+    }
+  }
+
+  /* Focus styles for accessibility */
+  .logo-link:focus {
+    outline: 2px solid var(--color-accent, #007acc);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Print styles */
+  @media print {
+    .logo-image {
+      max-width: 120px !important;
+    }
+    
+    .logo-text {
+      font-size: 18px !important;
+    }
+  }
+
+  /* High contrast mode */
+  @media (prefers-contrast: high) {
+    .logo-link:hover {
+      opacity: 0.7;
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .logo-link {
+      transition: none;
+    }
+  }
+</style>

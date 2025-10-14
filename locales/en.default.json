@@ -17,7 +17,37 @@
     "checkout": "Checkout",
     "title": "Cart",
     "update": "Update",
-    "remove": "Remove"
+    "remove": "Remove",
+    "decrease_quantity": "Decrease quantity",
+    "increase_quantity": "Increase quantity",
+    "quantity": "Quantity",
+    "empty": "Your cart is empty",
+    "empty_text": "Add some products to get started",
+    "continue_shopping": "Continue shopping",
+    "subtotal": "Subtotal",
+    "discounts": "Discounts",
+    "view_cart": "View cart",
+    "shipping_note": "Shipping calculated at checkout"
+  },
+  "customer": {
+    "account": {
+      "title": "Account"
+    },
+    "orders": {
+      "title": "Orders"
+    },
+    "addresses": {
+      "title": "Addresses"
+    },
+    "log_out": "Log out",
+    "login": {
+      "title": "Login",
+      "description": "Sign in to access your account",
+      "submit": "Sign in"
+    },
+    "register": {
+      "title": "Create account"
+    }
   },
   "customers": {
     "login": {
@@ -27,8 +57,27 @@
       "title": "Login"
     }
   },
+  "templates": {
+    "cart": {
+      "cart": "Cart"
+    }
+  },
+  "accessibility": {
+    "close": "Close",
+    "homepage": "Homepage"
+  },
+  "localization": {
+    "language": "Language",
+    "country": "Country"
+  },
+  "navigation": {
+    "menu": "Menu",
+    "expand": "Expand",
+    "secondary": "More"
+  },
   "collections": {
-    "title": "Collections"
+    "title": "Collections",
+    "view_all": "View collection"
   },
   "gift_card": {
     "add_to_apple_wallet": "Add to Apple Wallet",
@@ -58,7 +107,9 @@
   },
   "accessibility": {
     "star_reviews_info": "{{ rating_value }} out of {{ rating_max }} stars",
-    "view_more": "View more"
+    "view_more": "View more",
+    "close": "Close",
+    "homepage": "Homepage"
   },
   "general": {
     "accessibility": {

@@ -1,0 +1,350 @@
+{% comment %}
+  Header Account Popover Component
+  Account dropdown with user info and quick links
+{% endcomment %}
+
+<div class="account-popover" data-account-popover aria-hidden="true">
+  <div class="account-popover__content">
+    {% if customer %}
+      <!-- Logged In Customer -->
+      <div class="account-popover__header">
+        <div class="customer-info">
+          <span class="customer-name">{{ customer.first_name | default: customer.email }}</span>
+          <span class="customer-email">{{ customer.email }}</span>
+        </div>
+      </div>
+      
+      <ul class="account-popover__links">
+        <li>
+          <a href="{{ routes.account_url }}" class="account-popover__link">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="5" r="2" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M2 14c0-2.5 2.686-4.5 6-4.5s6 2 6 4.5" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+            {{ 'customer.account.title' | t }}
+          </a>
+        </li>
+        <li>
+          <a href="{{ routes.account_orders_url }}" class="account-popover__link">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <rect x="2" y="3" width="12" height="10" rx="1" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M6 1v4M10 1v4" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+            {{ 'customer.orders.title' | t | default: 'Orders' }}
+          </a>
+        </li>
+        <li>
+          <a href="{{ routes.account_addresses_url }}" class="account-popover__link">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M13 6.5C13 10.5 8 14.5 8 14.5S3 10.5 3 6.5C3 3.5 5.5 1 8 1S13 3.5 13 6.5Z" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+            {{ 'customer.addresses.title' | t | default: 'Addresses' }}
+          </a>
+        </li>
+        <li class="account-popover__divider"></li>
+        <li>
+          <a href="{{ routes.account_logout_url }}" class="account-popover__link account-popover__link--logout">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 14H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h3M11 11l3-3-3-3M9 8h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            {{ 'customer.log_out' | t | default: 'Log out' }}
+          </a>
+        </li>
+      </ul>
+    {% else %}
+      <!-- Guest User -->
+      <div class="account-popover__guest">
+        <h3 class="account-popover__title">{{ 'customer.login.title' | t }}</h3>
+        <p class="account-popover__description">{{ 'customer.login.description' | t | default: 'Sign in to access your account' }}</p>
+        
+        <div class="account-popover__actions">
+          <a href="{{ routes.account_login_url }}" class="account-button account-button--primary">
+            {{ 'customer.login.submit' | t }}
+          </a>
+          <a href="{{ routes.account_register_url }}" class="account-button account-button--secondary">
+            {{ 'customer.register.title' | t | default: 'Create account' }}
+          </a>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  .account-popover {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.2s ease;
+  }
+
+  .account-popover.is-open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .account-popover__content {
+    background: var(--header-bg, white);
+    border: 1px solid var(--header-border, #e5e5e5);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    min-width: 240px;
+    overflow: hidden;
+  }
+
+  /* Customer Info Header */
+  .account-popover__header {
+    padding: 16px 20px;
+    background: rgba(0, 0, 0, 0.02);
+    border-bottom: 1px solid var(--header-border, #e5e5e5);
+  }
+
+  .customer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .customer-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: inherit;
+  }
+
+  .customer-email {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  /* Account Links */
+  .account-popover__links {
+    list-style: none;
+    margin: 0;
+    padding: 8px 0;
+  }
+
+  .account-popover__link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    text-decoration: none;
+    color: inherit;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+  }
+
+  .account-popover__link:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--menu-hover, #007acc);
+  }
+
+  .account-popover__link:focus {
+    outline: 2px solid var(--color-accent, #007acc);
+    outline-offset: -2px;
+  }
+
+  .account-popover__link svg {
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+
+  .account-popover__link--logout {
+    color: var(--color-error, #e74c3c);
+  }
+
+  .account-popover__link--logout:hover {
+    background: rgba(231, 76, 60, 0.05);
+    color: var(--color-error, #e74c3c);
+  }
+
+  .account-popover__divider {
+    height: 1px;
+    background: var(--header-border, #e5e5e5);
+    margin: 8px 0;
+  }
+
+  /* Guest User Styles */
+  .account-popover__guest {
+    padding: 20px;
+    text-align: center;
+  }
+
+  .account-popover__title {
+    margin: 0 0 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: inherit;
+  }
+
+  .account-popover__description {
+    margin: 0 0 20px;
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.6);
+    line-height: 1.4;
+  }
+
+  .account-popover__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .account-button {
+    display: block;
+    padding: 10px 16px;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .account-button--primary {
+    background: var(--color-accent, #007acc);
+    color: white;
+  }
+
+  .account-button--primary:hover {
+    background: var(--color-accent-dark, #005fa3);
+  }
+
+  .account-button--secondary {
+    background: none;
+    color: inherit;
+    border: 1px solid var(--header-border, #e5e5e5);
+  }
+
+  .account-button--secondary:hover {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: var(--color-accent, #007acc);
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .account-popover__content {
+      min-width: 200px;
+    }
+
+    .account-popover__guest {
+      padding: 16px;
+    }
+
+    .account-popover__link {
+      padding: 10px 16px;
+      font-size: 13px;
+    }
+  }
+
+  /* High contrast mode */
+  @media (prefers-contrast: high) {
+    .account-popover__content {
+      border-width: 2px;
+    }
+
+    .account-popover__link:hover {
+      background: rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .account-popover,
+    .account-popover__link,
+    .account-button {
+      transition: none;
+    }
+
+    .account-popover {
+      transform: none;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    .account-popover {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+// Account Popover Functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const accountIcon = document.querySelector('.header__icon--account');
+  const accountPopover = document.querySelector('[data-account-popover]');
+
+  if (!accountIcon || !accountPopover) return;
+
+  let isOpen = false;
+  let closeTimeout;
+
+  // Show popover on hover
+  accountIcon.addEventListener('mouseenter', function() {
+    clearTimeout(closeTimeout);
+    showPopover();
+  });
+
+  // Hide popover when leaving icon (with delay)
+  accountIcon.addEventListener('mouseleave', function() {
+    clearTimeout(closeTimeout);
+    closeTimeout = setTimeout(hidePopover, 300);
+  });
+
+  // Keep popover open when hovering over it
+  accountPopover.addEventListener('mouseenter', function() {
+    clearTimeout(closeTimeout);
+  });
+
+  // Hide popover when leaving popover
+  accountPopover.addEventListener('mouseleave', function() {
+    clearTimeout(closeTimeout);
+    closeTimeout = setTimeout(hidePopover, 100);
+  });
+
+  // Toggle on click
+  accountIcon.addEventListener('click', function(e) {
+    e.preventDefault();
+    if (isOpen) {
+      hidePopover();
+    } else {
+      showPopover();
+    }
+  });
+
+  // Close on outside click
+  document.addEventListener('click', function(e) {
+    if (!accountIcon.contains(e.target) && !accountPopover.contains(e.target)) {
+      hidePopover();
+    }
+  });
+
+  // Close on escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && isOpen) {
+      hidePopover();
+      accountIcon.focus();
+    }
+  });
+
+  function showPopover() {
+    isOpen = true;
+    accountPopover.classList.add('is-open');
+    accountPopover.setAttribute('aria-hidden', 'false');
+  }
+
+  function hidePopover() {
+    isOpen = false;
+    accountPopover.classList.remove('is-open');
+    accountPopover.setAttribute('aria-hidden', 'true');
+    clearTimeout(closeTimeout);
+  }
+});
+</script>

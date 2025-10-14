@@ -1,0 +1,168 @@
+{% comment %}
+  Header Custom Icons Component
+  Renders custom icon array for header enhanced plus
+  
+  Parameters:
+  - icons: string - JSON formatted array of custom icons
+    Format: [{"icon": "<svg>...</svg>", "url": "/link", "label": "Custom", "target": "_blank"}]
+{% endcomment %}
+
+{%- liquid
+  assign icons_data = icons | default: ''
+  
+  # Try to parse JSON if it looks like JSON
+  if icons_data contains '[' and icons_data contains ']'
+    assign icons_parsed = icons_data | replace: '"', '"' | replace: '"', '"'
+  else
+    assign icons_parsed = ''
+  endif
+-%}
+
+{% if icons_data != blank and icons_data != '[]' %}
+  <div class="header__custom-icons" data-custom-icons>
+    {% comment %} 
+      For now, we'll use a simple pipe-separated format since Liquid can't parse JSON
+      Format: icon_svg|url|label|target,icon_svg|url|label|target
+    {% endcomment %}
+    
+    {% assign icon_groups = icons_data | split: ',' %}
+    {% for icon_group in icon_groups %}
+      {% assign icon_parts = icon_group | split: '|' %}
+      {% if icon_parts.size >= 3 %}
+        {% assign icon_svg = icon_parts[0] | strip %}
+        {% assign icon_url = icon_parts[1] | strip %}
+        {% assign icon_label = icon_parts[2] | strip %}
+        {% assign icon_target = icon_parts[3] | strip | default: '' %}
+        
+        <a href="{{ icon_url }}" 
+           class="header__custom-icon"
+           aria-label="{{ icon_label }}"
+           {% if icon_target == '_blank' or icon_url contains 'http' %}
+             target="_blank" rel="noopener noreferrer"
+           {% endif %}>
+          <div class="custom-icon-wrapper">
+            {{ icon_svg }}
+          </div>
+          <span class="visually-hidden">{{ icon_label }}</span>
+        </a>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endif %}
+
+<style>
+  .header__custom-icons {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--header-spacing, 20px) * 0.6);
+  }
+
+  .header__custom-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    color: inherit;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .header__custom-icon:hover {
+    color: var(--menu-hover, #007acc);
+    background: rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+  }
+
+  .custom-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--icon-size, 20px);
+    height: var(--icon-size, 20px);
+  }
+
+  .custom-icon-wrapper svg {
+    width: 100%;
+    height: 100%;
+    max-width: var(--icon-size, 20px);
+    max-height: var(--icon-size, 20px);
+    fill: currentColor;
+    stroke: currentColor;
+  }
+
+  /* Ensure proper SVG styling */
+  .custom-icon-wrapper svg [fill="none"] {
+    fill: none;
+  }
+
+  .custom-icon-wrapper svg [stroke="currentColor"] {
+    stroke: currentColor;
+  }
+
+  .custom-icon-wrapper svg [fill="currentColor"] {
+    fill: currentColor;
+  }
+
+  /* Accessibility */
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Mobile Optimization */
+  @media (max-width: 768px) {
+    .header__custom-icons {
+      gap: calc(var(--header-spacing, 12px) * 0.4);
+    }
+
+    .header__custom-icon {
+      padding: 4px;
+    }
+
+    .custom-icon-wrapper {
+      width: calc(var(--icon-size, 20px) * 0.9);
+      height: calc(var(--icon-size, 20px) * 0.9);
+    }
+  }
+
+  /* High contrast mode */
+  @media (prefers-contrast: high) {
+    .header__custom-icon:hover {
+      background: rgba(0, 0, 0, 0.15);
+      outline: 2px solid currentColor;
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .header__custom-icon {
+      transition: none;
+    }
+
+    .header__custom-icon:hover {
+      transform: none;
+    }
+  }
+
+  /* Focus styles for keyboard navigation */
+  .header__custom-icon:focus {
+    outline: 2px solid var(--color-accent, #007acc);
+    outline-offset: 2px;
+  }
+
+  /* Print styles */
+  @media print {
+    .header__custom-icons {
+      display: none;
+    }
+  }
+</style>

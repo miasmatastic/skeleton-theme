@@ -1,0 +1,509 @@
+{% comment %}
+  Header Mobile Drawer Component
+  Mobile navigation drawer with menu and featured content
+  
+  Parameters:
+  - menu: link_list - Primary navigation menu
+  - secondary_menu: link_list - Secondary navigation menu
+  - show_featured_content: boolean - Show featured content
+  - featured_collection: collection - Featured collection for mobile
+{% endcomment %}
+
+{%- liquid
+  assign primary_menu = menu
+  assign secondary_menu_list = secondary_menu
+  assign show_featured = show_featured_content | default: false
+  assign featured_coll = featured_collection
+-%}
+
+<div class="mobile-drawer" data-mobile-drawer aria-hidden="true">
+  <div class="mobile-drawer__overlay" data-mobile-drawer-overlay></div>
+  
+  <nav class="mobile-drawer__content" 
+       role="navigation" 
+       aria-label="Mobile navigation"
+       data-mobile-drawer-content>
+    
+    <div class="mobile-drawer__header">
+      <h2 class="mobile-drawer__title">{{ 'navigation.menu' | t | default: 'Menu' }}</h2>
+      <button type="button" 
+              class="mobile-drawer__close"
+              aria-label="{{ 'accessibility.close' | t | default: 'Close menu' }}"
+              data-mobile-drawer-close>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M15 5L5 15M5 5l10 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="mobile-drawer__body">
+      {% if primary_menu != blank and primary_menu.links.size > 0 %}
+        <!-- Primary Navigation -->
+        <div class="mobile-nav-section">
+          <ul class="mobile-nav-list" data-mobile-nav-primary>
+            {% for link in primary_menu.links %}
+              <li class="mobile-nav-item{% if link.links.size > 0 %} has-children{% endif %}">
+                <a href="{{ link.url }}" 
+                   class="mobile-nav-link{% if link.active %} mobile-nav-link--active{% endif %}"
+                   {% if link.current %}aria-current="page"{% endif %}>
+                  <span class="mobile-nav-text">{{ link.title }}</span>
+                  {% if link.links.size > 0 %}
+                    <button type="button" 
+                            class="mobile-nav-toggle"
+                            aria-label="{{ 'navigation.expand' | t | default: 'Expand' }} {{ link.title }}"
+                            data-mobile-nav-toggle>
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      </svg>
+                    </button>
+                  {% endif %}
+                </a>
+                
+                {% if link.links.size > 0 %}
+                  <ul class="mobile-nav-submenu" data-mobile-nav-submenu>
+                    {% for child_link in link.links %}
+                      <li class="mobile-nav-subitem">
+                        <a href="{{ child_link.url }}" 
+                           class="mobile-nav-sublink{% if child_link.active %} mobile-nav-sublink--active{% endif %}"
+                           {% if child_link.current %}aria-current="page"{% endif %}>
+                          {{ child_link.title }}
+                        </a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      {% if secondary_menu_list != blank and secondary_menu_list.links.size > 0 %}
+        <!-- Secondary Navigation -->
+        <div class="mobile-nav-section mobile-nav-section--secondary">
+          <h3 class="mobile-nav-section-title">{{ 'navigation.secondary' | t | default: 'More' }}</h3>
+          <ul class="mobile-nav-list mobile-nav-list--secondary">
+            {% for link in secondary_menu_list.links %}
+              <li class="mobile-nav-item">
+                <a href="{{ link.url }}" 
+                   class="mobile-nav-link{% if link.active %} mobile-nav-link--active{% endif %}"
+                   {% if link.current %}aria-current="page"{% endif %}>
+                  <span class="mobile-nav-text">{{ link.title }}</span>
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      {% if show_featured and featured_coll != blank %}
+        <!-- Featured Collection -->
+        <div class="mobile-nav-section mobile-nav-section--featured">
+          <h3 class="mobile-nav-section-title">{{ featured_coll.title }}</h3>
+          <div class="mobile-featured-products">
+            {% for product in featured_coll.products limit: 4 %}
+              <a href="{{ product.url }}" class="mobile-featured-product">
+                {% if product.featured_image != blank %}
+                  <img src="{{ product.featured_image | image_url: width: 80 }}" 
+                       alt="{{ product.title }}" 
+                       class="mobile-featured-product__image"
+                       width="40" 
+                       height="40"
+                       loading="lazy">
+                {% endif %}
+                <div class="mobile-featured-product__info">
+                  <span class="mobile-featured-product__title">{{ product.title | truncate: 30 }}</span>
+                  <span class="mobile-featured-product__price">{{ product.price | money }}</span>
+                </div>
+              </a>
+            {% endfor %}
+          </div>
+          <a href="{{ featured_coll.url }}" class="mobile-featured-collection-link">
+            {{ 'collections.view_all' | t | default: 'View collection' }}
+          </a>
+        </div>
+      {% endif %}
+
+      <!-- Utility Links -->
+      <div class="mobile-nav-section mobile-nav-section--utility">
+        <ul class="mobile-nav-list mobile-nav-list--utility">
+          <li class="mobile-nav-item">
+            <a href="{{ routes.account_url }}" class="mobile-nav-link">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <circle cx="9" cy="5.5" r="2.25" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M3 16c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+              <span class="mobile-nav-text">{{ 'customer.account.title' | t }}</span>
+            </a>
+          </li>
+          <li class="mobile-nav-item">
+            <a href="{{ routes.cart_url }}" class="mobile-nav-link">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <path d="M5 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM14 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM2 2h1l.4 2M6 11h6l3-7H4.4" 
+                      stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span class="mobile-nav-text">{{ 'templates.cart.cart' | t }} ({{ cart.item_count }})</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .mobile-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9998;
+    visibility: hidden;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+
+  .mobile-drawer.is-open {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .mobile-drawer__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    transition: opacity 0.3s ease;
+  }
+
+  .mobile-drawer__content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 85%;
+    max-width: 320px;
+    height: 100%;
+    background: var(--header-bg, white);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-drawer.is-open .mobile-drawer__content {
+    transform: translateX(0);
+  }
+
+  .mobile-drawer__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    border-bottom: 1px solid var(--header-border, #e5e5e5);
+    background: var(--header-bg, white);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .mobile-drawer__title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: inherit;
+  }
+
+  .mobile-drawer__close {
+    background: none;
+    border: none;
+    padding: 8px;
+    color: inherit;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+  }
+
+  .mobile-drawer__close:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .mobile-drawer__body {
+    padding: 0 0 40px;
+  }
+
+  .mobile-nav-section {
+    border-bottom: 1px solid var(--header-border, #e5e5e5);
+  }
+
+  .mobile-nav-section:last-child {
+    border-bottom: none;
+  }
+
+  .mobile-nav-section-title {
+    margin: 0;
+    padding: 20px 20px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .mobile-nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .mobile-nav-item {
+    position: relative;
+  }
+
+  .mobile-nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    text-decoration: none;
+    color: inherit;
+    font-size: 16px;
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .mobile-nav-link:hover,
+  .mobile-nav-link--active {
+    background: rgba(0, 0, 0, 0.02);
+    color: var(--menu-hover, #007acc);
+  }
+
+  .mobile-nav-link:focus {
+    outline: 2px solid var(--color-accent, #007acc);
+    outline-offset: -2px;
+  }
+
+  .mobile-nav-text {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .mobile-nav-toggle {
+    background: none;
+    border: none;
+    padding: 4px;
+    color: inherit;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+  }
+
+  .mobile-nav-toggle:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .mobile-nav-toggle svg {
+    transition: transform 0.2s ease;
+  }
+
+  .mobile-nav-toggle[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+  }
+
+  /* Submenu Styles */
+  .mobile-nav-submenu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background: rgba(0, 0, 0, 0.02);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .mobile-nav-submenu.is-open {
+    max-height: 500px;
+  }
+
+  .mobile-nav-subitem {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .mobile-nav-subitem:last-child {
+    border-bottom: none;
+  }
+
+  .mobile-nav-sublink {
+    display: block;
+    padding: 12px 20px 12px 40px;
+    text-decoration: none;
+    color: inherit;
+    font-size: 15px;
+    transition: background-color 0.2s ease;
+  }
+
+  .mobile-nav-sublink:hover,
+  .mobile-nav-sublink--active {
+    background: rgba(0, 0, 0, 0.03);
+    color: var(--menu-hover, #007acc);
+  }
+
+  /* Featured Products */
+  .mobile-featured-products {
+    padding: 0 20px;
+  }
+
+  .mobile-featured-product {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    text-decoration: none;
+    color: inherit;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .mobile-featured-product:last-child {
+    border-bottom: none;
+  }
+
+  .mobile-featured-product__image {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .mobile-featured-product__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .mobile-featured-product__title {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+
+  .mobile-featured-product__price {
+    display: block;
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  .mobile-featured-collection-link {
+    display: block;
+    padding: 16px 20px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--color-accent, #007acc);
+    font-weight: 500;
+    font-size: 14px;
+  }
+
+  /* Utility Section */
+  .mobile-nav-section--utility {
+    margin-top: 20px;
+  }
+
+  .mobile-nav-list--utility .mobile-nav-link {
+    font-size: 15px;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-drawer,
+    .mobile-drawer__content,
+    .mobile-nav-link,
+    .mobile-nav-toggle,
+    .mobile-nav-submenu {
+      transition: none;
+    }
+
+    .mobile-nav-toggle[aria-expanded="true"] svg {
+      transform: none;
+    }
+  }
+
+  /* High contrast mode */
+  @media (prefers-contrast: high) {
+    .mobile-drawer__content {
+      border-left: 3px solid var(--header-border, #000);
+    }
+
+    .mobile-nav-link:hover {
+      background: rgba(0, 0, 0, 0.1);
+    }
+  }
+</style>
+
+<script>
+// Mobile Drawer Functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const drawer = document.querySelector('[data-mobile-drawer]');
+  const overlay = document.querySelector('[data-mobile-drawer-overlay]');
+  const closeBtn = document.querySelector('[data-mobile-drawer-close]');
+  const toggles = document.querySelectorAll('[data-mobile-nav-toggle]');
+
+  if (!drawer) return;
+
+  // Close drawer
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeMobileDrawer);
+  }
+
+  if (overlay) {
+    overlay.addEventListener('click', closeMobileDrawer);
+  }
+
+  // Handle submenu toggles
+  toggles.forEach(toggle => {
+    toggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      toggleSubmenu(this);
+    });
+  });
+
+  // Close on escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && drawer.classList.contains('is-open')) {
+      closeMobileDrawer();
+    }
+  });
+
+  function closeMobileDrawer() {
+    drawer.classList.remove('is-open');
+    drawer.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('mobile-menu-open');
+  }
+
+  function toggleSubmenu(toggle) {
+    const submenu = toggle.closest('.mobile-nav-item').querySelector('[data-mobile-nav-submenu]');
+    if (!submenu) return;
+
+    const isOpen = submenu.classList.contains('is-open');
+    
+    // Close all other submenus
+    document.querySelectorAll('[data-mobile-nav-submenu]').forEach(menu => {
+      menu.classList.remove('is-open');
+    });
+    
+    document.querySelectorAll('[data-mobile-nav-toggle]').forEach(btn => {
+      btn.setAttribute('aria-expanded', 'false');
+    });
+
+    // Toggle current submenu
+    if (!isOpen) {
+      submenu.classList.add('is-open');
+      toggle.setAttribute('aria-expanded', 'true');
+    } else {
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+  }
+});
+</script>

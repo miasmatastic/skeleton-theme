@@ -1,0 +1,406 @@
+{% comment %}
+  Header Localization Component
+  Renders language and country selectors
+  
+  Parameters:
+  - show_language: boolean - Show language selector
+  - show_country: boolean - Show country selector  
+  - style: string - Display style ('dropdown', 'flags', 'text')
+{% endcomment %}
+
+{%- liquid
+  assign show_lang = show_language | default: false
+  assign show_country_sel = show_country | default: false
+  assign display_style = style | default: 'dropdown'
+-%}
+
+{% if show_lang or show_country_sel %}
+  <div class="header__localization header__localization--{{ display_style }}" 
+       data-localization>
+    
+    {% if show_lang and localization.available_languages.size > 1 %}
+      <!-- Language Selector -->
+      <div class="localization-selector localization-selector--language"
+           data-selector="language">
+        {% if display_style == 'dropdown' %}
+          <button type="button" 
+                  class="localization-trigger"
+                  aria-expanded="false"
+                  aria-haspopup="true"
+                  aria-label="{{ 'localization.language' | t | default: 'Language' }}"
+                  data-localization-trigger="language">
+            {% if display_style == 'flags' %}
+              <span class="flag flag--{{ localization.language.iso_code }}"></span>
+            {% endif %}
+            <span class="localization-text">{{ localization.language.endonym_name | default: localization.language.name }}</span>
+            <svg class="localization-arrow" width="12" height="12" viewBox="0 0 12 12">
+              <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+          
+          <div class="localization-dropdown" data-localization-dropdown="language">
+            {% for language in localization.available_languages %}
+              {% unless language.iso_code == localization.language.iso_code %}
+                <a href="#" 
+                   class="localization-option"
+                   hreflang="{{ language.iso_code }}"
+                   aria-label="{{ language.endonym_name | default: language.name }}"
+                   data-localization-option="language"
+                   data-value="{{ language.iso_code }}">
+                  {% if display_style == 'flags' %}
+                    <span class="flag flag--{{ language.iso_code }}"></span>
+                  {% endif %}
+                  <span class="localization-text">{{ language.endonym_name | default: language.name }}</span>
+                </a>
+              {% endunless %}
+            {% endfor %}
+          </div>
+        {% else %}
+          <!-- Simple text/flag display -->
+          <span class="localization-display">
+            {% if display_style == 'flags' %}
+              <span class="flag flag--{{ localization.language.iso_code }}"></span>
+            {% endif %}
+            <span class="localization-text">{{ localization.language.endonym_name | default: localization.language.name }}</span>
+          </span>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {% if show_country_sel and localization.available_countries.size > 1 %}
+      <!-- Country Selector -->
+      <div class="localization-selector localization-selector--country"
+           data-selector="country">
+        {% if display_style == 'dropdown' %}
+          <button type="button" 
+                  class="localization-trigger"
+                  aria-expanded="false"
+                  aria-haspopup="true"
+                  aria-label="{{ 'localization.country' | t | default: 'Country' }}"
+                  data-localization-trigger="country">
+            {% if display_style == 'flags' %}
+              <span class="flag flag--{{ localization.country.iso_code }}"></span>
+            {% endif %}
+            <span class="localization-text">{{ localization.country.name }} ({{ localization.country.currency.symbol }})</span>
+            <svg class="localization-arrow" width="12" height="12" viewBox="0 0 12 12">
+              <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+          
+          <div class="localization-dropdown" data-localization-dropdown="country">
+            {% for country in localization.available_countries %}
+              {% unless country.iso_code == localization.country.iso_code %}
+                <a href="#" 
+                   class="localization-option"
+                   aria-label="{{ country.name }}"
+                   data-localization-option="country"
+                   data-value="{{ country.iso_code }}">
+                  {% if display_style == 'flags' %}
+                    <span class="flag flag--{{ country.iso_code }}"></span>
+                  {% endif %}
+                  <span class="localization-text">{{ country.name }} ({{ country.currency.symbol }})</span>
+                </a>
+              {% endunless %}
+            {% endfor %}
+          </div>
+        {% else %}
+          <!-- Simple text/flag display -->
+          <span class="localization-display">
+            {% if display_style == 'flags' %}
+              <span class="flag flag--{{ localization.country.iso_code }}"></span>
+            {% endif %}
+            <span class="localization-text">{{ localization.country.name }}</span>
+          </span>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+{% endif %}
+
+<style>
+  .header__localization {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .localization-selector {
+    position: relative;
+  }
+
+  .localization-trigger {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: 1px solid var(--header-border, #e5e5e5);
+    padding: 6px 12px;
+    border-radius: 6px;
+    color: inherit;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s ease;
+  }
+
+  .localization-trigger:hover {
+    border-color: var(--menu-hover, #007acc);
+    background: rgba(0, 0, 0, 0.02);
+  }
+
+  .localization-trigger:focus {
+    outline: 2px solid var(--color-accent, #007acc);
+    outline-offset: 1px;
+  }
+
+  .localization-display {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: inherit;
+  }
+
+  .localization-text {
+    white-space: nowrap;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .localization-arrow {
+    transition: transform 0.2s ease;
+    opacity: 0.7;
+  }
+
+  .localization-trigger[aria-expanded="true"] .localization-arrow {
+    transform: rotate(180deg);
+  }
+
+  /* Flag Styles */
+  .flag {
+    display: inline-block;
+    width: 16px;
+    height: 12px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* Basic flag backgrounds - you would typically use actual flag images */
+  .flag--en { background: linear-gradient(to bottom, #012169 33%, #fff 33%, #fff 66%, #C8102E 66%); }
+  .flag--fr { background: linear-gradient(to right, #002395 33%, #fff 33%, #fff 66%, #ED2939 66%); }
+  .flag--de { background: linear-gradient(to bottom, #000 33%, #DD0000 33%, #DD0000 66%, #FFCE00 66%); }
+  .flag--es { background: linear-gradient(to bottom, #AA151B 25%, #F1BF00 25%, #F1BF00 75%, #AA151B 75%); }
+
+  /* Dropdown Styles */
+  .localization-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: var(--header-bg, white);
+    border: 1px solid var(--header-border, #e5e5e5);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    min-width: 180px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.2s ease;
+  }
+
+  .localization-selector:hover .localization-dropdown,
+  .localization-trigger[aria-expanded="true"] + .localization-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .localization-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    text-decoration: none;
+    color: inherit;
+    font-size: 13px;
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .localization-option:last-child {
+    border-bottom: none;
+  }
+
+  .localization-option:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--menu-hover, #007acc);
+  }
+
+  .localization-option:focus {
+    outline: 2px solid var(--color-accent, #007acc);
+    outline-offset: -2px;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .header__localization {
+      gap: 8px;
+    }
+
+    .localization-trigger,
+    .localization-display {
+      font-size: 12px;
+      padding: 4px 8px;
+    }
+
+    .localization-text {
+      max-width: 80px;
+    }
+
+    .localization-dropdown {
+      min-width: 160px;
+    }
+  }
+
+  /* High contrast mode */
+  @media (prefers-contrast: high) {
+    .localization-trigger {
+      border-width: 2px;
+    }
+
+    .localization-dropdown {
+      border-width: 2px;
+    }
+
+    .localization-option:hover {
+      background: rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .localization-trigger,
+    .localization-arrow,
+    .localization-dropdown,
+    .localization-option {
+      transition: none;
+    }
+
+    .localization-trigger[aria-expanded="true"] .localization-arrow {
+      transform: none;
+    }
+
+    .localization-dropdown {
+      transform: none;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    .header__localization {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+// Localization Dropdown Functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const localizationTriggers = document.querySelectorAll('[data-localization-trigger]');
+  
+  localizationTriggers.forEach(trigger => {
+    const type = trigger.dataset.localizationTrigger;
+    const dropdown = document.querySelector(`[data-localization-dropdown="${type}"]`);
+    if (!dropdown) return;
+
+    // Toggle dropdown
+    trigger.addEventListener('click', function(e) {
+      e.preventDefault();
+      toggleDropdown(trigger, dropdown);
+    });
+
+    // Handle option selection
+    const options = dropdown.querySelectorAll('[data-localization-option]');
+    options.forEach(option => {
+      option.addEventListener('click', function(e) {
+        e.preventDefault();
+        const value = this.dataset.value;
+        selectLocalization(type, value);
+        closeDropdown(trigger, dropdown);
+      });
+    });
+
+    // Close on outside click
+    document.addEventListener('click', function(e) {
+      if (!trigger.contains(e.target) && !dropdown.contains(e.target)) {
+        closeDropdown(trigger, dropdown);
+      }
+    });
+
+    // Keyboard navigation
+    trigger.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleDropdown(trigger, dropdown);
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        openDropdown(trigger, dropdown);
+        focusFirstOption(dropdown);
+      }
+    });
+
+    dropdown.addEventListener('keydown', function(e) {
+      const currentOption = document.activeElement;
+      const options = dropdown.querySelectorAll('[data-localization-option]');
+      const currentIndex = Array.from(options).indexOf(currentOption);
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const nextIndex = (currentIndex + 1) % options.length;
+        options[nextIndex].focus();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const prevIndex = currentIndex > 0 ? currentIndex - 1 : options.length - 1;
+        options[prevIndex].focus();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        closeDropdown(trigger, dropdown);
+        trigger.focus();
+      }
+    });
+  });
+
+  function toggleDropdown(trigger, dropdown) {
+    const isExpanded = trigger.getAttribute('aria-expanded') === 'true';
+    if (isExpanded) {
+      closeDropdown(trigger, dropdown);
+    } else {
+      openDropdown(trigger, dropdown);
+    }
+  }
+
+  function openDropdown(trigger, dropdown) {
+    trigger.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeDropdown(trigger, dropdown) {
+    trigger.setAttribute('aria-expanded', 'false');
+  }
+
+  function focusFirstOption(dropdown) {
+    const firstOption = dropdown.querySelector('[data-localization-option]');
+    if (firstOption) firstOption.focus();
+  }
+
+  function selectLocalization(type, value) {
+    // In a real implementation, this would update the localization
+    // For now, we'll just refresh the page or redirect
+    console.log(`Selected ${type}: ${value}`);
+    
+    // You would typically use Shopify's localization forms here
+    // Example: submit a form to update the locale
+  }
+});
+</script>
