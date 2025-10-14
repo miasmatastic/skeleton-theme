@@ -432,4 +432,3 @@ For Pure Junk Media team members:
 **Built with ❤️ by Pure Junk Media Development Team**
 
 *A comprehensive e-commerce theme solution built on Shopify's best practices*
-
