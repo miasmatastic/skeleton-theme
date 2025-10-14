@@ -28,13 +28,11 @@
     {% capture product_items %}
       {% for product in selected_collection.products limit: products_limit %}
         <div class="showcase-product-item">
-          {% render 'product-card',
-            product: product,
-            section_settings: section.settings,
+          {% render 'card-product-dynamic',
+            product_card_product: product,
             show_vendor: section.settings.show_vendor,
             show_rating: section.settings.show_rating,
-            show_quick_add: section.settings.show_quick_add,
-            section_id: section.id
+            show_quick_add: section.settings.show_quick_add
           %}
         </div>
         {% unless forloop.last %}
@@ -58,7 +56,23 @@
     %}
   {% else %}
     <div class="custom-showcase__placeholder">
-      <p>{{ 'sections.collection_list.empty' | t }}</p>
+      <div class="placeholder-content">
+        {% if selected_collection == blank %}
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+            <rect x="8" y="8" width="48" height="48" rx="4" stroke="currentColor" stroke-width="2"/>
+            <path d="M20 24H44M20 32H44M20 40H36" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <h3>No collection selected</h3>
+          <p>Choose a collection in the section settings to showcase your products.</p>
+        {% else %}
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+            <circle cx="32" cy="20" r="8" stroke="currentColor" stroke-width="2"/>
+            <path d="M16 48C16 40 23 34 32 34S48 40 48 48" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          <h3>Collection is empty</h3>
+          <p>The "{{ selected_collection.title }}" collection doesn't have any products yet.</p>
+        {% endif %}
+      </div>
     </div>
   {% endif %}
 </div>
@@ -268,7 +282,7 @@
 
 {% schema %}
 {
-  "name": "Custom Showcase",
+  "name": "t:general.custom_showcase",
   "class": "custom-showcase-section",
   "blocks": [
     {
@@ -306,12 +320,12 @@
     {
       "type": "collection",
       "id": "collection",
-      "label": "Collection to Showcase"
+      "label": "t:labels.collection_to_showcase"
     },
     {
       "type": "range",
       "id": "products_limit",
-      "label": "Number of Products to Show",
+      "label": "t:labels.number_of_products",
       "min": 1,
       "max": 50,
       "step": 1,

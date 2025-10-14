@@ -9,12 +9,68 @@
  */
 {
   "sections": {
-    "main": {
-      "type": "hello-world",
-      "settings": {}
+    "announcement": {
+      "type": "announcement-enhanced",
+      "settings": {
+        "auto_rotate": true,
+        "change_slides_speed": 5,
+        "show_navigation_dots": true,
+        "show_navigation_arrows": false
+      }
+    },
+    "hero_showcase": {
+      "type": "custom-showcase",
+      "settings": {
+        "collection": "",
+        "layout_type": "hero",
+        "products_limit": 6,
+        "columns": 3,
+        "mobile_columns": "1",
+        "section_width": "full-width",
+        "enable_enhanced_features": true,
+        "content_alignment": "center",
+        "title": "Featured Products",
+        "title_font_size": 32,
+        "show_vendor": false,
+        "show_rating": true,
+        "show_quick_add": true
+      }
+    },
+    "dynamic_grid": {
+      "type": "dynamic-product-grid",
+      "settings": {
+        "title": "New Arrivals",
+        "collection": "",
+        "layout_preset": "grid",
+        "products_per_row": 4,
+        "products_per_row_mobile": 2,
+        "rows_to_show": 2,
+        "enable_quick_add": true,
+        "show_vendor": false,
+        "show_rating": true,
+        "enable_pagination": false,
+        "enable_filtering": false,
+        "color_scheme": "scheme-1"
+      }
+    },
+    "collection_list": {
+      "type": "collection-list-enhanced",
+      "settings": {
+        "title": "Shop by Category",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "columns_mobile": "1",
+        "show_collection_description": true,
+        "show_product_count": true,
+        "image_ratio": "adapt",
+        "color_scheme": "scheme-1"
+      }
     }
   },
   "order": [
-    "main"
+    "announcement",
+    "hero_showcase", 
+    "dynamic_grid",
+    "collection_list"
   ]
 }

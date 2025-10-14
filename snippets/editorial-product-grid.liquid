@@ -1,0 +1,285 @@
+{% doc %}
+  Renders an editorial-style product grid with enhanced layouts.
+
+  @param {object} items - Collection of products to display
+  @param {string} [layout] - Grid layout style (editorial, magazine, minimal)
+
+  @example
+  {% render 'editorial-product-grid', items: collections.featured.products %}
+  {% render 'editorial-product-grid', items: products, layout: 'magazine' %}
+{% enddoc %}
+
+{%- liquid
+  assign layout = layout | default: 'editorial'
+  assign item_count = items.size
+-%}
+
+{%- if item_count > 0 -%}
+  <div class="editorial-grid editorial-grid--{{ layout }}" data-layout="{{ layout }}">
+    {%- for product in items limit: 8 -%}
+      {%- liquid
+        assign product_index = forloop.index0
+        assign item_class = 'editorial-item'
+        
+        # Editorial layout patterns
+        if layout == 'editorial'
+          case product_index
+            when 0
+              assign item_class = item_class | append: ' editorial-item--hero'
+            when 1, 2
+              assign item_class = item_class | append: ' editorial-item--featured'
+            else
+              assign item_class = item_class | append: ' editorial-item--standard'
+          endcase
+        elsif layout == 'magazine'
+          case product_index
+            when 0, 3
+              assign item_class = item_class | append: ' editorial-item--large'
+            when 1, 4
+              assign item_class = item_class | append: ' editorial-item--medium'
+            else
+              assign item_class = item_class | append: ' editorial-item--small'
+          endcase
+        endif
+      -%}
+      
+      <article class="{{ item_class }}">
+        <div class="editorial-item__media">
+          {%- if product.featured_image -%}
+            <a href="{{ product.url }}" class="editorial-item__image-link">
+              {% render 'image', image: product.featured_image, width: 800, height: 600, crop: 'center' %}
+            </a>
+          {%- else -%}
+            <div class="editorial-item__placeholder">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="48" height="48">
+                <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+              </svg>
+            </div>
+          {%- endif -%}
+          
+          {%- if product.compare_at_price > product.price -%}
+            <span class="editorial-item__badge editorial-item__badge--sale">
+              Sale
+            </span>
+          {%- endif -%}
+        </div>
+        
+        <div class="editorial-item__content">
+          {%- if product.vendor and layout == 'editorial' -%}
+            <p class="editorial-item__vendor">{{ product.vendor }}</p>
+          {%- endif -%}
+          
+          <h3 class="editorial-item__title">
+            <a href="{{ product.url }}">{{ product.title | escape }}</a>
+          </h3>
+          
+          {%- if product.description and layout != 'minimal' -%}
+            <p class="editorial-item__description">
+              {{ product.description | strip_html | truncatewords: 20 }}
+            </p>
+          {%- endif -%}
+          
+          <div class="editorial-item__price">
+            {% render 'price', product_resource: product %}
+          </div>
+        </div>
+      </article>
+    {%- endfor -%}
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .editorial-grid {
+    display: grid;
+    gap: 2rem;
+    grid-auto-rows: minmax(200px, auto);
+  }
+
+  .editorial-grid--editorial {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-areas: 
+      "hero hero featured1 featured2"
+      "hero hero item1 item2"
+      "item3 item4 item5 item6";
+  }
+
+  .editorial-grid--magazine {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .editorial-grid--minimal {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+
+  .editorial-item {
+    display: flex;
+    flex-direction: column;
+    background: rgba(var(--color-foreground), 0.02);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+  }
+
+  .editorial-item:hover {
+    transform: translateY(-4px);
+  }
+
+  .editorial-item--hero {
+    grid-area: hero;
+  }
+
+  .editorial-item--featured:nth-child(2) {
+    grid-area: featured1;
+  }
+
+  .editorial-item--featured:nth-child(3) {
+    grid-area: featured2;
+  }
+
+  .editorial-item--large {
+    grid-column: span 3;
+  }
+
+  .editorial-item--medium {
+    grid-column: span 2;
+  }
+
+  .editorial-item--small {
+    grid-column: span 1;
+  }
+
+  .editorial-item__media {
+    position: relative;
+    flex: 1;
+    min-height: 200px;
+  }
+
+  .editorial-item--hero .editorial-item__media {
+    min-height: 400px;
+  }
+
+  .editorial-item__image-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .editorial-item__image-link img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .editorial-item__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: rgba(var(--color-foreground), 0.1);
+    color: rgba(var(--color-foreground), 0.3);
+  }
+
+  .editorial-item__badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    padding: 0.25rem 0.75rem;
+    background: #ff4444;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    border-radius: 4px;
+    z-index: 2;
+  }
+
+  .editorial-item__content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .editorial-item__vendor {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.7;
+    margin: 0;
+  }
+
+  .editorial-item__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .editorial-item--hero .editorial-item__title {
+    font-size: 1.75rem;
+  }
+
+  .editorial-item__title a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .editorial-item__title a:hover {
+    opacity: 0.8;
+  }
+
+  .editorial-item__description {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    opacity: 0.8;
+    margin: 0;
+  }
+
+  .editorial-item__price {
+    margin-top: auto;
+    font-weight: 600;
+  }
+
+  @media (max-width: 1024px) {
+    .editorial-grid--editorial {
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-areas: 
+        "hero hero"
+        "featured1 featured2"
+        "item1 item2"
+        "item3 item4";
+    }
+
+    .editorial-grid--magazine {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .editorial-item--large {
+      grid-column: span 2;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .editorial-grid,
+    .editorial-grid--editorial,
+    .editorial-grid--magazine {
+      grid-template-columns: 1fr;
+      grid-template-areas: none;
+    }
+
+    .editorial-item--hero,
+    .editorial-item--featured,
+    .editorial-item--large,
+    .editorial-item--medium,
+    .editorial-item--small {
+      grid-column: span 1;
+      grid-area: auto;
+    }
+
+    .editorial-item__content {
+      padding: 1rem;
+    }
+  }
+{% endstylesheet %}

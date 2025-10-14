@@ -1,0 +1,315 @@
+{% doc %}
+  Renders an editorial-style collection grid with enhanced layouts.
+
+  @param {object} items - Collection of collections to display
+  @param {string} [layout] - Grid layout style (editorial, magazine, minimal)
+
+  @example
+  {% render 'editorial-collection-grid', items: collections %}
+  {% render 'editorial-collection-grid', items: collections, layout: 'magazine' %}
+{% enddoc %}
+
+{%- liquid
+  assign layout = layout | default: 'editorial'
+  assign item_count = items.size
+-%}
+
+{%- if item_count > 0 -%}
+  <div class="editorial-collection-grid editorial-collection-grid--{{ layout }}" data-layout="{{ layout }}">
+    {%- for collection in items limit: 8 -%}
+      {%- liquid
+        assign collection_index = forloop.index0
+        assign item_class = 'editorial-collection-item'
+        
+        # Editorial layout patterns
+        if layout == 'editorial'
+          case collection_index
+            when 0
+              assign item_class = item_class | append: ' editorial-collection-item--hero'
+            when 1, 2
+              assign item_class = item_class | append: ' editorial-collection-item--featured'
+            else
+              assign item_class = item_class | append: ' editorial-collection-item--standard'
+          endcase
+        elsif layout == 'magazine'
+          case collection_index
+            when 0, 3
+              assign item_class = item_class | append: ' editorial-collection-item--large'
+            when 1, 4
+              assign item_class = item_class | append: ' editorial-collection-item--medium'
+            else
+              assign item_class = item_class | append: ' editorial-collection-item--small'
+          endcase
+        endif
+      -%}
+      
+      <article class="{{ item_class }}">
+        <div class="editorial-collection-item__media">
+          {%- if collection.featured_image -%}
+            <a href="{{ collection.url }}" class="editorial-collection-item__image-link">
+              {% render 'image', image: collection.featured_image, width: 800, height: 600, crop: 'center' %}
+            </a>
+          {%- else -%}
+            <div class="editorial-collection-item__placeholder">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="48" height="48">
+                <path d="M7,4V2A1,1 0 0,1 8,1H16A1,1 0 0,1 17,2V4H20A1,1 0 0,1 21,5V7A1,1 0 0,1 20,8H19V19A3,3 0 0,1 16,22H8A3,3 0 0,1 5,19V8H4A1,1 0 0,1 3,7V5A1,1 0 0,1 4,4H7M9,3V4H15V3H9M7,8V19A1,1 0 0,0 8,20H16A1,1 0 0,0 17,19V8H7Z"/>
+              </svg>
+            </div>
+          {%- endif -%}
+          
+          {%- if collection.products_count > 0 -%}
+            <span class="editorial-collection-item__count">
+              {{ collection.products_count }} 
+              {%- if collection.products_count == 1 -%}
+                item
+              {%- else -%}
+                items
+              {%- endif -%}
+            </span>
+          {%- endif -%}
+        </div>
+        
+        <div class="editorial-collection-item__content">
+          <h3 class="editorial-collection-item__title">
+            <a href="{{ collection.url }}">{{ collection.title | escape }}</a>
+          </h3>
+          
+          {%- if collection.description and layout != 'minimal' -%}
+            <p class="editorial-collection-item__description">
+              {{ collection.description | strip_html | truncatewords: 20 }}
+            </p>
+          {%- endif -%}
+          
+          {%- if collection.products.size > 0 and layout == 'editorial' -%}
+            <div class="editorial-collection-item__preview">
+              {%- for product in collection.products limit: 3 -%}
+                <div class="editorial-collection-item__preview-item">
+                  {%- if product.featured_image -%}
+                    <img src="{{ product.featured_image | image_url: width: 60, height: 60 }}" 
+                         alt="{{ product.title | escape }}"
+                         width="30" height="30">
+                  {%- endif -%}
+                </div>
+              {%- endfor -%}
+              {%- if collection.products_count > 3 -%}
+                <span class="editorial-collection-item__preview-more">
+                  +{{ collection.products_count | minus: 3 }}
+                </span>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        </div>
+      </article>
+    {%- endfor -%}
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .editorial-collection-grid {
+    display: grid;
+    gap: 2rem;
+    grid-auto-rows: minmax(200px, auto);
+  }
+
+  .editorial-collection-grid--editorial {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-areas: 
+      "hero hero featured1 featured2"
+      "hero hero item1 item2"
+      "item3 item4 item5 item6";
+  }
+
+  .editorial-collection-grid--magazine {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .editorial-collection-grid--minimal {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+
+  .editorial-collection-item {
+    display: flex;
+    flex-direction: column;
+    background: rgba(var(--color-foreground), 0.02);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+  }
+
+  .editorial-collection-item:hover {
+    transform: translateY(-4px);
+  }
+
+  .editorial-collection-item--hero {
+    grid-area: hero;
+  }
+
+  .editorial-collection-item--featured:nth-child(2) {
+    grid-area: featured1;
+  }
+
+  .editorial-collection-item--featured:nth-child(3) {
+    grid-area: featured2;
+  }
+
+  .editorial-collection-item--large {
+    grid-column: span 3;
+  }
+
+  .editorial-collection-item--medium {
+    grid-column: span 2;
+  }
+
+  .editorial-collection-item--small {
+    grid-column: span 1;
+  }
+
+  .editorial-collection-item__media {
+    position: relative;
+    flex: 1;
+    min-height: 200px;
+  }
+
+  .editorial-collection-item--hero .editorial-collection-item__media {
+    min-height: 300px;
+  }
+
+  .editorial-collection-item__image-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .editorial-collection-item__image-link img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .editorial-collection-item__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: rgba(var(--color-foreground), 0.1);
+    color: rgba(var(--color-foreground), 0.3);
+  }
+
+  .editorial-collection-item__count {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.25rem 0.75rem;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 12px;
+    backdrop-filter: blur(4px);
+  }
+
+  .editorial-collection-item__content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .editorial-collection-item__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .editorial-collection-item--hero .editorial-collection-item__title {
+    font-size: 1.75rem;
+  }
+
+  .editorial-collection-item__title a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .editorial-collection-item__title a:hover {
+    opacity: 0.8;
+  }
+
+  .editorial-collection-item__description {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    opacity: 0.8;
+    margin: 0;
+  }
+
+  .editorial-collection-item__preview {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: auto;
+  }
+
+  .editorial-collection-item__preview-item {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid rgba(var(--color-foreground), 0.1);
+  }
+
+  .editorial-collection-item__preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .editorial-collection-item__preview-more {
+    font-size: 0.75rem;
+    font-weight: 500;
+    opacity: 0.7;
+    margin-left: 0.25rem;
+  }
+
+  @media (max-width: 1024px) {
+    .editorial-collection-grid--editorial {
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-areas: 
+        "hero hero"
+        "featured1 featured2"
+        "item1 item2"
+        "item3 item4";
+    }
+
+    .editorial-collection-grid--magazine {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .editorial-collection-item--large {
+      grid-column: span 2;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .editorial-collection-grid,
+    .editorial-collection-grid--editorial,
+    .editorial-collection-grid--magazine {
+      grid-template-columns: 1fr;
+      grid-template-areas: none;
+    }
+
+    .editorial-collection-item--hero,
+    .editorial-collection-item--featured,
+    .editorial-collection-item--large,
+    .editorial-collection-item--medium,
+    .editorial-collection-item--small {
+      grid-column: span 1;
+      grid-area: auto;
+    }
+
+    .editorial-collection-item__content {
+      padding: 1rem;
+    }
+  }
+{% endstylesheet %}

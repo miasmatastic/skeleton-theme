@@ -1,0 +1,295 @@
+{% doc %}
+  Renders an editorial-style blog grid with enhanced layouts.
+
+  @param {object} items - Collection of blog articles to display
+  @param {string} [layout] - Grid layout style (editorial, magazine, minimal)
+
+  @example
+  {% render 'editorial-blog-grid', items: blog.articles %}
+  {% render 'editorial-blog-grid', items: articles, layout: 'magazine' %}
+{% enddoc %}
+
+{%- liquid
+  assign layout = layout | default: 'editorial'
+  assign item_count = items.size
+-%}
+
+{%- if item_count > 0 -%}
+  <div class="editorial-blog-grid editorial-blog-grid--{{ layout }}" data-layout="{{ layout }}">
+    {%- for article in items limit: 8 -%}
+      {%- liquid
+        assign article_index = forloop.index0
+        assign item_class = 'editorial-blog-item'
+        
+        # Editorial layout patterns
+        if layout == 'editorial'
+          case article_index
+            when 0
+              assign item_class = item_class | append: ' editorial-blog-item--hero'
+            when 1, 2
+              assign item_class = item_class | append: ' editorial-blog-item--featured'
+            else
+              assign item_class = item_class | append: ' editorial-blog-item--standard'
+          endcase
+        elsif layout == 'magazine'
+          case article_index
+            when 0, 3
+              assign item_class = item_class | append: ' editorial-blog-item--large'
+            when 1, 4
+              assign item_class = item_class | append: ' editorial-blog-item--medium'
+            else
+              assign item_class = item_class | append: ' editorial-blog-item--small'
+          endcase
+        endif
+      -%}
+      
+      <article class="{{ item_class }}">
+        <div class="editorial-blog-item__media">
+          {%- if article.image -%}
+            <a href="{{ article.url }}" class="editorial-blog-item__image-link">
+              {% render 'image', image: article.image, width: 800, height: 600, crop: 'center' %}
+            </a>
+          {%- else -%}
+            <div class="editorial-blog-item__placeholder">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="48" height="48">
+                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+              </svg>
+            </div>
+          {%- endif -%}
+        </div>
+        
+        <div class="editorial-blog-item__content">
+          {%- if article.tags.size > 0 and layout == 'editorial' -%}
+            <div class="editorial-blog-item__tags">
+              {%- for tag in article.tags limit: 2 -%}
+                <span class="editorial-blog-item__tag">{{ tag }}</span>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+          
+          <h3 class="editorial-blog-item__title">
+            <a href="{{ article.url }}">{{ article.title | escape }}</a>
+          </h3>
+          
+          {%- if article.excerpt and layout != 'minimal' -%}
+            <p class="editorial-blog-item__excerpt">
+              {{ article.excerpt | strip_html | truncatewords: 25 }}
+            </p>
+          {%- endif -%}
+          
+          <div class="editorial-blog-item__meta">
+            {%- if article.author -%}
+              <span class="editorial-blog-item__author">{{ article.author }}</span>
+            {%- endif -%}
+            <time class="editorial-blog-item__date" datetime="{{ article.published_at | date: '%Y-%m-%d' }}">
+              {{ article.published_at | date: '%B %d, %Y' }}
+            </time>
+          </div>
+        </div>
+      </article>
+    {%- endfor -%}
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .editorial-blog-grid {
+    display: grid;
+    gap: 2rem;
+    grid-auto-rows: minmax(200px, auto);
+  }
+
+  .editorial-blog-grid--editorial {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-areas: 
+      "hero hero featured1 featured2"
+      "hero hero item1 item2"
+      "item3 item4 item5 item6";
+  }
+
+  .editorial-blog-grid--magazine {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .editorial-blog-grid--minimal {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+  .editorial-blog-item {
+    display: flex;
+    flex-direction: column;
+    background: rgba(var(--color-foreground), 0.02);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+  }
+
+  .editorial-blog-item:hover {
+    transform: translateY(-4px);
+  }
+
+  .editorial-blog-item--hero {
+    grid-area: hero;
+  }
+
+  .editorial-blog-item--featured:nth-child(2) {
+    grid-area: featured1;
+  }
+
+  .editorial-blog-item--featured:nth-child(3) {
+    grid-area: featured2;
+  }
+
+  .editorial-blog-item--large {
+    grid-column: span 3;
+  }
+
+  .editorial-blog-item--medium {
+    grid-column: span 2;
+  }
+
+  .editorial-blog-item--small {
+    grid-column: span 1;
+  }
+
+  .editorial-blog-item__media {
+    position: relative;
+    flex: 1;
+    min-height: 200px;
+  }
+
+  .editorial-blog-item--hero .editorial-blog-item__media {
+    min-height: 300px;
+  }
+
+  .editorial-blog-item__image-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .editorial-blog-item__image-link img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .editorial-blog-item__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: rgba(var(--color-foreground), 0.1);
+    color: rgba(var(--color-foreground), 0.3);
+  }
+
+  .editorial-blog-item__content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .editorial-blog-item__tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .editorial-blog-item__tag {
+    padding: 0.25rem 0.75rem;
+    background: rgba(var(--color-foreground), 0.1);
+    color: var(--color-foreground);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    border-radius: 12px;
+    letter-spacing: 0.05em;
+  }
+
+  .editorial-blog-item__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .editorial-blog-item--hero .editorial-blog-item__title {
+    font-size: 1.75rem;
+  }
+
+  .editorial-blog-item__title a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .editorial-blog-item__title a:hover {
+    opacity: 0.8;
+  }
+
+  .editorial-blog-item__excerpt {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    opacity: 0.8;
+    margin: 0;
+  }
+
+  .editorial-blog-item__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: auto;
+    font-size: 0.875rem;
+    opacity: 0.7;
+  }
+
+  .editorial-blog-item__author {
+    font-weight: 500;
+  }
+
+  .editorial-blog-item__date {
+    font-style: italic;
+  }
+
+  @media (max-width: 1024px) {
+    .editorial-blog-grid--editorial {
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-areas: 
+        "hero hero"
+        "featured1 featured2"
+        "item1 item2"
+        "item3 item4";
+    }
+
+    .editorial-blog-grid--magazine {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .editorial-blog-item--large {
+      grid-column: span 2;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .editorial-blog-grid,
+    .editorial-blog-grid--editorial,
+    .editorial-blog-grid--magazine {
+      grid-template-columns: 1fr;
+      grid-template-areas: none;
+    }
+
+    .editorial-blog-item--hero,
+    .editorial-blog-item--featured,
+    .editorial-blog-item--large,
+    .editorial-blog-item--medium,
+    .editorial-blog-item--small {
+      grid-column: span 1;
+      grid-area: auto;
+    }
+
+    .editorial-blog-item__content {
+      padding: 1rem;
+    }
+  }
+{% endstylesheet %}

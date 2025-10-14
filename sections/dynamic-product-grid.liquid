@@ -42,7 +42,14 @@
       data-products-count="{{ selected_collection.products.size }}"
       data-products-limit="{{ products_limit }}"
     >
-      <div class="dynamic-product-grid__grid" id="ProductGrid-{{ section.id }}">
+      <div class="dynamic-product-grid__grid" 
+           id="ProductGrid-{{ section.id }}"
+           role="region"
+           aria-label="Product grid"
+           aria-describedby="grid-description-{{ section.id }}">
+        <div id="grid-description-{{ section.id }}" class="sr-only">
+          Use arrow keys to navigate between products
+        </div>
         {% for product in selected_collection.products limit: products_limit %}
           <div class="dynamic-product-grid__item">
             {% render 'card-product-dynamic',
@@ -87,13 +94,22 @@
   {% else %}
     <div class="dynamic-product-grid__placeholder">
       <div class="placeholder-content">
-        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-          <rect x="8" y="8" width="48" height="48" rx="4" stroke="currentColor" stroke-width="2"/>
-          <circle cx="32" cy="26" r="6" stroke="currentColor" stroke-width="2"/>
-          <path d="M16 44L24 36L32 44L40 36L48 44" stroke="currentColor" stroke-width="2"/>
-        </svg>
-        <h3>No products found</h3>
-        <p>{{ 'sections.collection_list.empty' | t }}</p>
+        {% if selected_collection == blank %}
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+            <rect x="8" y="8" width="48" height="48" rx="4" stroke="currentColor" stroke-width="2"/>
+            <path d="M20 24H44M20 32H44M20 40H36" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <h3>No collection selected</h3>
+          <p>Select a collection in the section settings to display products.</p>
+        {% else %}
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+            <rect x="8" y="8" width="48" height="48" rx="4" stroke="currentColor" stroke-width="2"/>
+            <circle cx="32" cy="26" r="6" stroke="currentColor" stroke-width="2"/>
+            <path d="M16 44L24 36L32 44L40 36L48 44" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          <h3>No products found</h3>
+          <p>The "{{ selected_collection.title }}" collection is empty. Add products to see them here.</p>
+        {% endif %}
       </div>
     </div>
   {% endif %}
@@ -116,6 +132,8 @@
     init() {
       this.setupQuickAdd();
       this.setupCarousel();
+      this.setupKeyboardNavigation();
+      this.announceChanges();
     }
     
     setupQuickAdd() {
@@ -127,7 +145,83 @@
         }
       });
     }
+
+    setupKeyboardNavigation() {
+      this.carouselBtns.forEach(btn => {
+        btn.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            btn.click();
+          }
+        });
+      });
+
+      // Arrow key navigation for grid items
+      this.addEventListener('keydown', (e) => {
+        if (e.target.closest('.dynamic-product-grid__item')) {
+          this.handleArrowNavigation(e);
+        }
+      });
+    }
+
+    /**
+     * Handles arrow key navigation within the product grid
+     * Supports up/down/left/right arrow keys for accessibility
+     * @param {KeyboardEvent} e - The keyboard event
+     */
+    handleArrowNavigation(e) {
+      const items = Array.from(this.querySelectorAll('.dynamic-product-grid__item [href], .dynamic-product-grid__item button'));
+      const currentIndex = items.indexOf(e.target);
+      let newIndex = currentIndex;
+
+      switch (e.key) {
+        case 'ArrowRight':
+          newIndex = Math.min(currentIndex + 1, items.length - 1);
+          break;
+        case 'ArrowLeft':
+          newIndex = Math.max(currentIndex - 1, 0);
+          break;
+        case 'ArrowDown':
+          // Move to item below (assuming grid layout)
+          const itemsPerRow = parseInt(getComputedStyle(this.grid).getPropertyValue('--columns-desktop')) || 4;
+          newIndex = Math.min(currentIndex + itemsPerRow, items.length - 1);
+          break;
+        case 'ArrowUp':
+          const itemsPerRowUp = parseInt(getComputedStyle(this.grid).getPropertyValue('--columns-desktop')) || 4;
+          newIndex = Math.max(currentIndex - itemsPerRowUp, 0);
+          break;
+        default:
+          return;
+      }
+
+      if (newIndex !== currentIndex) {
+        e.preventDefault();
+        items[newIndex].focus();
+      }
+    }
+
+    announceChanges() {
+      // Create live region for screen readers
+      if (!this.liveRegion) {
+        this.liveRegion = document.createElement('div');
+        this.liveRegion.setAttribute('aria-live', 'polite');
+        this.liveRegion.setAttribute('aria-atomic', 'true');
+        this.liveRegion.className = 'sr-only';
+        this.appendChild(this.liveRegion);
+      }
+    }
+
+    announceToScreenReader(message) {
+      if (this.liveRegion) {
+        this.liveRegion.textContent = message;
+      }
+    }
     
+    /**
+     * Handles quick add to cart functionality
+     * @param {HTMLElement} button - The quick add button that was clicked
+     * @returns {Promise<void>}
+     */
     async handleQuickAdd(button) {
       const productId = button.dataset.productId;
       const variantId = button.dataset.variantId;
@@ -182,8 +276,15 @@
       }
     }
     
+    /**
+     * Sets up carousel functionality including button event listeners and touch support
+     * Enables horizontal scrolling through product grid on mobile and desktop
+     */
     setupCarousel() {
       if (this.carouselBtns.length === 0) return;
+      
+      // Set initial ARIA states
+      this.updateCarouselAria();
       
       this.carouselBtns.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -212,7 +313,8 @@
         isDragging = false;
         
         const diff = startX - currentX;
-        if (Math.abs(diff) > 50) {
+        // Improved touch sensitivity for better mobile UX
+        if (Math.abs(diff) > 30) {
           if (diff > 0) {
             this.moveCarousel('next');
           } else {
@@ -222,6 +324,11 @@
       });
     }
     
+    /**
+     * Moves the carousel in the specified direction
+     * Updates button states and announces changes to screen readers
+     * @param {string} direction - Either 'next' or 'prev'
+     */
     moveCarousel(direction) {
       const maxSlides = Math.ceil(this.totalProducts / this.productsPerPage) - 1;
       
@@ -234,12 +341,40 @@
       const translateX = -(this.currentSlide * 100);
       this.grid.style.transform = `translateX(${translateX}%)`;
       
-      // Update button states
+      // Update button states and ARIA
+      this.updateCarouselAria();
+      
+      // Announce change to screen readers
+      const currentPage = this.currentSlide + 1;
+      const totalPages = maxSlides + 1;
+      this.announceToScreenReader(`Showing page ${currentPage} of ${totalPages}`);
+    }
+
+    /**
+     * Updates ARIA attributes and button states for accessibility
+     * Called after carousel movement to maintain proper screen reader support
+     */
+    updateCarouselAria() {
+      const maxSlides = Math.ceil(this.totalProducts / this.productsPerPage) - 1;
       const prevBtn = this.querySelector('.carousel-btn--prev');
       const nextBtn = this.querySelector('.carousel-btn--next');
       
-      if (prevBtn) prevBtn.disabled = this.currentSlide === 0;
-      if (nextBtn) nextBtn.disabled = this.currentSlide === maxSlides;
+      if (prevBtn) {
+        prevBtn.disabled = this.currentSlide === 0;
+        prevBtn.setAttribute('aria-pressed', 'false');
+        prevBtn.setAttribute('tabindex', this.currentSlide === 0 ? '-1' : '0');
+      }
+      
+      if (nextBtn) {
+        nextBtn.disabled = this.currentSlide === maxSlides;
+        nextBtn.setAttribute('aria-pressed', 'false'); 
+        nextBtn.setAttribute('tabindex', this.currentSlide === maxSlides ? '-1' : '0');
+      }
+
+      // Update grid ARIA attributes
+      const currentPage = this.currentSlide + 1;
+      const totalPages = maxSlides + 1;
+      this.grid.setAttribute('aria-label', `Product grid, page ${currentPage} of ${totalPages}`);
     }
   }
   
@@ -354,11 +489,58 @@
     margin: 0;
     opacity: 0.8;
   }
+
+  /* Accessibility */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Focus styles */
+  .dynamic-product-grid__item:focus-within {
+    outline: 2px solid var(--color-accent, #007bff);
+    outline-offset: 2px;
+  }
+
+  .carousel-btn:focus {
+    outline: 2px solid var(--color-accent, #007bff);
+    outline-offset: 2px;
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .carousel-btn {
+      border: 2px solid currentColor;
+    }
+    
+    .dynamic-product-grid__item {
+      border: 1px solid currentColor;
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .dynamic-product-grid__grid {
+      transition: none;
+    }
+    
+    .carousel-btn {
+      transition: none;
+    }
+  }
   
   /* Mobile Responsive */
   @media screen and (max-width: 768px) {
     .dynamic-product-grid__grid {
       grid-template-columns: repeat(var(--columns-mobile), 1fr);
+      gap: var(--spacing-md, 1rem);
     }
     
     .dynamic-product-grid--carousel .dynamic-product-grid__item {
@@ -366,16 +548,28 @@
     }
     
     .carousel-btn {
-      width: 40px;
-      height: 40px;
+      width: 44px;
+      height: 44px;
+      /* Larger touch targets for better mobile UX */
     }
     
     .carousel-btn--prev {
-      left: -20px;
+      left: -22px;
     }
     
     .carousel-btn--next {
-      right: -20px;
+      right: -22px;
+    }
+
+    /* Better mobile spacing */
+    .dynamic-product-grid__header {
+      margin-bottom: var(--spacing-lg, 1.5rem);
+    }
+
+    /* Touch-friendly quick add buttons */
+    .quick-add-btn {
+      min-height: 44px;
+      font-size: 0.9rem;
     }
   }
   
@@ -398,7 +592,7 @@
 
 {% schema %}
 {
-  "name": "Dynamic Product Grid",
+  "name": "t:general.dynamic_product_grid",
   "class": "dynamic-product-grid-section",
   "blocks": [
     {
@@ -440,13 +634,13 @@
     {
       "type": "collection",
       "id": "collection",
-      "label": "Collection",
+      "label": "t:labels.collection_to_showcase",
       "info": "Select the collection to display products from"
     },
     {
       "type": "range",
       "id": "products_limit",
-      "label": "Number of Products",
+      "label": "t:labels.number_of_products",
       "min": 2,
       "max": 50,
       "step": 1,
@@ -515,7 +709,7 @@
     {
       "type": "range",
       "id": "card_gap",
-      "label": "Card Spacing",
+      "label": "t:labels.card_spacing",
       "min": 8,
       "max": 40,
       "step": 2,
@@ -524,30 +718,30 @@
     },
     {
       "type": "header",
-      "content": "Product Display Options"
+      "content": "t:labels.product_display_options"
     },
     {
       "type": "checkbox",
       "id": "enable_quick_add",
-      "label": "Enable Quick Add",
+      "label": "t:labels.enable_quick_add",
       "default": true,
       "info": "Show quick add button on product cards"
     },
     {
       "type": "checkbox",
       "id": "show_vendor",
-      "label": "Show Vendor",
+      "label": "t:labels.show_vendor",
       "default": false
     },
     {
       "type": "checkbox",
       "id": "show_rating",
-      "label": "Show Product Rating",
+      "label": "t:labels.show_rating",
       "default": false
     },
     {
       "type": "header",
-      "content": "Badge Customization"
+      "content": "t:labels.badge_customization"
     },
     {
       "type": "text",

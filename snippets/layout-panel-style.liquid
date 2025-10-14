@@ -1,0 +1,33 @@
+{% doc %}
+  Renders layout panel styling for components.
+
+  @param {object} settings - Settings object containing layout properties
+  @param {string} [class] - Optional CSS class for the panel
+
+  @example
+  {% render 'layout-panel-style', settings: block.settings %}
+  {% render 'layout-panel-style', settings: section.settings, class: 'custom-panel' %}
+{% enddoc %}
+
+{%- liquid
+  assign panel_bg = settings.panel_background | default: 'transparent'
+  assign panel_padding = settings.panel_padding | default: 0
+  assign panel_margin = settings.panel_margin | default: 0
+  assign panel_shadow = settings.panel_shadow | default: false
+  assign element_class = class | default: 'layout-panel'
+-%}
+
+<style>
+  .{{ element_class }} {
+    background-color: {{ panel_bg }};
+    {%- if panel_padding > 0 -%}
+      padding: {{ panel_padding }}px;
+    {%- endif -%}
+    {%- if panel_margin > 0 -%}
+      margin: {{ panel_margin }}px;
+    {%- endif -%}
+    {%- if panel_shadow -%}
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    {%- endif -%}
+  }
+</style>

@@ -12,9 +12,25 @@
     "main": {
       "type": "product",
       "settings": {}
+    },
+    "related_products": {
+      "type": "dynamic-product-grid",
+      "settings": {
+        "title": "You may also like",
+        "collection": "",
+        "layout_preset": "carousel",
+        "products_per_row": 4,
+        "products_per_row_mobile": 2,
+        "rows_to_show": 1,
+        "enable_quick_add": true,
+        "show_vendor": false,
+        "show_rating": true,
+        "color_scheme": "scheme-1"
+      }
     }
   },
   "order": [
-    "main"
+    "main",
+    "related_products"
   ]
 }

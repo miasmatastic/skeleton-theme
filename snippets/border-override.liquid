@@ -1,0 +1,29 @@
+{% doc %}
+  Renders a border override style based on settings.
+
+  @param {object} settings - Settings object containing border properties
+  @param {string} [class] - Optional CSS class for the border element
+
+  @example
+  {% render 'border-override', settings: block.settings %}
+  {% render 'border-override', settings: section.settings, class: 'custom-border' %}
+{% enddoc %}
+
+{%- liquid
+  assign border_width = settings.border_width | default: 0
+  assign border_color = settings.border_color | default: 'transparent'
+  assign border_style = settings.border_style | default: 'solid'
+  assign border_radius = settings.border_radius | default: 0
+  assign element_class = class | default: 'border-override'
+-%}
+
+{%- if border_width > 0 -%}
+  <style>
+    .{{ element_class }} {
+      border: {{ border_width }}px {{ border_style }} {{ border_color }};
+      {%- if border_radius > 0 -%}
+        border-radius: {{ border_radius }}px;
+      {%- endif -%}
+    }
+  </style>
+{%- endif -%}

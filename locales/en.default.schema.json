@@ -4,6 +4,7 @@
     "article": "Article",
     "block": "Block",
     "blog": "Blog",
+    "button": "Button",
     "cart": "Cart",
     "collection": "Collection",
     "collections": "Collections",
@@ -13,10 +14,19 @@
     "column": "Column",
     "content": "Content",
     "custom_section": "Custom section",
+    "custom_showcase": "Custom showcase",
+    "custom_collection": "Custom collection",
+    "dynamic_product_grid": "Dynamic product grid",
+    "collection_list_enhanced": "Enhanced collection list",
+    "announcement_enhanced": "Enhanced announcement",
+    "header_enhanced": "Enhanced header",
+    "header_enhanced_plus": "Enhanced header plus",
     "fonts": "Fonts",
     "footer": "Footer",
     "group": "Group",
     "header": "Header",
+    "icon": "Icon",
+    "image": "Image",
     "layout": "Layout",
     "main": "Main",
     "page": "Page",
@@ -29,9 +39,11 @@
     "section": "Section",
     "settings": "Settings",
     "sidebar": "Sidebar",
+    "spacer": "Spacer",
     "text": "Text",
     "theme": "Theme",
-    "typography": "Typography"
+    "typography": "Typography",
+    "video": "Video"
   },
   "labels": {
     "alignment": "Alignment",
@@ -47,7 +59,66 @@
     "page_width": "Page width",
     "show_payment_icons": "Show payment icons",
     "text_style": "Text style",
-    "text": "Text"
+    "text": "Text",
+    "card_spacing": "Card spacing",
+    "enable_quick_add": "Enable quick add",
+    "show_vendor": "Show vendor",
+    "show_rating": "Show product rating",
+    "badge_customization": "Badge customization",
+    "badge_text": "Badge text",
+    "badge_background_color": "Badge background color",
+    "badge_text_color": "Badge text color",
+    "product_display_options": "Product display options",
+    "layout_preset": "Layout preset",
+    "products_per_row": "Products per row",
+    "products_per_row_mobile": "Products per row (mobile)",
+    "rows_to_show": "Rows to show",
+    "color_scheme": "Color scheme",
+    "section_width": "Section width",
+    "collection_to_showcase": "Collection to showcase",
+    "number_of_products": "Number of products to show",
+    "layout_type": "Layout type",
+    "columns": "Columns",
+    "mobile_columns": "Mobile columns",
+    "content_alignment": "Content alignment",
+    "title": "Title",
+    "title_font_size": "Title font size",
+    "enhanced_features": "Enhanced features",
+    "enable_enhanced_features": "Enable enhanced features",
+    "typography": "Typography",
+    "title_font_family": "Title font family",
+    "custom_font_family": "Custom font family",
+    "title_font_weight": "Title font weight",
+    "product_title_font_size": "Product title font size",
+    "product_title_font_weight": "Product title font weight",
+    "section_height": "Section height",
+    "image_hover_effect": "Image hover effect",
+    "hover_effect_intensity": "Hover effect intensity",
+    "card_styling": "Card styling",
+    "card_background": "Card background",
+    "card_border_radius": "Card border radius",
+    "card_border_width": "Card border width",
+    "card_border_color": "Card border color",
+    "card_shadow": "Card shadow",
+    "product_spacing": "Product spacing",
+    "show_product_images": "Show product images",
+    "show_product_titles": "Show product titles",
+    "show_product_prices": "Show product prices",
+    "bottom_padding": "Bottom padding",
+    "top_padding": "Top padding",
+    "button_text": "Button text",
+    "button_url": "Button URL",
+    "button_style": "Button style",
+    "button_size": "Button size",
+    "open_in_new_tab": "Open in new tab",
+    "icon_size": "Icon size",
+    "icon_color": "Icon color",
+    "desktop_columns": "Desktop columns",
+    "card_background_style": "Card background style",
+    "spacing": "Spacing",
+    "height": "Height",
+    "width": "Width",
+    "border_radius": "Border radius"
   },
   "options": {
     "alignment": {
@@ -61,16 +132,57 @@
     },
     "page_width": {
       "narrow": "Narrow",
-      "wide": "Wide"
+      "wide": "Wide",
+      "extra_wide": "Extra wide"
     },
     "size": {
       "large": "Large",
-      "small": "Small"
+      "small": "Small",
+      "medium": "Medium"
     },
     "text_style": {
       "title": "Title",
       "subtitle": "Subtitle",
       "normal": "Normal text"
     },
+    "layout_preset": {
+      "grid": "Grid",
+      "carousel": "Carousel",
+      "masonry": "Masonry"
+    },
+    "layout_type": {
+      "hero": "Hero",
+      "standard": "Standard",
+      "featured": "Featured"
+    },
+    "font_weight": {
+      "light": "Light",
+      "normal": "Normal",
+      "medium": "Medium", 
+      "semi_bold": "Semi bold",
+      "bold": "Bold",
+      "extra_bold": "Extra bold"
+    },
+    "font_family": {
+      "heading": "Heading font",
+      "body": "Body font",
+      "custom": "Custom font"
+    },
+    "hover_effect": {
+      "none": "None",
+      "darken": "Darken",
+      "lighten": "Lighten", 
+      "lift_card": "Lift card",
+      "zoom": "Zoom"
+    },
+    "color_scheme": {
+      "scheme_1": "Scheme 1",
+      "scheme_2": "Scheme 2",
+      "scheme_3": "Scheme 3"
+    },
+    "section_width": {
+      "page_width": "Page width",
+      "full_width": "Full width"
+    }
   }
 }

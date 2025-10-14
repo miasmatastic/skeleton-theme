@@ -1,0 +1,44 @@
+{% doc %}
+  Renders unit pricing information for product variants.
+
+  @param {object} price - The unit price object
+  @param {object} measurement - The unit price measurement object
+
+  @example
+  {% render 'unit-price', price: variant.unit_price, measurement: variant.unit_price_measurement %}
+{% enddoc %}
+
+{%- if price and measurement -%}
+  <div class="unit-price">
+    <span class="unit-price__price">{{ price | money }}</span>
+    <span class="unit-price__separator">/</span>
+    <span class="unit-price__measurement">
+      {%- if measurement.reference_value != 1 -%}
+        {{ measurement.reference_value }}
+      {%- endif -%}
+      {{ measurement.reference_unit }}
+    </span>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .unit-price {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    font-size: 0.875em;
+    color: rgba(var(--color-foreground), 0.7);
+  }
+
+  .unit-price__price {
+    font-weight: 500;
+  }
+
+  .unit-price__separator {
+    opacity: 0.5;
+  }
+
+  .unit-price__measurement {
+    font-size: 0.9em;
+  }
+{% endstylesheet %}

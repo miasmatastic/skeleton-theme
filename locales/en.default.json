@@ -53,5 +53,9 @@
     "collection_list": {
       "empty": "No collections found"
     }
+  },
+  "content": {
+    "price_regular": "Regular price",
+    "price_sale": "Sale price"
   }
 }

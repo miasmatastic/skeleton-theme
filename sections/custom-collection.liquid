@@ -42,25 +42,12 @@
             {% if this_collection != blank %}
               {% paginate this_collection.products by section.settings.products_per_page %}
                 {% for product in this_collection.products %}
-                  {% capture children %}
-                    <div class="product-card__image">
-                      <a href="{{ product.url }}">
-                        {{ product.featured_image | image_url: width: 600 | image_tag: alt: product.title }}
-                      </a>
-                    </div>
-                    <div class="product-card__info">
-                      <a href="{{ product.url }}" class="product-card__title">{{ product.title }}</a>
-                      <div class="product-card__price">
-                        {{ product.price | money }}
-                      </div>
-                    </div>
-                  {% endcapture %}
                   <div class="ctg-card">
-                    {% render 'product-card',
-                      product: product,
-                      children: children,
-                      block: block,
-                      product_card_gap: section.settings.products_per_row
+                    {% render 'card-product-dynamic',
+                      product_card_product: product,
+                      show_vendor: false,
+                      show_rating: false,
+                      show_quick_add: true
                     %}
                   </div>
                 {% endfor %}
@@ -122,6 +109,10 @@
 </style>
 
 <script>
+  /**
+   * Custom Collection Tabs Grid
+   * Manages tabbed collection interface with AJAX loading and pagination
+   */
   (function() {
     var section = document.querySelector('section.collection-tabs-grid');
     if (!section) return;
@@ -131,6 +122,10 @@
     var enableAjax = gridEl?.dataset.enableAjax === 'true';
     var viewName = gridEl?.dataset.templateView || 'ajax-grid';
 
+    /**
+     * Sets CSS custom property for grid columns based on window width
+     * Enables responsive grid layout without media queries
+     */
     function setColsVar() {
       var cols = parseInt(gridEl?.dataset.productsPerRow || '3', 10);
       var gridInner = gridEl?.querySelector('.ctg-grid-inner');
@@ -138,6 +133,10 @@
     }
     setColsVar();
 
+    /**
+     * Updates visual state of tab buttons
+     * @param {string} handle - Collection handle of the active tab
+     */
     function updateActiveTab(handle) {
       tabs.forEach(function(btn) {
         var isActive = btn.dataset.collectionHandle === handle;
@@ -146,6 +145,11 @@
       });
     }
 
+    /**
+     * Fetches and displays collection products via AJAX
+     * @param {string} handle - Collection handle to fetch
+     * @param {string} pageUrl - URL to fetch (for pagination)
+     */
     function fetchGrid(handle, pageUrl) {
       var url = pageUrl || '/collections/' + handle + '?section_id=' + section.id;
       return fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
@@ -170,6 +174,10 @@
         });
     }
 
+    /**
+     * Attaches click event to "Load More" button for pagination
+     * @param {string} handle - Collection handle for the current tab
+     */
     function attachLoadMore(handle) {
       var btn = gridEl.querySelector('.ctg-load-more');
       if (!btn) return;
@@ -217,7 +225,7 @@
 
 {% schema %}
 {
-  "name": "Collection tabs grid",
+  "name": "t:general.custom_collection",
   "settings": [
     { "type": "text", "id": "heading", "label": "Heading", "default": "Shop by collection" },
     { "type": "range", "id": "products_per_page", "label": "Products per tab", "min": 4, "max": 48, "step": 2, "default": 12 },

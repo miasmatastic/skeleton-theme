@@ -1,11 +1,11 @@
 [
   {
     "name": "theme_info",
-    "theme_name": "Skeleton",
-    "theme_version": "0.1.0",
-    "theme_author": "Shopify",
-    "theme_documentation_url": "https://help.shopify.com/manual/online-store/themes",
-    "theme_support_url": "https://support.shopify.com/"
+    "theme_name": "PJM Skeleton Plus",
+    "theme_version": "1.0.0",
+    "theme_author": "Pure Junk Media",
+    "theme_documentation_url": "https://github.com/miasmatastic/skeleton-theme",
+    "theme_support_url": "https://purejunkmedia.com/support"
   },
   {
     "name": "t:general.typography",
@@ -20,6 +20,12 @@
         "default": "work_sans_n4",
         "label": "t:general.primary"
       },
+      {
+        "type": "font_picker",
+        "id": "type_secondary_font",
+        "default": "work_sans_n6",
+        "label": "t:general.secondary"
+      }
     ]
   },
   {
@@ -37,9 +43,13 @@
           {
             "value": "110rem",
             "label": "t:options.page_width.wide"
+          },
+          {
+            "value": "130rem",
+            "label": "t:options.page_width.extra_wide"
           }
         ],
-        "default": "90rem"
+        "default": "110rem"
       },
       {
         "type": "range",
@@ -69,6 +79,12 @@
         "label": "t:labels.foreground"
       },
       {
+        "type": "color",
+        "id": "accent_color",
+        "default": "#007bff",
+        "label": "Accent Color"
+      },
+      {
         "type": "range",
         "id": "input_corner_radius",
         "min": 0,
@@ -77,6 +93,36 @@
         "unit": "px",
         "label": "t:labels.input_corner_radius",
         "default": 4
+      }
+    ]
+  },
+  {
+    "name": "Enhanced Features",
+    "settings": [
+      {
+        "type": "header",
+        "content": "PJM Enhanced Sections"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_enhanced_features",
+        "label": "Enable Enhanced Features",
+        "default": true,
+        "info": "Unlock additional customization options for PJM sections"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_quick_add",
+        "label": "Enable Quick Add to Cart",
+        "default": true,
+        "info": "Show quick add buttons on product cards"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_product_badges",
+        "label": "Enable Product Badges",
+        "default": true,
+        "info": "Show sale and custom badges on products"
       }
     ]
   }

@@ -9,12 +9,30 @@
  */
 {
   "sections": {
+    "collection_banner": {
+      "type": "custom-showcase",
+      "settings": {
+        "layout_type": "banner",
+        "section_width": "full-width",
+        "content_alignment": "center",
+        "title": "{{ collection.title }}",
+        "description": "{{ collection.description }}"
+      }
+    },
     "main": {
-      "type": "collection",
-      "settings": {}
+      "type": "custom-collection",
+      "settings": {
+        "products_per_page": 24,
+        "products_per_row": 4,
+        "enable_filtering": true,
+        "enable_sorting": true,
+        "show_collection_description": true,
+        "image_ratio": "adapt"
+      }
     }
   },
   "order": [
+    "collection_banner",
     "main"
   ]
 }
