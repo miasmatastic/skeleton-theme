@@ -2,7 +2,11 @@
 
   <br>
 
-**Pure Junk Media's Enhanced Shopify Theme Development Framework**    <img src="./assets/shoppy-x-ray.svg" alt="logo" width="200">
+**Pure Junk Media's Enhanced Shopify Theme Development Framework**    
+
+<br>
+
+<img src="https://purejunkmedia.com/wp-content/uploads/2024/12/Pure-Junk-Media-Logo-A-Digital-Marketing-Company-e1733424638525-300x146.webp" alt="logo" width="200">
 
   <br>
 
@@ -366,4 +370,5 @@ For internal Pure Junk Media team members:
 ---
 
 **Built with ❤️ by Pure Junk Media Development Team**
+
 **Migration from Horizon to Skeleton - Phase 1 Complete** ✅
