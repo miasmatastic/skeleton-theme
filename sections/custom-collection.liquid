@@ -1,0 +1,250 @@
+<section id="section-{{ section.id }}" class="collection-tabs-grid">
+  {% if section.settings.heading != blank %}
+    <h2 class="ctg-heading">{{ section.settings.heading }}</h2>
+  {% endif %}
+
+  {%- assign blocks = section.blocks | where: "type", "collection" -%}
+  {% if blocks.size == 0 %}
+    <p class="ctg-empty">Add at least one collection block in the editor.</p>
+  {% else %}
+    <div class="ctg-tabs" role="tablist" aria-label="Collection tabs">
+      {% assign active_handle = request.params.tab | default: blocks.first.settings.collection.handle %}
+      {% for block in blocks %}
+        {% assign col = block.settings.collection %}
+        {% if col %}
+          <button
+            type="button"
+            class="ctg-tab{% if col.handle == active_handle %} is-active{% endif %}"
+            role="tab"
+            aria-selected="{% if col.handle == active_handle %}true{% else %}false{% endif %}"
+            data-collection-handle="{{ col.handle | escape }}"
+          >
+            {{ col.title }}
+          </button>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <div
+      id="ctg-grid-{{ section.id }}"
+      class="ctg-grid"
+      style="--cols:{{ section.settings.products_per_row }};"
+      data-products-per-row="{{ section.settings.products_per_row }}"
+      data-enable-ajax="{{ section.settings.enable_ajax }}"
+      data-template-view="ajax-grid"
+    >
+      <div class="ctg-grid-inner" aria-live="polite">
+        {% assign found_active = false %}
+        {% for block in blocks %}
+          {% assign col = block.settings.collection %}
+          {% if col and col.handle == active_handle %}
+            {% assign this_collection = collections[col.handle] %}
+            {% if this_collection != blank %}
+              {% paginate this_collection.products by section.settings.products_per_page %}
+                {% for product in this_collection.products %}
+                  {% capture children %}
+                    <div class="product-card__image">
+                      <a href="{{ product.url }}">
+                        {{ product.featured_image | image_url: width: 600 | image_tag: alt: product.title }}
+                      </a>
+                    </div>
+                    <div class="product-card__info">
+                      <a href="{{ product.url }}" class="product-card__title">{{ product.title }}</a>
+                      <div class="product-card__price">
+                        {{ product.price | money }}
+                      </div>
+                    </div>
+                  {% endcapture %}
+                  <div class="ctg-card">
+                    {% render 'product-card',
+                      product: product,
+                      children: children,
+                      block: block,
+                      product_card_gap: section.settings.products_per_row
+                    %}
+                  </div>
+                {% endfor %}
+                {% if paginate.pages > 1 and section.settings.show_load_more %}
+                  <button
+                    type="button"
+                    class="ctg-load-more"
+                    data-next-url="{{ paginate.next.url | append: '&view=ajax-grid' }}"
+                  >
+                    Load more
+                  </button>
+                {% endif %}
+              {% endpaginate %}
+            {% else %}
+              <p class="ctg-empty">No products found in this collection.</p>
+            {% endif %}
+            {% assign found_active = true %}
+          {% endif %}
+        {% endfor %}
+        {% unless found_active %}
+          <p class="ctg-empty">No products found in this collection.</p>
+        {% endunless %}
+      </div>
+    </div>
+  {% endif %}
+</section>
+
+<style>
+  .collection-tabs-grid { margin: var(--spacing, 2rem) 0; }
+  .ctg-heading { margin-bottom: 1rem; }
+  .ctg-tabs { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; }
+  .ctg-tab {
+    border: 1px solid rgba(0,0,0,.1);
+    background: #fff;
+    padding: .5rem .75rem;
+    border-radius: 999px;
+    cursor: pointer;
+    font: inherit;
+  }
+  .ctg-tab.is-active { background: #111; color: #fff; border-color: #111; }
+
+  .ctg-grid-inner { display: grid; gap: 1rem; grid-template-columns: repeat(var(--cols, 3), minmax(0,1fr)); min-height: 200px; }
+  @media (max-width: 990px) {
+    .ctg-grid-inner { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  }
+  @media (max-width: 600px) {
+    .ctg-grid-inner { grid-template-columns: repeat(1, minmax(0,1fr)); }
+  }
+
+  .ctg-card { width: 100%; }
+  .ctg-load-more {
+    display: inline-block; margin: 1rem auto 0; padding: .6rem 1rem; border: 1px solid #ddd; background: #fff; cursor: pointer;
+  }
+
+  /* Custom user CSS for CFG-Grid section */
+  {{ section.settings.cfg_grid_css }}
+  /* Custom user CSS for card, title, image */
+  {{ section.settings.card_css }}
+</style>
+
+<script>
+  (function() {
+    var section = document.querySelector('section.collection-tabs-grid');
+    if (!section) return;
+
+    var gridEl = section.querySelector('[id^="ctg-grid-"]');
+    var tabs = section.querySelectorAll('.ctg-tab');
+    var enableAjax = gridEl?.dataset.enableAjax === 'true';
+    var viewName = gridEl?.dataset.templateView || 'ajax-grid';
+
+    function setColsVar() {
+      var cols = parseInt(gridEl?.dataset.productsPerRow || '3', 10);
+      var gridInner = gridEl?.querySelector('.ctg-grid-inner');
+      if (gridInner) gridInner.style.setProperty('--cols', cols);
+    }
+    setColsVar();
+
+    function updateActiveTab(handle) {
+      tabs.forEach(function(btn) {
+        var isActive = btn.dataset.collectionHandle === handle;
+        btn.classList.toggle('is-active', isActive);
+        btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+    }
+
+    function fetchGrid(handle, pageUrl) {
+      var url = pageUrl || '/collections/' + handle + '?section_id=' + section.id;
+      return fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(function(r) { return r.text(); })
+        .then(function(html) {
+          var parser = new DOMParser();
+          var doc = parser.parseFromString(html, 'text/html');
+          var incoming = doc.querySelector('.ctg-grid-inner');
+          var loadMore = doc.querySelector('.ctg-load-more');
+
+          if (incoming) {
+            var container = gridEl.querySelector('.ctg-grid-inner');
+            container.innerHTML = incoming.innerHTML;
+          }
+          var existingBtn = gridEl.querySelector('.ctg-load-more');
+          if (existingBtn) existingBtn.remove();
+          if (loadMore) {
+            gridEl.appendChild(loadMore);
+            attachLoadMore(handle);
+          }
+          setColsVar();
+        });
+    }
+
+    function attachLoadMore(handle) {
+      var btn = gridEl.querySelector('.ctg-load-more');
+      if (!btn) return;
+      btn.addEventListener('click', function() {
+        var nextUrl = this.dataset.nextUrl;
+        if (!nextUrl) return;
+        this.disabled = true;
+        fetch(nextUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+          .then(function(r) { return r.text(); })
+          .then(function(html) {
+            var doc = new DOMParser().parseFromString(html, 'text/html');
+            var incoming = doc.querySelector('.ctg-grid-inner');
+            var moreBtn = doc.querySelector('.ctg-load-more');
+            var container = gridEl.querySelector('.ctg-grid-inner');
+            if (incoming) container.insertAdjacentHTML('beforeend', incoming.innerHTML);
+            if (moreBtn && moreBtn.dataset.nextUrl) {
+              btn.dataset.nextUrl = moreBtn.dataset.nextUrl;
+              btn.disabled = false;
+            } else {
+              btn.remove();
+            }
+          });
+      });
+    }
+    if (tabs.length) attachLoadMore(tabs[0].dataset.collectionHandle);
+
+    tabs.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var handle = this.dataset.collectionHandle;
+        updateActiveTab(handle);
+        if (!enableAjax) {
+          var params = new URLSearchParams(window.location.search);
+          params.set('tab', handle);
+          window.location.search = params.toString();
+          return;
+        }
+        var params = new URLSearchParams(window.location.search);
+        params.set('tab', handle);
+        history.replaceState({}, '', window.location.pathname + '?' + params.toString());
+        fetchGrid(handle);
+      });
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Collection tabs grid",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Shop by collection" },
+    { "type": "range", "id": "products_per_page", "label": "Products per tab", "min": 4, "max": 48, "step": 2, "default": 12 },
+    { "type": "range", "id": "products_per_row", "label": "Desktop columns", "min": 2, "max": 6, "step": 1, "default": 3 },
+    { "type": "select", "id": "media_aspect_ratio", "label": "Image ratio", "default": "square", "options": [
+      { "value": "adapt", "label": "Adapt to image" },
+      { "value": "square", "label": "Square" },
+      { "value": "portrait", "label": "Portrait" }
+    ]},
+    { "type": "checkbox", "id": "show_vendor", "label": "Show vendor", "default": false },
+    { "type": "checkbox", "id": "enable_ajax", "label": "Swap tabs with AJAX", "default": true },
+    { "type": "checkbox", "id": "show_load_more", "label": "Show Load more", "default": true },
+    { "type": "textarea", "id": "cfg_grid_css", "label": "Custom CSS for CFG-Grid section", "info": "Enter custom CSS for the grid section here. Selector: .collection-tabs-grid" },
+    { "type": "textarea", "id": "card_css", "label": "Custom CSS for Product Card, Title, and Image",  "info": "Enter custom CSS using these selectors:\n.card (for the product card container),\n.product-card__title (for the product title text),\n.product-card__image img (for the product image)" }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Collection",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Collection" }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [
+    { "name": "Collection tabs grid", "blocks": [ { "type": "collection" }, { "type": "collection" }, { "type": "collection" } ] }
+  ]
+}
+{% endschema %}
