@@ -9,7 +9,7 @@
   <br>
 </h1>
 
-<p align="left">
+<p align="center">
   <a href="./LICENSE.md"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License"></a>
   <a href="./actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Shopify/skeleton-theme/actions/workflows/ci.yml/badge.svg"></a>
   <a href="#"><img src="https://img.shields.io/badge/Version-0.01--PreAlpha-orange.svg" alt="Version"></a>
@@ -509,3 +509,4 @@ For Pure Junk Media team members:
 **Built with ❤️ by Pure Junk Media Development Team**
 
 *A comprehensive e-commerce theme solution built on Shopify's best practices*
+
