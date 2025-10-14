@@ -76,15 +76,24 @@
   endunless
   
   # Size calculations
-  assign size_map = '{"small": {"width": 24, "height": 24}, "medium": {"width": 32, "height": 32}, "large": {"width": 48, "height": 48}}'
-  assign size_data = size_map | parse_json
-  
   if badge_size == 'custom'
     assign badge_width = custom_width | default: 32
     assign badge_height = custom_height | default: 32
   else
-    assign badge_width = size_data[badge_size].width
-    assign badge_height = size_data[badge_size].height
+    case badge_size
+      when 'small'
+        assign badge_width = 24
+        assign badge_height = 24
+      when 'medium'
+        assign badge_width = 32
+        assign badge_height = 32
+      when 'large'
+        assign badge_width = 48
+        assign badge_height = 48
+      else
+        assign badge_width = 32
+        assign badge_height = 32
+    endcase
   endif
   
   # Mobile size calculations
@@ -93,8 +102,20 @@
       assign mobile_width = custom_width | default: 24
       assign mobile_height = custom_height | default: 24
     else
-      assign mobile_width = size_data[mobile_size].width
-      assign mobile_height = size_data[mobile_size].height
+      case mobile_size
+        when 'small'
+          assign mobile_width = 24
+          assign mobile_height = 24
+        when 'medium'
+          assign mobile_width = 32
+          assign mobile_height = 32
+        when 'large'
+          assign mobile_width = 48
+          assign mobile_height = 48
+        else
+          assign mobile_width = 32
+          assign mobile_height = 32
+      endcase
     endif
   else
     assign mobile_width = badge_width
@@ -210,7 +231,7 @@
   </style>
 {% endif %}
 
-{% stylesheet %}
+<style>
   .product-badge-overlay {
     transition: opacity 0.3s ease;
   }
@@ -280,4 +301,4 @@
       border: 2px solid currentColor;
     }
   }
-{% endstylesheet %}
+</style>

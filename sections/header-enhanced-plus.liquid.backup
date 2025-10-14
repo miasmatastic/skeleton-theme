@@ -182,7 +182,15 @@ Features: Multi-row layout, advanced positioning, search integration, localizati
   .header__container {
     max-width: {{ section.settings.container_max_width }}px;
   }
-  
+</style>
+
+{% stylesheet %}
+
+  .header-enhanced-plus-wrapper {
+    position: relative;
+    z-index: var(--z-header, 100);
+  }
+
   .header-enhanced-plus {
     background: var(--header-bg);
     color: var(--header-text);
@@ -199,7 +207,32 @@ Features: Multi-row layout, advanced positioning, search integration, localizati
     border-bottom-color: {{ section.settings.transparent_border_color | default: 'transparent' }};
   }
 
-    .header-row-1 {
+  /* Sticky Header */
+  .header--sticky {
+    position: sticky;
+    top: 0;
+    transition: transform 0.3s ease;
+  }
+
+  .header--hidden {
+    transform: translateY(-100%);
+  }
+
+  .header__container {
+    /* max-width is set dynamically in the <style> tag above */
+    margin: 0 auto;
+    padding: 0 var(--header-padding-x);
+    display: flex;
+    align-items: center;
+    gap: var(--header-spacing);
+    height: var(--header-height-row1);
+  }
+    gap: var(--header-spacing);
+    height: var(--header-height-row1);
+  }
+
+  /* Header Rows */
+  .header-row-1 {
     {% if section.settings.compact_mode %}
       --header-spacing: calc(var(--header-spacing) * 0.75);
       --header-padding-x: calc(var(--header-padding-x) * 0.75);
@@ -212,64 +245,6 @@ Features: Multi-row layout, advanced positioning, search integration, localizati
       background: {{ section.settings.row2_bg_color }};
     {% endif %}
   }
-
-  
-
-  /* Icon Customization */
-  .header__icon {
-    width: {{ section.settings.icon_size }}px;
-    height: {{ section.settings.icon_size }}px;
-    color: var(--icon-color);
-    transition: color 0.2s ease;
-  }
-
-  .header__icon:hover {
-    color: var(--menu-hover);
-  }
-
-  .header-row-2 {
-    {% unless section.settings.show_row2_mobile %}
-      display: none;
-    {% endunless %}
-  }
-
-  {% if section.settings.custom_header_css != blank %}
-    {{ section.settings.custom_header_css }}
-  {% endif %}
-</style>
-
-{% stylesheet %}
-
-  .header-enhanced-plus-wrapper {
-    position: relative;
-    z-index: var(--z-header, 100);
-  }
-
-
-  /* Sticky Header */
-  .header--sticky {
-    position: sticky;
-    top: 0;
-    transition: transform 0.3s ease;
-  }
-
-  .header--hidden {
-    transform: translateY(-100%);
-    /* gap: var(--header-spacing);
-    height: var(--header-height-row1); */
-  }
-  .header__container {
-    /* max-width is set dynamically in the <style> tag above */
-    margin: 0 auto;
-    padding: 0 var(--header-padding-x);
-    display: flex;
-    align-items: center;
-    gap: var(--header-spacing);
-    height: var(--header-height-row1);
-  }
-
-  /* Header Rows */
-
 
   /* Logo Section */
   .header__logo-section {
@@ -314,6 +289,23 @@ Features: Multi-row layout, advanced positioning, search integration, localizati
     order: 4;
   }
 
+  /* Icon Customization */
+  .header__icon {
+    width: {{ section.settings.icon_size }}px;
+    height: {{ section.settings.icon_size }}px;
+    color: var(--icon-color);
+    transition: color 0.2s ease;
+  }
+
+  .header__icon:hover {
+    color: var(--menu-hover);
+  }
+
+  /* Custom CSS Injection */
+  {% if section.settings.custom_header_css != blank %}
+    {{ section.settings.custom_header_css }}
+  {% endif %}
+
   /* Mobile Responsive */
   @media (max-width: 768px) {
     :root {
@@ -331,6 +323,11 @@ Features: Multi-row layout, advanced positioning, search integration, localizati
       display: flex;
     }
 
+    .header-row-2 {
+      {% unless section.settings.show_row2_mobile %}
+        display: none;
+      {% endunless %}
+    }
 
     .header__utilities {
       gap: calc(var(--header-spacing) * 0.5);
@@ -873,7 +870,8 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       "type": "collection",
       "id": "mobile_featured_collection",
-      "label": "Featured Collection (Mobile)"
+      "label": "Featured Collection (Mobile)",
+      "visible_if": "{{ section.settings.mobile_featured_content }}"
     },
     {
       "type": "header",
