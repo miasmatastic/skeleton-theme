@@ -62,10 +62,6 @@
       "cart": "Cart"
     }
   },
-  "accessibility": {
-    "close": "Close",
-    "homepage": "Homepage"
-  },
   "localization": {
     "language": "Language",
     "country": "Country"
