@@ -12,6 +12,9 @@
   - Overlay images with positioning and opacity controls
   - Flexible linking: products, collections, pages, external URLs
   - Advanced styling: borders, shadows, typography
+  - Enhanced header controls: alignment, sizing, font selection, colors
+  - Enhanced footer CTA: alignment, styling, font controls
+  - Adobe Fonts integration support
   - Responsive design with mobile optimization
   - Accessibility compliant with ARIA labels and keyboard navigation
   - Performance optimized with lazy loading
@@ -48,13 +51,13 @@
     {% if section.settings.heading != blank or section.settings.subheading != blank %}
       <header class="lifestyle-showcase__header">
         {% if section.settings.heading != blank %}
-          <h2 class="lifestyle-showcase__heading">
+          <h2 class="lifestyle-showcase__heading lifestyle-showcase__heading--{{ section.settings.heading_alignment | default: 'center' }}">
             {{ section.settings.heading }}
           </h2>
         {% endif %}
         
         {% if section.settings.subheading != blank %}
-          <p class="lifestyle-showcase__subheading">
+          <p class="lifestyle-showcase__subheading lifestyle-showcase__subheading--{{ section.settings.subheading_alignment | default: 'center' }}">
             {{ section.settings.subheading }}
           </p>
         {% endif %}
@@ -112,10 +115,11 @@
     
     {% comment %} Optional Call-to-Action Footer {% endcomment %}
     {% if section.settings.show_footer_cta and section.settings.footer_button_text != blank %}
-      <footer class="lifestyle-showcase__footer">
+      <footer class="lifestyle-showcase__footer lifestyle-showcase__footer--{{ section.settings.footer_button_alignment | default: 'center' }}">
         <a 
           href="{{ section.settings.footer_button_link | default: '#' }}"
           class="lifestyle-showcase__footer-button"
+          style="{{ section.settings.footer_button_custom_style }}"
         >
           {{ section.settings.footer_button_text }}
         </a>
@@ -139,28 +143,52 @@
   
   /* Header Styles */
   .lifestyle-showcase__header {
-    text-align: center;
     margin-bottom: 3rem;
   }
   
   .lifestyle-showcase__heading {
-    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-size: {{ section.settings.heading_size | default: '2.5rem' }};
     font-weight: 800;
-    color: var(--color-foreground);
+    color: {{ section.settings.heading_color | default: '#1a1a1a' }};
+    font-family: {% render 'font-family-helper', source: section.settings.heading_font_source, custom_font: section.settings.heading_custom_font %};
     margin: 0 0 1rem 0;
     line-height: 1.2;
     text-transform: uppercase;
     letter-spacing: 1px;
   }
   
+  .lifestyle-showcase__heading--left {
+    text-align: left;
+  }
+  
+  .lifestyle-showcase__heading--center {
+    text-align: center;
+  }
+  
+  .lifestyle-showcase__heading--right {
+    text-align: right;
+  }
+  
   .lifestyle-showcase__subheading {
-    font-size: clamp(1rem, 2vw, 1.25rem);
-    color: var(--color-foreground);
-    opacity: 0.8;
+    font-size: {{ section.settings.subheading_size | default: '1.125rem' }};
+    color: {{ section.settings.subheading_color | default: '#666666' }};
+    font-family: {% render 'font-family-helper', source: section.settings.subheading_font_source, custom_font: section.settings.subheading_custom_font %};
     margin: 0;
+    line-height: 1.5;
+  }
+  
+  .lifestyle-showcase__subheading--left {
+    text-align: left;
+  }
+  
+  .lifestyle-showcase__subheading--center {
+    text-align: center;
     max-width: 600px;
     margin: 0 auto;
-    line-height: 1.5;
+  }
+  
+  .lifestyle-showcase__subheading--right {
+    text-align: right;
   }
   
   /* Grid Layout */
@@ -222,28 +250,40 @@
   
   /* Footer CTA */
   .lifestyle-showcase__footer {
-    text-align: center;
     margin-top: 3rem;
+  }
+  
+  .lifestyle-showcase__footer--left {
+    text-align: left;
+  }
+  
+  .lifestyle-showcase__footer--center {
+    text-align: center;
+  }
+  
+  .lifestyle-showcase__footer--right {
+    text-align: right;
   }
   
   .lifestyle-showcase__footer-button {
     display: inline-block;
-    background: var(--color-button);
-    color: var(--color-button-text);
+    background: var(--brand-primary);
+    color: {{ section.settings.footer_button_text_color | default: '#ffffff' }};
     padding: 1rem 2rem;
     border-radius: 50px;
     font-weight: 600;
     text-decoration: none;
-    font-size: 1rem;
+    font-size: {{ section.settings.footer_button_size | default: '1rem' }};
+    font-family: {% render 'font-family-helper', source: section.settings.footer_button_font_source, custom_font: section.settings.footer_button_custom_font %};
     text-transform: uppercase;
     letter-spacing: 0.5px;
     transition: all 0.3s ease;
-    border: 2px solid var(--color-button);
+    border: 2px solid var(--brand-primary);
   }
   
   .lifestyle-showcase__footer-button:hover {
     background: transparent;
-    color: var(--color-button);
+    color: var(--brand-primary);
     transform: translateY(-2px);
   }
   
@@ -283,6 +323,20 @@
     .lifestyle-showcase__header {
       margin-bottom: 1.5rem;
     }
+    
+    /* Responsive typography */
+    .lifestyle-showcase__heading {
+      font-size: calc({{ section.settings.heading_size | default: '2.5rem' }} * 0.8);
+    }
+    
+    .lifestyle-showcase__subheading {
+      font-size: calc({{ section.settings.subheading_size | default: '1.125rem' }} * 0.9);
+    }
+    
+    .lifestyle-showcase__footer-button {
+      font-size: calc({{ section.settings.footer_button_size | default: '1rem' }} * 0.9);
+      padding: 0.875rem 1.75rem;
+    }
   }
   
   @media screen and (max-width: 480px) {
@@ -297,6 +351,20 @@
     
     .lifestyle-showcase {
       padding: calc(var(--section-padding-top) * 0.7) 0 calc(var(--section-padding-bottom) * 0.7);
+    }
+    
+    /* Further scale down typography */
+    .lifestyle-showcase__heading {
+      font-size: calc({{ section.settings.heading_size | default: '2.5rem' }} * 0.65);
+    }
+    
+    .lifestyle-showcase__subheading {
+      font-size: calc({{ section.settings.subheading_size | default: '1.125rem' }} * 0.85);
+    }
+    
+    .lifestyle-showcase__footer-button {
+      font-size: calc({{ section.settings.footer_button_size | default: '1rem' }} * 0.85);
+      padding: 0.75rem 1.5rem;
     }
   }
   
@@ -549,6 +617,31 @@
           "default": 80
         },
         {
+          "type": "select",
+          "id": "overlay_blend_mode",
+          "label": "Overlay Blend Mode",
+          "options": [
+            { "value": "normal", "label": "Normal" },
+            { "value": "multiply", "label": "Multiply" },
+            { "value": "screen", "label": "Screen" },
+            { "value": "overlay", "label": "Overlay" },
+            { "value": "soft-light", "label": "Soft Light" },
+            { "value": "hard-light", "label": "Hard Light" },
+            { "value": "color-dodge", "label": "Color Dodge" },
+            { "value": "color-burn", "label": "Color Burn" },
+            { "value": "darken", "label": "Darken" },
+            { "value": "lighten", "label": "Lighten" },
+            { "value": "difference", "label": "Difference" },
+            { "value": "exclusion", "label": "Exclusion" },
+            { "value": "hue", "label": "Hue" },
+            { "value": "saturation", "label": "Saturation" },
+            { "value": "color", "label": "Color" },
+            { "value": "luminosity", "label": "Luminosity" }
+          ],
+          "default": "normal",
+          "info": "How the overlay image blends with the background"
+        },
+        {
           "type": "checkbox",
           "id": "gradient_overlay",
           "label": "Add Gradient Overlay",
@@ -570,6 +663,31 @@
           "step": 5,
           "unit": "%",
           "default": 30
+        },
+        {
+          "type": "select",
+          "id": "gradient_overlay_blend_mode",
+          "label": "Gradient Overlay Blend Mode",
+          "options": [
+            { "value": "normal", "label": "Normal" },
+            { "value": "multiply", "label": "Multiply" },
+            { "value": "screen", "label": "Screen" },
+            { "value": "overlay", "label": "Overlay" },
+            { "value": "soft-light", "label": "Soft Light" },
+            { "value": "hard-light", "label": "Hard Light" },
+            { "value": "color-dodge", "label": "Color Dodge" },
+            { "value": "color-burn", "label": "Color Burn" },
+            { "value": "darken", "label": "Darken" },
+            { "value": "lighten", "label": "Lighten" },
+            { "value": "difference", "label": "Difference" },
+            { "value": "exclusion", "label": "Exclusion" },
+            { "value": "hue", "label": "Hue" },
+            { "value": "saturation", "label": "Saturation" },
+            { "value": "color", "label": "Color" },
+            { "value": "luminosity", "label": "Luminosity" }
+          ],
+          "default": "normal",
+          "info": "How the gradient overlay blends with the background"
         },
         {
           "type": "header",
@@ -689,10 +807,104 @@
       "default": "SUCCESS COMES IN MANY FORMS"
     },
     {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "Heading Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "text",
+      "id": "heading_size",
+      "label": "Heading Size",
+      "placeholder": "48px or 3rem or 4vh",
+      "default": "2.5rem",
+      "info": "Enter size with units (px, rem, em, vh, vw, %)"
+    },
+    {
+      "type": "select",
+      "id": "heading_font_source",
+      "label": "Heading Font",
+      "options": [
+        { "value": "shopify-primary", "label": "Theme Primary Font" },
+        { "value": "shopify-secondary", "label": "Theme Secondary Font" },
+        { "value": "adobe-heading", "label": "Adobe Heading Font" },
+        { "value": "adobe-body", "label": "Adobe Body Font" },
+        { "value": "adobe-display", "label": "Adobe Display Font" },
+        { "value": "adobe-accent", "label": "Adobe Accent Font" },
+        { "value": "custom", "label": "Custom Font" }
+      ],
+      "default": "adobe-heading"
+    },
+    {
+      "type": "text",
+      "id": "heading_custom_font",
+      "label": "Custom Heading Font",
+      "placeholder": "font-name, fallback-font, sans-serif",
+      "visible_if": "{{ section.settings.heading_font_source == 'custom' }}"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Text Color",
+      "default": "#1a1a1a"
+    },
+    {
       "type": "text",
       "id": "subheading",
       "label": "Section Subheading",
       "default": "Find your own path to happiness and freedom."
+    },
+    {
+      "type": "select",
+      "id": "subheading_alignment",
+      "label": "Subheading Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "text",
+      "id": "subheading_size",
+      "label": "Subheading Size",
+      "placeholder": "20px or 1.25rem or 2vh",
+      "default": "1.125rem",
+      "info": "Enter size with units (px, rem, em, vh, vw, %)"
+    },
+    {
+      "type": "select",
+      "id": "subheading_font_source",
+      "label": "Subheading Font",
+      "options": [
+        { "value": "shopify-primary", "label": "Theme Primary Font" },
+        { "value": "shopify-secondary", "label": "Theme Secondary Font" },
+        { "value": "adobe-heading", "label": "Adobe Heading Font" },
+        { "value": "adobe-body", "label": "Adobe Body Font" },
+        { "value": "adobe-display", "label": "Adobe Display Font" },
+        { "value": "adobe-accent", "label": "Adobe Accent Font" },
+        { "value": "custom", "label": "Custom Font" }
+      ],
+      "default": "adobe-body"
+    },
+    {
+      "type": "text",
+      "id": "subheading_custom_font",
+      "label": "Custom Subheading Font",
+      "placeholder": "font-name, fallback-font, sans-serif",
+      "visible_if": "{{ section.settings.subheading_font_source == 'custom' }}"
+    },
+    {
+      "type": "color",
+      "id": "subheading_color",
+      "label": "Subheading Text Color",
+      "default": "#666666"
     },
     {
       "type": "header",
@@ -775,6 +987,65 @@
       "type": "url",
       "id": "footer_button_link",
       "label": "Footer Button Link"
+    },
+    {
+      "type": "select",
+      "id": "footer_button_alignment",
+      "label": "Button Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center",
+      "visible_if": "{{ section.settings.show_footer_cta }}"
+    },
+    {
+      "type": "text",
+      "id": "footer_button_size",
+      "label": "Button Text Size",
+      "placeholder": "16px or 1rem or 1.2vh",
+      "default": "1rem",
+      "info": "Enter size with units (px, rem, em, vh, vw, %)",
+      "visible_if": "{{ section.settings.show_footer_cta }}"
+    },
+    {
+      "type": "select",
+      "id": "footer_button_font_source",
+      "label": "Button Font",
+      "options": [
+        { "value": "shopify-primary", "label": "Theme Primary Font" },
+        { "value": "shopify-secondary", "label": "Theme Secondary Font" },
+        { "value": "adobe-heading", "label": "Adobe Heading Font" },
+        { "value": "adobe-body", "label": "Adobe Body Font" },
+        { "value": "adobe-display", "label": "Adobe Display Font" },
+        { "value": "adobe-accent", "label": "Adobe Accent Font" },
+        { "value": "custom", "label": "Custom Font" }
+      ],
+      "default": "adobe-accent",
+      "visible_if": "{{ section.settings.show_footer_cta }}"
+    },
+    {
+      "type": "text",
+      "id": "footer_button_custom_font",
+      "label": "Custom Button Font",
+      "placeholder": "font-name, fallback-font, sans-serif",
+      "visible_if": "{{ section.settings.show_footer_cta and section.settings.footer_button_font_source == 'custom' }}"
+    },
+    {
+      "type": "color",
+      "id": "footer_button_text_color",
+      "label": "Button Text Color",
+      "default": "#ffffff",
+      "visible_if": "{{ section.settings.show_footer_cta }}"
+    },
+    {
+      "type": "textarea",
+      "id": "footer_button_custom_style",
+      "label": "Custom Button Styles",
+      "placeholder": "background: #333; padding: 12px 24px; border-radius: 6px; border: 2px solid #ccc;",
+      "info": "Custom CSS properties for button styling (background, padding, border, etc.)",
+      "visible_if": "{{ section.settings.show_footer_cta }}"
     },
     {
       "type": "header",

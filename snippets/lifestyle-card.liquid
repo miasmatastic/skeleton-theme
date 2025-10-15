@@ -57,7 +57,8 @@
     when 'image'
       if card_settings.background_image != blank
         assign bg_position = card_settings.background_position | default: 'center'
-        assign background_style = 'background-image: url(' | append: card_settings.background_image | image_url: width: 800 | append: '); background-size: cover; background-position: ' | append: bg_position | append: '; background-repeat: no-repeat;'
+        assign bg_image_url = card_settings.background_image | image_url: width: 800
+        assign background_style = 'background-image: url("' | append: bg_image_url | append: '"); background-size: cover; background-position: ' | append: bg_position | append: '; background-repeat: no-repeat;'
       endif
   endcase
   
@@ -67,8 +68,10 @@
     assign overlay_position = card_settings.overlay_position | default: 'center'
     assign overlay_size = card_settings.overlay_size | default: 50
     assign overlay_opacity = card_settings.overlay_opacity | default: 100
+    assign overlay_blend_mode = card_settings.overlay_blend_mode | default: 'normal'
+    assign overlay_image_url = card_settings.overlay_image | image_url: width: 600
     
-    assign overlay_style = 'background-image: url(' | append: card_settings.overlay_image | image_url: width: 400 | append: '); opacity: ' | append: overlay_opacity | divided_by: 100.0 | append: '; background-size: ' | append: overlay_size | append: '%; background-position: '
+    assign overlay_style = 'background-image: url("' | append: overlay_image_url | append: '"); opacity: ' | append: overlay_opacity | divided_by: 100.0 | append: '; background-size: ' | append: overlay_size | append: '%; mix-blend-mode: ' | append: overlay_blend_mode | append: '; background-position: '
     
     case overlay_position
       when 'top-left'
@@ -143,6 +146,7 @@
       style="
         background: {{ card_settings.gradient_overlay_color | default: 'rgba(0,0,0,0.3)' }};
         opacity: {{ card_settings.gradient_overlay_opacity | default: 50 | divided_by: 100.0 }};
+        mix-blend-mode: {{ card_settings.gradient_overlay_blend_mode | default: 'normal' }};
       "
       aria-hidden="true"
     ></div>

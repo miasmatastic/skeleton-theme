@@ -1,0 +1,35 @@
+{% comment %}
+  Font Family Helper Snippet
+  Usage: {% render 'font-family-helper', source: section.settings.title_font_source, shopify_font: section.settings.title_font_family, custom_font: section.settings.title_custom_font %}
+{% endcomment %}
+
+{% liquid
+  case source
+    when 'shopify-primary'
+      echo 'var(--font-primary--family)'
+    when 'shopify-secondary'
+      echo 'var(--font-secondary--family)'
+    when 'adobe-heading'
+      echo 'var(--font-adobe-heading)'
+    when 'adobe-body'
+      echo 'var(--font-adobe-body)'
+    when 'adobe-display'
+      echo 'var(--font-adobe-display)'
+    when 'adobe-accent'
+      echo 'var(--font-adobe-accent)'
+    when 'shopify-picker'
+      if shopify_font
+        echo shopify_font.family | append: ', ' | append: shopify_font.fallback_families
+      else
+        echo 'var(--font-primary--family)'
+      endif
+    when 'custom'
+      if custom_font != blank
+        echo custom_font
+      else
+        echo 'var(--font-primary--family)'
+      endif
+    else
+      echo 'var(--font-primary--family)'
+  endcase
+%}

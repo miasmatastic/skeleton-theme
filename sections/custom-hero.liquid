@@ -4,18 +4,28 @@
   
   Features:
   - Responsive background images (desktop/mobile)
-  - Overlay system with color and gradient support
-  - Advanced typography controls with custom fonts
+  - Overlay system with color, gradient, and blend mode support
+  - Enhanced typography system with Adobe Fonts integration
   - Drop shadow effects for all text elements
   - Flexible alignment options
   - Custom button styling
+  - Creative blend modes for overlay effects
+  - Overlaid highlight image with positioning and effects
 {% endcomment %}
 
 {% style %}
-  {{ section.settings.title_font_family | font_face: font_display: 'swap' }}
-  {{ section.settings.subtitle_font_family | font_face: font_display: 'swap' }}
-  {{ section.settings.paragraph_font_family | font_face: font_display: 'swap' }}
-  {{ section.settings.button_font_family | font_face: font_display: 'swap' }}
+  {% if section.settings.title_font_source == 'shopify-picker' and section.settings.title_font_family %}
+    {{ section.settings.title_font_family | font_face: font_display: 'swap' }}
+  {% endif %}
+  {% if section.settings.subtitle_font_source == 'shopify-picker' and section.settings.subtitle_font_family %}
+    {{ section.settings.subtitle_font_family | font_face: font_display: 'swap' }}
+  {% endif %}
+  {% if section.settings.paragraph_font_source == 'shopify-picker' and section.settings.paragraph_font_family %}
+    {{ section.settings.paragraph_font_family | font_face: font_display: 'swap' }}
+  {% endif %}
+  {% if section.settings.button_font_source == 'shopify-picker' and section.settings.button_font_family %}
+    {{ section.settings.button_font_family | font_face: font_display: 'swap' }}
+  {% endif %}
 
   .custom-hero-section {
     min-height: {{ section.settings.min_height }};
@@ -70,6 +80,7 @@
     height: 100%;
     background: {{ section.settings.overlay_color }};
     opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+    mix-blend-mode: {{ section.settings.overlay_blend_mode | default: 'normal' }};
     z-index: 2;
     pointer-events: none;
   }
@@ -82,8 +93,62 @@
       height: 100%;
       background: {{ section.settings.gradient_overlay }};
       opacity: {{ section.settings.gradient_opacity | divided_by: 100.0 }};
+      mix-blend-mode: {{ section.settings.overlay_blend_mode | default: 'normal' }};
       z-index: 3;
       pointer-events: none;
+    }
+  {% endif %}
+
+  {% if section.settings.highlight_image %}
+    .custom-hero-highlight-image {
+      position: absolute;
+      width: {{ section.settings.highlight_image_size | default: '300px' }};
+      height: auto;
+      opacity: {{ section.settings.highlight_image_opacity | default: 80 | divided_by: 100.0 }};
+      mix-blend-mode: {{ section.settings.highlight_image_blend_mode | default: 'normal' }};
+      z-index: {{ section.settings.highlight_image_z_index | default: 4 }};
+      pointer-events: none;
+      transform: rotate({{ section.settings.highlight_image_rotation | default: 0 }}deg);
+      
+      {% comment %} Horizontal Alignment {% endcomment %}
+      {% case section.settings.highlight_image_horizontal_align %}
+        {% when 'left' %}
+          left: {{ section.settings.highlight_image_offset_x | default: '0px' }};
+        {% when 'center' %}
+          left: 50%;
+          transform: translateX(-50%) rotate({{ section.settings.highlight_image_rotation | default: 0 }}deg);
+          margin-left: {{ section.settings.highlight_image_offset_x | default: '0px' }};
+        {% when 'right' %}
+          right: {{ section.settings.highlight_image_offset_x | default: '0px' }};
+      {% endcase %}
+      
+      {% comment %} Vertical Alignment {% endcomment %}
+      {% case section.settings.highlight_image_vertical_align %}
+        {% when 'top' %}
+          top: {{ section.settings.highlight_image_offset_y | default: '0px' }};
+        {% when 'center' %}
+          top: 50%;
+          {% if section.settings.highlight_image_horizontal_align == 'center' %}
+            transform: translate(-50%, -50%) rotate({{ section.settings.highlight_image_rotation | default: 0 }}deg);
+          {% else %}
+            transform: translateY(-50%) rotate({{ section.settings.highlight_image_rotation | default: 0 }}deg);
+          {% endif %}
+          margin-top: {{ section.settings.highlight_image_offset_y | default: '0px' }};
+        {% when 'bottom' %}
+          bottom: {{ section.settings.highlight_image_offset_y | default: '0px' }};
+      {% endcase %}
+    }
+    
+    @media (max-width: 768px) {
+      .custom-hero-highlight-image {
+        width: calc({{ section.settings.highlight_image_size | default: '300px' }} * 0.7);
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .custom-hero-highlight-image {
+        width: calc({{ section.settings.highlight_image_size | default: '300px' }} * 0.5);
+      }
     }
   {% endif %}
 
@@ -114,11 +179,7 @@
     font-weight: bold;
     margin-bottom: 0.5rem;
     color: {{ section.settings.text_color }};
-    {% if section.settings.title_font_family %}
-      font-family: {{ section.settings.title_font_family.family }}, {{ section.settings.title_font_family.fallback_families }};
-      font-weight: {{ section.settings.title_font_family.weight }};
-      font-style: {{ section.settings.title_font_family.style }};
-    {% endif %}
+    font-family: {% render 'font-family-helper', source: section.settings.title_font_source, shopify_font: section.settings.title_font_family, custom_font: section.settings.title_custom_font %};
     filter: drop-shadow({{ section.settings.title_shadow_x | default: '1px' }} {{ section.settings.title_shadow_y | default: '1px' }} {{ section.settings.title_shadow_blur | default: '5px' }} {{ section.settings.title_shadow_color | default: '#000000' }});
     line-height: 1.2;
   }
@@ -127,11 +188,7 @@
     font-size: clamp(1.2rem, 3vw, 1.8rem);
     margin-bottom: 1rem;
     color: {{ section.settings.text_color }};
-    {% if section.settings.subtitle_font_family %}
-      font-family: {{ section.settings.subtitle_font_family.family }}, {{ section.settings.subtitle_font_family.fallback_families }};
-      font-weight: {{ section.settings.subtitle_font_family.weight }};
-      font-style: {{ section.settings.subtitle_font_family.style }};
-    {% endif %}
+    font-family: {% render 'font-family-helper', source: section.settings.subtitle_font_source, shopify_font: section.settings.subtitle_font_family, custom_font: section.settings.subtitle_custom_font %};
     filter: drop-shadow({{ section.settings.subtitle_shadow_x | default: '1px' }} {{ section.settings.subtitle_shadow_y | default: '1px' }} {{ section.settings.subtitle_shadow_blur | default: '5px' }} {{ section.settings.subtitle_shadow_color | default: '#000000' }});
     line-height: 1.3;
   }
@@ -141,11 +198,7 @@
     margin-bottom: 2rem;
     color: {{ section.settings.text_color }};
     max-width: 600px;
-    {% if section.settings.paragraph_font_family %}
-      font-family: {{ section.settings.paragraph_font_family.family }}, {{ section.settings.paragraph_font_family.fallback_families }};
-      font-weight: {{ section.settings.paragraph_font_family.weight }};
-      font-style: {{ section.settings.paragraph_font_family.style }};
-    {% endif %}
+    font-family: {% render 'font-family-helper', source: section.settings.paragraph_font_source, shopify_font: section.settings.paragraph_font_family, custom_font: section.settings.paragraph_custom_font %};
     filter: drop-shadow({{ section.settings.paragraph_shadow_x | default: '1px' }} {{ section.settings.paragraph_shadow_y | default: '1px' }} {{ section.settings.paragraph_shadow_blur | default: '5px' }} {{ section.settings.paragraph_shadow_color | default: '#000000' }});
     line-height: 1.5;
   }
@@ -163,11 +216,7 @@
     cursor: pointer;
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     transition: all 0.3s ease;
-    {% if section.settings.button_font_family %}
-      font-family: {{ section.settings.button_font_family.family }}, {{ section.settings.button_font_family.fallback_families }};
-      font-weight: {{ section.settings.button_font_family.weight }};
-      font-style: {{ section.settings.button_font_family.style }};
-    {% endif %}
+    font-family: {% render 'font-family-helper', source: section.settings.button_font_source, shopify_font: section.settings.button_font_family, custom_font: section.settings.button_custom_font %};
     filter: drop-shadow({{ section.settings.button_shadow_x | default: '1px' }} {{ section.settings.button_shadow_y | default: '1px' }} {{ section.settings.button_shadow_blur | default: '5px' }} {{ section.settings.button_shadow_color | default: '#000000' }});
     {{ section.settings.button_custom_style }}
   }
@@ -218,6 +267,14 @@
       border: 2px solid currentColor;
     }
   }
+
+  /* Blend Mode Fallbacks - mix-blend-mode is supported in all modern browsers */
+  @supports not (mix-blend-mode: normal) {
+    .custom-hero-overlay__color,
+    .custom-hero-overlay__gradient {
+      mix-blend-mode: normal;
+    }
+  }
 {% endstyle %}
 
 <section class="custom-hero-section" id="custom-hero-{{ section.id }}">
@@ -227,6 +284,20 @@
       <div class="custom-hero-overlay__gradient"></div>
     {% endif %}
   </div>
+  
+  {% if section.settings.highlight_image %}
+    <img 
+      src="{{ section.settings.highlight_image | image_url: width: 800 }}"
+      alt="Decorative highlight image"
+      class="custom-hero-highlight-image"
+      loading="lazy"
+      width="{{ section.settings.highlight_image.width }}"
+      height="{{ section.settings.highlight_image.height }}"
+      srcset="{{ section.settings.highlight_image | image_url: width: 400 }} 400w,
+              {{ section.settings.highlight_image | image_url: width: 600 }} 600w,
+              {{ section.settings.highlight_image | image_url: width: 800 }} 800w"
+      sizes="(max-width: 480px) 200px, (max-width: 768px) 300px, 400px">
+  {% endif %}
   
   <div class="custom-hero-content">
     {% if section.settings.title != blank %}
@@ -310,6 +381,152 @@
       "info": "0 = fully transparent, 100 = fully opaque"
     },
     {
+      "type": "select",
+      "id": "overlay_blend_mode",
+      "label": "Overlay Blend Mode",
+      "options": [
+        { "value": "normal", "label": "Normal (Default)" },
+        { "value": "multiply", "label": "Multiply (Darkens)" },
+        { "value": "screen", "label": "Screen (Lightens)" },
+        { "value": "overlay", "label": "Overlay (Contrast Mix)" },
+        { "value": "darken", "label": "Darken (Keep Darker)" },
+        { "value": "lighten", "label": "Lighten (Keep Lighter)" },
+        { "value": "color-dodge", "label": "Color Dodge (Bright Glow)" },
+        { "value": "color-burn", "label": "Color Burn (Dark Contrast)" },
+        { "value": "hard-light", "label": "Hard Light (Strong Effect)" },
+        { "value": "soft-light", "label": "Soft Light (Gentle Effect)" },
+        { "value": "difference", "label": "Difference (Color Invert)" },
+        { "value": "exclusion", "label": "Exclusion (Soft Invert)" },
+        { "value": "hue", "label": "Hue (Color Only)" },
+        { "value": "saturation", "label": "Saturation (Intensity Only)" },
+        { "value": "color", "label": "Color (Hue + Saturation)" },
+        { "value": "luminosity", "label": "Luminosity (Brightness Only)" },
+        { "value": "plus-darker", "label": "Plus Darker (Additive Dark)" },
+        { "value": "plus-lighter", "label": "Plus Lighter (Additive Light)" }
+      ],
+      "default": "normal",
+      "info": "How the overlay blends with the background image - experiment for creative effects!"
+    },
+    {
+      "type": "header",
+      "content": "✨ Highlight Image Overlay"
+    },
+    {
+      "type": "image_picker",
+      "id": "highlight_image",
+      "label": "Highlight Image",
+      "info": "Optional decorative image that overlays the hero section"
+    },
+    {
+      "type": "select",
+      "id": "highlight_image_horizontal_align",
+      "label": "Horizontal Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "right",
+      "visible_if": "{{ section.settings.highlight_image }}"
+    },
+    {
+      "type": "select",
+      "id": "highlight_image_vertical_align",
+      "label": "Vertical Alignment",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "center",
+      "visible_if": "{{ section.settings.highlight_image }}"
+    },
+    {
+      "type": "text",
+      "id": "highlight_image_size",
+      "label": "Image Size",
+      "placeholder": "300px or 15vh or 20vw",
+      "default": "300px",
+      "info": "Enter size with units (px, vh, vw, %, rem, etc.)",
+      "visible_if": "{{ section.settings.highlight_image }}"
+    },
+    {
+      "type": "range",
+      "id": "highlight_image_opacity",
+      "label": "Image Opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 80,
+      "unit": "%",
+      "visible_if": "{{ section.settings.highlight_image }}"
+    },
+    {
+      "type": "select",
+      "id": "highlight_image_blend_mode",
+      "label": "Image Blend Mode",
+      "options": [
+        { "value": "normal", "label": "Normal (Default)" },
+        { "value": "multiply", "label": "Multiply (Darkens)" },
+        { "value": "screen", "label": "Screen (Lightens)" },
+        { "value": "overlay", "label": "Overlay (Contrast Mix)" },
+        { "value": "darken", "label": "Darken (Keep Darker)" },
+        { "value": "lighten", "label": "Lighten (Keep Lighter)" },
+        { "value": "color-dodge", "label": "Color Dodge (Bright Glow)" },
+        { "value": "color-burn", "label": "Color Burn (Dark Contrast)" },
+        { "value": "hard-light", "label": "Hard Light (Strong Effect)" },
+        { "value": "soft-light", "label": "Soft Light (Gentle Effect)" },
+        { "value": "difference", "label": "Difference (Color Invert)" },
+        { "value": "exclusion", "label": "Exclusion (Soft Invert)" },
+        { "value": "hue", "label": "Hue (Color Only)" },
+        { "value": "saturation", "label": "Saturation (Intensity Only)" },
+        { "value": "color", "label": "Color (Hue + Saturation)" },
+        { "value": "luminosity", "label": "Luminosity (Brightness Only)" }
+      ],
+      "default": "normal",
+      "visible_if": "{{ section.settings.highlight_image }}"
+    },
+    {
+      "type": "range",
+      "id": "highlight_image_rotation",
+      "label": "Image Rotation",
+      "min": -180,
+      "max": 180,
+      "step": 5,
+      "default": 0,
+      "unit": "deg",
+      "visible_if": "{{ section.settings.highlight_image }}"
+    },
+    {
+      "type": "range",
+      "id": "highlight_image_z_index",
+      "label": "Layer Order (Z-Index)",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 4,
+      "info": "Higher numbers appear in front. Overlay is 2-3, content is 5+",
+      "visible_if": "{{ section.settings.highlight_image }}"
+    },
+    {
+      "type": "text",
+      "id": "highlight_image_offset_x",
+      "label": "Horizontal Offset",
+      "placeholder": "0px or 5% or 2rem",
+      "default": "0px",
+      "info": "Move left (-) or right (+) from alignment position",
+      "visible_if": "{{ section.settings.highlight_image }}"
+    },
+    {
+      "type": "text",
+      "id": "highlight_image_offset_y",
+      "label": "Vertical Offset",
+      "placeholder": "0px or 5% or 2rem",
+      "default": "0px",
+      "info": "Move up (-) or down (+) from alignment position",
+      "visible_if": "{{ section.settings.highlight_image }}"
+    },
+    {
       "type": "header",
       "content": "📐 Layout & Alignment"
     },
@@ -369,28 +586,124 @@
       "content": "✏️ Typography"
     },
     {
+      "type": "select",
+      "id": "title_font_source",
+      "label": "Title Font",
+      "options": [
+        { "value": "shopify-primary", "label": "Theme Primary Font" },
+        { "value": "shopify-secondary", "label": "Theme Secondary Font" },
+        { "value": "adobe-heading", "label": "Adobe Heading Font" },
+        { "value": "adobe-body", "label": "Adobe Body Font" },
+        { "value": "adobe-display", "label": "Adobe Display Font" },
+        { "value": "adobe-accent", "label": "Adobe Accent Font" },
+        { "value": "shopify-picker", "label": "Shopify Font Picker" },
+        { "value": "custom", "label": "Custom Font" }
+      ],
+      "default": "adobe-heading"
+    },
+    {
       "type": "font_picker",
       "id": "title_font_family",
-      "label": "Title Font",
-      "default": "assistant_n4"
+      "label": "Choose Shopify Font",
+      "default": "assistant_n4",
+      "visible_if": "{{ section.settings.title_font_source == 'shopify-picker' }}"
+    },
+    {
+      "type": "text",
+      "id": "title_custom_font",
+      "label": "Custom Font Family",
+      "placeholder": "font-name, fallback-font, sans-serif",
+      "visible_if": "{{ section.settings.title_font_source == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "subtitle_font_source",
+      "label": "Subtitle Font",
+      "options": [
+        { "value": "shopify-primary", "label": "Theme Primary Font" },
+        { "value": "shopify-secondary", "label": "Theme Secondary Font" },
+        { "value": "adobe-heading", "label": "Adobe Heading Font" },
+        { "value": "adobe-body", "label": "Adobe Body Font" },
+        { "value": "adobe-display", "label": "Adobe Display Font" },
+        { "value": "adobe-accent", "label": "Adobe Accent Font" },
+        { "value": "shopify-picker", "label": "Shopify Font Picker" },
+        { "value": "custom", "label": "Custom Font" }
+      ],
+      "default": "adobe-body"
     },
     {
       "type": "font_picker",
       "id": "subtitle_font_family",
-      "label": "Subtitle Font",
-      "default": "assistant_n4"
+      "label": "Choose Shopify Font",
+      "default": "assistant_n4",
+      "visible_if": "{{ section.settings.subtitle_font_source == 'shopify-picker' }}"
+    },
+    {
+      "type": "text",
+      "id": "subtitle_custom_font",
+      "label": "Custom Font Family",
+      "placeholder": "font-name, fallback-font, sans-serif",
+      "visible_if": "{{ section.settings.subtitle_font_source == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "paragraph_font_source",
+      "label": "Paragraph Font",
+      "options": [
+        { "value": "shopify-primary", "label": "Theme Primary Font" },
+        { "value": "shopify-secondary", "label": "Theme Secondary Font" },
+        { "value": "adobe-heading", "label": "Adobe Heading Font" },
+        { "value": "adobe-body", "label": "Adobe Body Font" },
+        { "value": "adobe-display", "label": "Adobe Display Font" },
+        { "value": "adobe-accent", "label": "Adobe Accent Font" },
+        { "value": "shopify-picker", "label": "Shopify Font Picker" },
+        { "value": "custom", "label": "Custom Font" }
+      ],
+      "default": "adobe-body"
     },
     {
       "type": "font_picker",
       "id": "paragraph_font_family",
-      "label": "Paragraph Font",
-      "default": "assistant_n4"
+      "label": "Choose Shopify Font",
+      "default": "assistant_n4",
+      "visible_if": "{{ section.settings.paragraph_font_source == 'shopify-picker' }}"
+    },
+    {
+      "type": "text",
+      "id": "paragraph_custom_font",
+      "label": "Custom Font Family",
+      "placeholder": "font-name, fallback-font, sans-serif",
+      "visible_if": "{{ section.settings.paragraph_font_source == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "button_font_source",
+      "label": "Button Font",
+      "options": [
+        { "value": "shopify-primary", "label": "Theme Primary Font" },
+        { "value": "shopify-secondary", "label": "Theme Secondary Font" },
+        { "value": "adobe-heading", "label": "Adobe Heading Font" },
+        { "value": "adobe-body", "label": "Adobe Body Font" },
+        { "value": "adobe-display", "label": "Adobe Display Font" },
+        { "value": "adobe-accent", "label": "Adobe Accent Font" },
+        { "value": "shopify-picker", "label": "Shopify Font Picker" },
+        { "value": "custom", "label": "Custom Font" }
+      ],
+      "default": "adobe-accent"
     },
     {
       "type": "font_picker",
       "id": "button_font_family",
-      "label": "Button Font",
-      "default": "assistant_n4"
+      "label": "Choose Shopify Font",
+      "default": "assistant_n4",
+      "visible_if": "{{ section.settings.button_font_source == 'shopify-picker' }}"
+    },
+    {
+      "type": "text",
+      "id": "button_custom_font",
+      "label": "Custom Font Family",
+      "placeholder": "font-name, fallback-font, sans-serif",
+      "visible_if": "{{ section.settings.button_font_source == 'custom' }}"
     },
     {
       "type": "header",

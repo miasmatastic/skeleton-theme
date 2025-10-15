@@ -25,6 +25,38 @@
         "id": "type_secondary_font",
         "default": "work_sans_n6",
         "label": "t:general.secondary"
+      },
+      {
+        "type": "header",
+        "content": "🎨 Adobe Fonts Integration"
+      },
+      {
+        "type": "text",
+        "id": "adobe_heading_font",
+        "label": "Adobe Heading Font",
+        "placeholder": "proxima-nova, 'Helvetica Neue', Arial, sans-serif",
+        "info": "Your primary Adobe heading font with fallbacks. Include quotes around multi-word font names."
+      },
+      {
+        "type": "text",
+        "id": "adobe_body_font",
+        "label": "Adobe Body Font",
+        "placeholder": "source-sans-pro, Georgia, serif",
+        "info": "Your primary Adobe body font with fallbacks"
+      },
+      {
+        "type": "text",
+        "id": "adobe_display_font",
+        "label": "Adobe Display Font",
+        "placeholder": "futura-pt, Impact, sans-serif",
+        "info": "Your primary Adobe display font for special headings"
+      },
+      {
+        "type": "text",
+        "id": "adobe_accent_font",
+        "label": "Adobe Accent Font",
+        "placeholder": "bebas-neue, 'Arial Black', sans-serif",
+        "info": "Your Adobe accent font for emphasis and CTAs"
       }
     ]
   },
@@ -97,6 +129,117 @@
     ]
   },
   {
+    "name": "Global Color System",
+    "settings": [
+      {
+        "type": "header",
+        "content": "🎨 Brand Colors"
+      },
+      {
+        "type": "color",
+        "id": "brand_primary",
+        "default": "#3b82f6",
+        "label": "Primary Brand Color",
+        "info": "Main brand color used for buttons, links, and accents"
+      },
+      {
+        "type": "color",
+        "id": "brand_secondary",
+        "default": "#10b981",
+        "label": "Secondary Brand Color",
+        "info": "Supporting brand color for variety and emphasis"
+      },
+      {
+        "type": "color",
+        "id": "brand_accent",
+        "default": "#f59e0b",
+        "label": "Accent Color",
+        "info": "Highlight color for CTAs and special elements"
+      },
+      {
+        "type": "color",
+        "id": "brand_danger",
+        "default": "#ef4444",
+        "label": "Error/Danger Color",
+        "info": "Used for errors, warnings, and sale badges"
+      },
+      {
+        "type": "color",
+        "id": "brand_success",
+        "default": "#22c55e",
+        "label": "Success Color",
+        "info": "Used for confirmations and positive actions"
+      },
+      {
+        "type": "header",
+        "content": "🌐 Base Colors"
+      },
+      {
+        "type": "color",
+        "id": "color_base_background",
+        "default": "#ffffff",
+        "label": "Base Background",
+        "info": "Main page background color"
+      },
+      {
+        "type": "color",
+        "id": "color_base_text",
+        "default": "#1a1a1a",
+        "label": "Base Text",
+        "info": "Primary text color"
+      },
+      {
+        "type": "color",
+        "id": "color_base_text_secondary",
+        "default": "#6b7280",
+        "label": "Secondary Text",
+        "info": "Muted text for descriptions and captions"
+      },
+      {
+        "type": "color",
+        "id": "color_base_border",
+        "default": "#e5e7eb",
+        "label": "Border Color",
+        "info": "Default border color for cards and dividers"
+      },
+      {
+        "type": "color",
+        "id": "color_base_shadow",
+        "default": "#00000015",
+        "label": "Shadow Color",
+        "info": "Color for drop shadows and overlays"
+      },
+      {
+        "type": "header",
+        "content": "🏷️ Product Colors"
+      },
+      {
+        "type": "color",
+        "id": "color_product_sale",
+        "default": "#dc2626",
+        "label": "Sale Badge Color"
+      },
+      {
+        "type": "color",
+        "id": "color_product_sold_out",
+        "default": "#6b7280",
+        "label": "Sold Out Color"
+      },
+      {
+        "type": "color",
+        "id": "color_product_new",
+        "default": "#059669",
+        "label": "New Product Badge"
+      },
+      {
+        "type": "color",
+        "id": "color_product_featured",
+        "default": "#7c3aed",
+        "label": "Featured Product Badge"
+      }
+    ]
+  },
+  {
     "name": "Color Schemes",
     "settings": [
       {
@@ -122,6 +265,18 @@
         "label": "Accent"
       },
       {
+        "type": "color",
+        "id": "color_scheme_1_border",
+        "default": "#e5e7eb",
+        "label": "Border"
+      },
+      {
+        "type": "color",
+        "id": "color_scheme_1_overlay",
+        "default": "#00000010",
+        "label": "Overlay"
+      },
+      {
         "type": "header",
         "content": "Scheme 2 - Neutral"
       },
@@ -144,6 +299,18 @@
         "label": "Accent"
       },
       {
+        "type": "color",
+        "id": "color_scheme_2_border",
+        "default": "#d1d5db",
+        "label": "Border"
+      },
+      {
+        "type": "color",
+        "id": "color_scheme_2_overlay",
+        "default": "#00000015",
+        "label": "Overlay"
+      },
+      {
         "type": "header",
         "content": "Scheme 3 - Dark"
       },
@@ -164,6 +331,18 @@
         "id": "color_scheme_3_accent",
         "default": "#f59e0b",
         "label": "Accent"
+      },
+      {
+        "type": "color",
+        "id": "color_scheme_3_border",
+        "default": "#475569",
+        "label": "Border"
+      },
+      {
+        "type": "color",
+        "id": "color_scheme_3_overlay",
+        "default": "#ffffff20",
+        "label": "Overlay"
       }
     ]
   },

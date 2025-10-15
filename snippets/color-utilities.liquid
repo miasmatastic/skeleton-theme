@@ -1,0 +1,93 @@
+{% comment %}
+  Color Utility Snippet
+  Usage examples:
+  
+  1. Get a brand color:
+     {% render 'color-utilities', type: 'brand', color: 'primary' %}
+     
+  2. Get a scheme color:
+     {% render 'color-utilities', type: 'scheme', scheme: '1', color: 'background' %}
+     
+  3. Get a product badge color:
+     {% render 'color-utilities', type: 'product', color: 'sale' %}
+     
+  4. Generate a CSS class:
+     {% render 'color-utilities', type: 'class', variant: 'text-brand-primary' %}
+{% endcomment %}
+
+{% liquid
+  assign type = type | default: 'brand'
+  assign color = color | default: 'primary'
+  assign scheme = scheme | default: '1'
+  assign variant = variant | default: 'text-brand-primary'
+  
+  case type
+    when 'brand'
+      case color
+        when 'primary'
+          echo 'var(--brand-primary)'
+        when 'secondary'
+          echo 'var(--brand-secondary)'
+        when 'accent'
+          echo 'var(--brand-accent)'
+        when 'danger'
+          echo 'var(--brand-danger)'
+        when 'success'
+          echo 'var(--brand-success)'
+        else
+          echo 'var(--brand-primary)'
+      endcase
+      
+    when 'scheme'
+      case color
+        when 'background'
+          echo 'var(--scheme-' | append: scheme | append: '-bg)'
+        when 'text'
+          echo 'var(--scheme-' | append: scheme | append: '-text)'
+        when 'accent'
+          echo 'var(--scheme-' | append: scheme | append: '-accent)'
+        when 'border'
+          echo 'var(--scheme-' | append: scheme | append: '-border)'
+        when 'overlay'
+          echo 'var(--scheme-' | append: scheme | append: '-overlay)'
+        else
+          echo 'var(--scheme-' | append: scheme | append: '-bg)'
+      endcase
+      
+    when 'product'
+      case color
+        when 'sale'
+          echo 'var(--color-product-sale)'
+        when 'sold-out'
+          echo 'var(--color-product-sold-out)'
+        when 'new'
+          echo 'var(--color-product-new)'
+        when 'featured'
+          echo 'var(--color-product-featured)'
+        else
+          echo 'var(--color-product-sale)'
+      endcase
+      
+    when 'base'
+      case color
+        when 'background'
+          echo 'var(--color-base-background)'
+        when 'text'
+          echo 'var(--color-base-text)'
+        when 'text-secondary'
+          echo 'var(--color-base-text-secondary)'
+        when 'border'
+          echo 'var(--color-base-border)'
+        when 'shadow'
+          echo 'var(--color-base-shadow)'
+        else
+          echo 'var(--color-base-background)'
+      endcase
+      
+    when 'class'
+      echo variant
+      
+    else
+      echo 'var(--brand-primary)'
+  endcase
+%}

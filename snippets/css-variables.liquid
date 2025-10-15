@@ -6,36 +6,81 @@
   {{ settings.type_primary_font | font_modify: 'style', 'italic' | font_face: font_display: 'swap' }}
 
   :root {
-    /* Typography */
+    /* Typography - Shopify Fonts */
     --font-primary--family: {{ settings.type_primary_font.family }}, {{ settings.type_primary_font.fallback_families }};
     --font-primary--style: {{ settings.type_primary_font.style }};
     --font-primary--weight: {{ settings.type_primary_font.weight }};
+    --font-secondary--family: {{ settings.type_secondary_font.family }}, {{ settings.type_secondary_font.fallback_families }};
+    --font-secondary--style: {{ settings.type_secondary_font.style }};
+    --font-secondary--weight: {{ settings.type_secondary_font.weight }};
+    
+    /* Typography - Adobe Fonts */
+    --font-adobe-heading: {{ settings.adobe_heading_font | default: 'Arial, sans-serif' }};
+    --font-adobe-body: {{ settings.adobe_body_font | default: 'Georgia, serif' }};
+    --font-adobe-display: {{ settings.adobe_display_font | default: 'Impact, sans-serif' }};
+    --font-adobe-accent: {{ settings.adobe_accent_font | default: '"Arial Black", sans-serif' }};
+    
+    /* Typography - Unified System */
+    --font-heading: var(--font-primary--family);
+    --font-body: var(--font-secondary--family);
     
     /* Layout */
     --page-width: {{ settings.max_page_width }};
     --page-margin: {{ settings.min_page_margin }}px;
     
-    /* Colors */
-    --color-background: {{ settings.background_color }};
-    --color-foreground: {{ settings.foreground_color }};
-    --color-accent: {{ settings.accent_color | default: '#007bff' }};
+    /* 🎨 Global Brand Colors */
+    --brand-primary: {{ settings.brand_primary | default: '#3b82f6' }};
+    --brand-secondary: {{ settings.brand_secondary | default: '#10b981' }};
+    --brand-accent: {{ settings.brand_accent | default: '#f59e0b' }};
+    --brand-danger: {{ settings.brand_danger | default: '#ef4444' }};
+    --brand-success: {{ settings.brand_success | default: '#22c55e' }};
+    
+    /* 🌐 Base Colors */
+    --color-base-background: {{ settings.color_base_background | default: '#ffffff' }};
+    --color-base-text: {{ settings.color_base_text | default: '#1a1a1a' }};
+    --color-base-text-secondary: {{ settings.color_base_text_secondary | default: '#6b7280' }};
+    --color-base-border: {{ settings.color_base_border | default: '#e5e7eb' }};
+    --color-base-shadow: {{ settings.color_base_shadow | default: '#00000015' }};
+    
+    /* 🏷️ Product Colors */
+    --color-product-sale: {{ settings.color_product_sale | default: '#dc2626' }};
+    --color-product-sold-out: {{ settings.color_product_sold_out | default: '#6b7280' }};
+    --color-product-new: {{ settings.color_product_new | default: '#059669' }};
+    --color-product-featured: {{ settings.color_product_featured | default: '#7c3aed' }};
+    
+    /* Legacy Colors (for backward compatibility) */
+    --color-background: {{ settings.background_color | default: settings.color_base_background | default: '#ffffff' }};
+    --color-foreground: {{ settings.foreground_color | default: settings.color_base_text | default: '#1a1a1a' }};
+    --color-accent: {{ settings.accent_color | default: settings.brand_primary | default: '#3b82f6' }};
     
     /* Color Schemes */
     --scheme-1-bg: {{ settings.color_scheme_1_background | default: '#ffffff' }};
     --scheme-1-text: {{ settings.color_scheme_1_text | default: '#1a1a1a' }};
     --scheme-1-accent: {{ settings.color_scheme_1_accent | default: '#3b82f6' }};
+    --scheme-1-border: {{ settings.color_scheme_1_border | default: '#e5e7eb' }};
+    --scheme-1-overlay: {{ settings.color_scheme_1_overlay | default: '#00000010' }};
     
     --scheme-2-bg: {{ settings.color_scheme_2_background | default: '#f8fafc' }};
     --scheme-2-text: {{ settings.color_scheme_2_text | default: '#334155' }};
     --scheme-2-accent: {{ settings.color_scheme_2_accent | default: '#10b981' }};
+    --scheme-2-border: {{ settings.color_scheme_2_border | default: '#d1d5db' }};
+    --scheme-2-overlay: {{ settings.color_scheme_2_overlay | default: '#00000015' }};
     
     --scheme-3-bg: {{ settings.color_scheme_3_background | default: '#1e293b' }};
     --scheme-3-text: {{ settings.color_scheme_3_text | default: '#f8fafc' }};
     --scheme-3-accent: {{ settings.color_scheme_3_accent | default: '#f59e0b' }};
+    --scheme-3-border: {{ settings.color_scheme_3_border | default: '#475569' }};
+    --scheme-3-overlay: {{ settings.color_scheme_3_overlay | default: '#ffffff20' }};
     
     /* Computed color variations */
-    --color-foreground-rgb: {{ settings.foreground_color | color_extract: 'red' }}, {{ settings.foreground_color | color_extract: 'green' }}, {{ settings.foreground_color | color_extract: 'blue' }};
-    --color-background-rgb: {{ settings.background_color | color_extract: 'red' }}, {{ settings.background_color | color_extract: 'green' }}, {{ settings.background_color | color_extract: 'blue' }};
+    --color-foreground-rgb: {{ settings.color_base_text | color_extract: 'red' }}, {{ settings.color_base_text | color_extract: 'green' }}, {{ settings.color_base_text | color_extract: 'blue' }};
+    --color-background-rgb: {{ settings.color_base_background | color_extract: 'red' }}, {{ settings.color_base_background | color_extract: 'green' }}, {{ settings.color_base_background | color_extract: 'blue' }};
+    
+    /* Brand color variations (lighter/darker) */
+    --brand-primary-light: {{ settings.brand_primary | color_lighten: 20 }};
+    --brand-primary-dark: {{ settings.brand_primary | color_darken: 20 }};
+    --brand-secondary-light: {{ settings.brand_secondary | color_lighten: 20 }};
+    --brand-secondary-dark: {{ settings.brand_secondary | color_darken: 20 }};
     
     /* Styles */
     --style-border-radius-inputs: {{ settings.input_corner_radius }}px;
@@ -83,10 +128,28 @@
     }
   }
 
+  /* 🎨 Global Color Utility Classes */
+  .text-brand-primary { color: var(--brand-primary) !important; }
+  .text-brand-secondary { color: var(--brand-secondary) !important; }
+  .text-brand-accent { color: var(--brand-accent) !important; }
+  .text-brand-danger { color: var(--brand-danger) !important; }
+  .text-brand-success { color: var(--brand-success) !important; }
+  
+  .bg-brand-primary { background-color: var(--brand-primary) !important; }
+  .bg-brand-secondary { background-color: var(--brand-secondary) !important; }
+  .bg-brand-accent { background-color: var(--brand-accent) !important; }
+  .bg-brand-danger { background-color: var(--brand-danger) !important; }
+  .bg-brand-success { background-color: var(--brand-success) !important; }
+  
+  .border-brand-primary { border-color: var(--brand-primary) !important; }
+  .border-brand-secondary { border-color: var(--brand-secondary) !important; }
+  .border-base { border-color: var(--color-base-border) !important; }
+
   /* Color Scheme Classes */
   .color-scheme-1 {
     background-color: var(--scheme-1-bg);
     color: var(--scheme-1-text);
+    border-color: var(--scheme-1-border);
   }
   
   .color-scheme-1 .accent {
@@ -96,6 +159,7 @@
   .color-scheme-2 {
     background-color: var(--scheme-2-bg);
     color: var(--scheme-2-text);
+    border-color: var(--scheme-2-border);
   }
   
   .color-scheme-2 .accent {
@@ -105,6 +169,7 @@
   .color-scheme-3 {
     background-color: var(--scheme-3-bg);
     color: var(--scheme-3-text);
+    border-color: var(--scheme-3-border);
   }
   
   .color-scheme-3 .accent {
@@ -125,5 +190,55 @@
   .scheme-3 {
     background-color: var(--scheme-3-bg);
     color: var(--scheme-3-text);
+  }
+
+  /* 🏷️ Product Badge Styles */
+  .badge-sale { 
+    background-color: var(--color-product-sale);
+    color: white;
+  }
+  
+  .badge-sold-out { 
+    background-color: var(--color-product-sold-out);
+    color: white;
+  }
+  
+  .badge-new { 
+    background-color: var(--color-product-new);
+    color: white;
+  }
+  
+  .badge-featured { 
+    background-color: var(--color-product-featured);
+    color: white;
+  }
+
+  /* Button Variants */
+  .btn-primary {
+    background-color: var(--brand-primary);
+    color: white;
+    border-color: var(--brand-primary);
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--brand-primary-dark);
+    border-color: var(--brand-primary-dark);
+  }
+  
+  .btn-secondary {
+    background-color: var(--brand-secondary);
+    color: white;
+    border-color: var(--brand-secondary);
+  }
+  
+  .btn-secondary:hover {
+    background-color: var(--brand-secondary-dark);
+    border-color: var(--brand-secondary-dark);
+  }
+  
+  .btn-accent {
+    background-color: var(--brand-accent);
+    color: white;
+    border-color: var(--brand-accent);
   }
 {% endstyle %}
