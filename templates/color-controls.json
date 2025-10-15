@@ -1,0 +1,27 @@
+{
+  "sections": {
+    "global-color-controls": {
+      "type": "global-color-controls",
+      "settings": {
+        "brand_primary": "#3b82f6",
+        "brand_secondary": "#10b981", 
+        "brand_accent": "#f59e0b",
+        "brand_danger": "#ef4444",
+        "brand_success": "#22c55e",
+        "base_background": "#ffffff",
+        "base_text": "#1a1a1a",
+        "base_text_secondary": "#6b7280",
+        "base_border": "#e5e7eb",
+        "product_sale": "#dc2626",
+        "product_sold_out": "#6b7280",
+        "product_new": "#059669",
+        "product_featured": "#7c3aed",
+        "sync_with_global_settings": true,
+        "show_contrast_warnings": true
+      }
+    }
+  },
+  "order": [
+    "global-color-controls"
+  ]
+}

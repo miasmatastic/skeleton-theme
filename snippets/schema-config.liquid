@@ -1,0 +1,202 @@
+{% comment %}
+  ██████╗ ███╗   ███╗    ███████╗ ██████╗██╗  ██╗███████╗███╗   ███╗ █████╗ 
+  ██╔══██╗████╗ ████║    ██╔════╝██╔════╝██║  ██║██╔════╝████╗ ████║██╔══██╗
+  ██████╔╝██╔████╔██║    ███████╗██║     ███████║█████╗  ██╔████╔██║███████║
+  ██╔═══╝ ██║╚██╔╝██║    ╚════██║██║     ██╔══██║██╔══╝  ██║╚██╔╝██║██╔══██║
+  ██║     ██║ ╚═╝ ██║    ███████║╚██████╗██║  ██║███████╗██║ ╚═╝ ██║██║  ██║
+  ╚═╝     ╚═╝     ╚═╝    ╚══════╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝
+  
+  MASTER SCHEMA CONFIGURATION
+  ===========================
+  Edit this file to customize all schema/JSON-LD data across your entire theme.
+  This single file controls all structured data for SEO and rich snippets.
+  
+  🏢 BUSINESS INFORMATION
+  📍 LOCATION DATA  
+  📞 CONTACT DETAILS
+  🌐 SOCIAL MEDIA
+  ⚙️  TECHNICAL SETTINGS
+  
+  Last Updated: {{ 'now' | date: '%B %d, %Y' }}
+{% endcomment %}
+
+{% liquid
+  comment
+    =================================================================
+    🏢 BUSINESS INFORMATION
+    =================================================================
+    Edit these values to match your business details
+  endcomment
+  
+  assign schema_business_name = 'Your Business Name'
+  assign schema_business_legal_name = 'Your Legal Business Name LLC'
+  assign schema_business_description = 'Your business description for search engines. Keep under 160 characters for best results.'
+  assign schema_business_founded = '2020'
+  assign schema_business_type = 'Organization'
+  
+  comment
+    Business Types Available:
+    - Organization (general business)
+    - Corporation 
+    - LocalBusiness
+    - OnlineStore
+    - Store
+    - AutoDealer
+    - ClothingStore
+    - etc. (see schema.org for full list)
+  endcomment
+
+  comment
+    =================================================================
+    📍 LOCATION & ADDRESS
+    =================================================================
+  endcomment
+  
+  assign schema_street_address = '123 Business Street'
+  assign schema_address_locality = 'Your City'
+  assign schema_address_region = 'Your State/Province'
+  assign schema_postal_code = '12345'
+  assign schema_address_country = 'US'
+  assign schema_latitude = '40.7589'
+  assign schema_longitude = '-73.9851'
+
+  comment
+    =================================================================
+    📞 CONTACT INFORMATION
+    =================================================================
+  endcomment
+  
+  assign schema_phone = '+1-555-123-4567'
+  assign schema_email = 'info@yourbusiness.com'
+  assign schema_contact_type = 'customer service'
+  assign schema_area_served = 'US'
+  assign schema_available_language = 'English'
+
+  comment
+    =================================================================
+    🌐 SOCIAL MEDIA & WEB PRESENCE
+    =================================================================
+    Add your social media URLs here. Leave blank if not applicable.
+  endcomment
+  
+  assign schema_facebook_url = 'https://www.facebook.com/yourbusiness'
+  assign schema_instagram_url = 'https://www.instagram.com/yourbusiness'
+  assign schema_twitter_url = 'https://www.twitter.com/yourbusiness'
+  assign schema_linkedin_url = 'https://www.linkedin.com/company/yourbusiness'
+  assign schema_youtube_url = 'https://www.youtube.com/c/yourbusiness'
+  assign schema_tiktok_url = 'https://www.tiktok.com/@yourbusiness'
+  assign schema_pinterest_url = 'https://www.pinterest.com/yourbusiness'
+
+  comment
+    =================================================================
+    💰 BUSINESS DETAILS
+    =================================================================
+  endcomment
+  
+  assign schema_price_range = '$$'
+  assign schema_payment_accepted = 'Cash, Credit Card, Debit Card, PayPal, Apple Pay, Google Pay'
+  assign schema_currencies_accepted = 'USD'
+
+  comment
+    Price Range Options:
+    $ = Inexpensive
+    $$ = Moderate  
+    $$$ = Expensive
+    $$$$ = Very Expensive
+  endcomment
+
+  comment
+    =================================================================
+    🕒 BUSINESS HOURS
+    =================================================================
+    Set your operating hours for local business schema
+  endcomment
+  
+  assign schema_monday_hours = '09:00-17:00'
+  assign schema_tuesday_hours = '09:00-17:00'
+  assign schema_wednesday_hours = '09:00-17:00'
+  assign schema_thursday_hours = '09:00-17:00'
+  assign schema_friday_hours = '09:00-17:00'
+  assign schema_saturday_hours = '10:00-16:00'
+  assign schema_sunday_hours = 'closed'
+
+  comment
+    Format: Use 24-hour format (09:00-17:00) or 'closed'
+    Leave as 'closed' for days you're not open
+  endcomment
+
+  comment
+    =================================================================
+    ⚙️ TECHNICAL SETTINGS
+    =================================================================
+  endcomment
+  
+  assign schema_site_name = shop.name
+  assign schema_site_url = shop.secure_url
+  assign schema_logo_url = 'logo.webp'
+  assign schema_default_image = 'default-image.webp'
+  assign schema_organization_id = 'org-' | append: shop.id
+
+  comment
+    =================================================================
+    🏆 AWARDS & CERTIFICATIONS
+    =================================================================
+    Add any business awards, certifications, or recognitions
+  endcomment
+  
+  assign schema_awards = 'Best E-commerce Store 2023, Top Customer Service Award 2022'
+  assign schema_certifications = 'BBB Accredited, SSL Certified, GDPR Compliant'
+
+  comment
+    =================================================================
+    🎯 SEO ENHANCEMENTS
+    =================================================================
+  endcomment
+  
+  assign schema_same_as_urls = schema_facebook_url | append: ',' | append: schema_instagram_url | append: ',' | append: schema_twitter_url | append: ',' | append: schema_linkedin_url
+  assign schema_keywords = 'ecommerce, online store, retail, shopping'
+  assign schema_industry = 'Retail'
+
+  comment
+    =================================================================
+    📱 APP & PLATFORM DATA
+    =================================================================
+  endcomment
+  
+  assign schema_app_name = shop.name | append: ' Mobile App'
+  assign schema_ios_app_url = 'https://apps.apple.com/app/yourbusiness'
+  assign schema_android_app_url = 'https://play.google.com/store/apps/details?id=com.yourbusiness'
+
+  comment
+    =================================================================
+    🔄 DYNAMIC VARIABLES (DO NOT EDIT)
+    =================================================================
+    These are automatically populated - do not modify
+  endcomment
+  
+  assign schema_current_url = canonical_url | default: request.origin | append: request.path
+  assign schema_current_title = page_title | default: shop.name
+  assign schema_current_description = page_description | default: shop.description | default: schema_business_description
+%}
+
+{% comment %}
+  =================================================================
+  📋 CONFIGURATION COMPLETE
+  =================================================================
+  
+  All schema data is now configured. This configuration will be used by:
+  - snippets/schema-organization.liquid
+  - snippets/schema-product.liquid  
+  - snippets/schema-website.liquid
+  - snippets/schema-breadcrumbs.liquid
+  - And other schema-related files
+  
+  📝 EDITING INSTRUCTIONS:
+  1. Update business information above
+  2. Add your real contact details
+  3. Update social media URLs (or leave blank)
+  4. Set your business hours
+  5. Customize technical settings as needed
+  
+  ✅ Once configured, schema will automatically appear across your site!
+{% endcomment %}

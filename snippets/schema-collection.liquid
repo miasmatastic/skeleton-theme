@@ -1,0 +1,46 @@
+{% comment %}
+  Collection Schema Generator
+  Generates structured data for collection pages
+  
+  Usage: {% render 'schema-collection' %}
+{% endcomment %}
+
+{% render 'schema-config' %}
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "CollectionPage",
+  "@id": "{{ collection.url | prepend: shop.secure_url }}#collection",
+  "name": "{{ collection.title | escape }}",
+  "description": "{{ collection.description | strip_html | truncate: 300 | escape }}",
+  "url": "{{ collection.url | prepend: shop.secure_url }}",
+  "image": "{{ collection.image | image_url: width: 1200 }}",
+  "numberOfItems": {{ collection.products_count }},
+  "mainEntity": {
+    "@type": "ItemList",
+    "numberOfItems": {{ collection.products_count }},
+    "itemListElement": [
+      {% for product in collection.products limit: 20 %}
+      {
+        "@type": "Product",
+        "position": {{ forloop.index }},
+        "name": "{{ product.title | escape }}",
+        "url": "{{ product.url | prepend: shop.secure_url }}",
+        "image": "{{ product.featured_image | image_url: width: 600 }}",
+        "offers": {
+          "@type": "Offer",
+          "price": "{{ product.price | money_without_currency | remove: ',' }}",
+          "priceCurrency": "{{ cart.currency.iso_code }}",
+          "availability": "{% if product.available %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}"
+        }
+      }{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ]
+  },
+  "isPartOf": {
+    "@type": "WebSite",
+    "@id": "{{ schema_site_url }}#website"
+  }
+}
+</script>

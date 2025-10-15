@@ -5,6 +5,9 @@
   https://shopify.dev/docs/storefronts/themes/architecture/templates/product
 {% endcomment %}
 
+{% comment %} Product Schema {% endcomment %}
+{% render 'schema-product' %}
+
 <div class="product-images">
   {% for image in product.images %}
     {% render 'image', class: 'product-image', image: image %}

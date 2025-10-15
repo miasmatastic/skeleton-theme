@@ -1,0 +1,117 @@
+{% comment %}
+  Organization Schema Generator
+  Generates comprehensive business/organization structured data
+{% endcomment %}
+
+{% render 'schema-config' %}
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "{{ schema_business_type }}",
+  "@id": "{{ schema_site_url }}#organization",
+  "name": "{{ schema_business_name | escape }}",
+  "legalName": "{{ schema_business_legal_name | escape }}",
+  "description": "{{ schema_business_description | escape }}",
+  "url": "{{ schema_site_url }}",
+  "logo": {
+    "@type": "ImageObject",
+    "url": "{{ schema_logo_url | asset_img_url: '400x400' }}",
+    "width": 400,
+    "height": 400
+  },
+  "image": "{{ schema_default_image | asset_img_url: '1200x630' }}",
+  "foundingDate": "{{ schema_business_founded }}",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "{{ schema_street_address | escape }}",
+    "addressLocality": "{{ schema_address_locality | escape }}",
+    "addressRegion": "{{ schema_address_region | escape }}",
+    "postalCode": "{{ schema_postal_code | escape }}",
+    "addressCountry": "{{ schema_address_country | escape }}"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": {{ schema_latitude }},
+    "longitude": {{ schema_longitude }}
+  },
+  "contactPoint": [{
+    "@type": "ContactPoint",
+    "telephone": "{{ schema_phone }}",
+    "contactType": "{{ schema_contact_type }}",
+    "areaServed": "{{ schema_address_country }}",
+    "availableLanguage": "{{ schema_available_language }}"
+  }],
+  "email": "{{ schema_email }}",
+  "priceRange": "{{ schema_price_range }}",
+  "paymentAccepted": "{{ schema_payment_accepted }}",
+  "currenciesAccepted": "{{ schema_currencies_accepted }}",
+  "openingHoursSpecification": [
+    {% unless schema_monday_hours == 'closed' %}
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": "Monday",
+      "opens": "{{ schema_monday_hours | split: '-' | first }}",
+      "closes": "{{ schema_monday_hours | split: '-' | last }}"
+    }{% unless schema_tuesday_hours == 'closed' or schema_wednesday_hours == 'closed' or schema_thursday_hours == 'closed' or schema_friday_hours == 'closed' or schema_saturday_hours == 'closed' or schema_sunday_hours == 'closed' %},{% endunless %}
+    {% endunless %}
+    {% unless schema_tuesday_hours == 'closed' %}
+    {
+      "@type": "OpeningHoursSpecification", 
+      "dayOfWeek": "Tuesday",
+      "opens": "{{ schema_tuesday_hours | split: '-' | first }}",
+      "closes": "{{ schema_tuesday_hours | split: '-' | last }}"
+    }{% unless schema_wednesday_hours == 'closed' or schema_thursday_hours == 'closed' or schema_friday_hours == 'closed' or schema_saturday_hours == 'closed' or schema_sunday_hours == 'closed' %},{% endunless %}
+    {% endunless %}
+    {% unless schema_wednesday_hours == 'closed' %}
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": "Wednesday", 
+      "opens": "{{ schema_wednesday_hours | split: '-' | first }}",
+      "closes": "{{ schema_wednesday_hours | split: '-' | last }}"
+    }{% unless schema_thursday_hours == 'closed' or schema_friday_hours == 'closed' or schema_saturday_hours == 'closed' or schema_sunday_hours == 'closed' %},{% endunless %}
+    {% endunless %}
+    {% unless schema_thursday_hours == 'closed' %}
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": "Thursday",
+      "opens": "{{ schema_thursday_hours | split: '-' | first }}",
+      "closes": "{{ schema_thursday_hours | split: '-' | last }}"
+    }{% unless schema_friday_hours == 'closed' or schema_saturday_hours == 'closed' or schema_sunday_hours == 'closed' %},{% endunless %}
+    {% endunless %}
+    {% unless schema_friday_hours == 'closed' %}
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": "Friday",
+      "opens": "{{ schema_friday_hours | split: '-' | first }}",
+      "closes": "{{ schema_friday_hours | split: '-' | last }}"
+    }{% unless schema_saturday_hours == 'closed' or schema_sunday_hours == 'closed' %},{% endunless %}
+    {% endunless %}
+    {% unless schema_saturday_hours == 'closed' %}
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": "Saturday",
+      "opens": "{{ schema_saturday_hours | split: '-' | first }}",
+      "closes": "{{ schema_saturday_hours | split: '-' | last }}"
+    }{% unless schema_sunday_hours == 'closed' %},{% endunless %}
+    {% endunless %}
+    {% unless schema_sunday_hours == 'closed' %}
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": "Sunday",
+      "opens": "{{ schema_sunday_hours | split: '-' | first }}",
+      "closes": "{{ schema_sunday_hours | split: '-' | last }}"
+    }
+    {% endunless %}
+  ],
+  "sameAs": [
+    {% if schema_facebook_url != blank %}"{{ schema_facebook_url }}"{% endif %}
+    {% if schema_instagram_url != blank %}{% if schema_facebook_url != blank %},{% endif %}"{{ schema_instagram_url }}"{% endif %}
+    {% if schema_twitter_url != blank %}{% if schema_facebook_url != blank or schema_instagram_url != blank %},{% endif %}"{{ schema_twitter_url }}"{% endif %}
+    {% if schema_linkedin_url != blank %}{% if schema_facebook_url != blank or schema_instagram_url != blank or schema_twitter_url != blank %},{% endif %}"{{ schema_linkedin_url }}"{% endif %}
+    {% if schema_youtube_url != blank %}{% if schema_facebook_url != blank or schema_instagram_url != blank or schema_twitter_url != blank or schema_linkedin_url != blank %},{% endif %}"{{ schema_youtube_url }}"{% endif %}
+    {% if schema_tiktok_url != blank %}{% if schema_facebook_url != blank or schema_instagram_url != blank or schema_twitter_url != blank or schema_linkedin_url != blank or schema_youtube_url != blank %},{% endif %}"{{ schema_tiktok_url }}"{% endif %}
+    {% if schema_pinterest_url != blank %}{% if schema_facebook_url != blank or schema_instagram_url != blank or schema_twitter_url != blank or schema_linkedin_url != blank or schema_youtube_url != blank or schema_tiktok_url != blank %},{% endif %}"{{ schema_pinterest_url }}"{% endif %}
+  ]
+}
+</script>

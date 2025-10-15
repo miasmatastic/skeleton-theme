@@ -10,6 +10,11 @@
     {% # Social, title, etc. %}
     {% render 'meta-tags' %}
 
+    {% comment %} Schema/JSON-LD Structured Data {% endcomment %}
+    {% render 'schema-organization' %}
+    {% render 'schema-website' %}
+    {% render 'schema-breadcrumbs' %}
+
     {%- comment -%} Adobe Web Fonts (Typekit) {%- endcomment -%}
     <link rel="stylesheet" href="https://use.typekit.net/cmc4hio.css">
 

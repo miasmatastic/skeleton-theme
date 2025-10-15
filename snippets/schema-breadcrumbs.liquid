@@ -1,0 +1,62 @@
+{% comment %}
+  Breadcrumb Schema Generator
+  Generates breadcrumb navigation structured data
+  
+  Usage: {% render 'schema-breadcrumbs' %}
+{% endcomment %}
+
+{% render 'schema-config' %}
+
+{% liquid
+  assign breadcrumb_items = ''
+  assign position = 1
+  
+  comment Create breadcrumb items based on current page type endcomment
+  
+  case template.name
+    when 'product'
+      assign breadcrumb_items = breadcrumb_items | append: '{"@type":"ListItem","position":' | append: position | append: ',"name":"Home","item":"' | append: shop.secure_url | append: '"},'
+      assign position = position | plus: 1
+      
+      if collection
+        assign breadcrumb_items = breadcrumb_items | append: '{"@type":"ListItem","position":' | append: position | append: ',"name":"' | append: collection.title | escape | append: '","item":"' | append: collection.url | prepend: shop.secure_url | append: '"},'
+        assign position = position | plus: 1
+      endif
+      
+      assign breadcrumb_items = breadcrumb_items | append: '{"@type":"ListItem","position":' | append: position | append: ',"name":"' | append: product.title | escape | append: '","item":"' | append: product.url | prepend: shop.secure_url | append: '"}'
+      
+    when 'collection'
+      assign breadcrumb_items = breadcrumb_items | append: '{"@type":"ListItem","position":' | append: position | append: ',"name":"Home","item":"' | append: shop.secure_url | append: '"},'
+      assign position = position | plus: 1
+      assign breadcrumb_items = breadcrumb_items | append: '{"@type":"ListItem","position":' | append: position | append: ',"name":"' | append: collection.title | escape | append: '","item":"' | append: collection.url | prepend: shop.secure_url | append: '"}'
+      
+    when 'page'
+      assign breadcrumb_items = breadcrumb_items | append: '{"@type":"ListItem","position":' | append: position | append: ',"name":"Home","item":"' | append: shop.secure_url | append: '"},'
+      assign position = position | plus: 1
+      assign breadcrumb_items = breadcrumb_items | append: '{"@type":"ListItem","position":' | append: position | append: ',"name":"' | append: page.title | escape | append: '","item":"' | append: page.url | prepend: shop.secure_url | append: '"}'
+      
+    when 'blog'
+      assign breadcrumb_items = breadcrumb_items | append: '{"@type":"ListItem","position":' | append: position | append: ',"name":"Home","item":"' | append: shop.secure_url | append: '"},'
+      assign position = position | plus: 1
+      assign breadcrumb_items = breadcrumb_items | append: '{"@type":"ListItem","position":' | append: position | append: ',"name":"' | append: blog.title | escape | append: '","item":"' | append: blog.url | prepend: shop.secure_url | append: '"}'
+      
+    when 'article'
+      assign breadcrumb_items = breadcrumb_items | append: '{"@type":"ListItem","position":' | append: position | append: ',"name":"Home","item":"' | append: shop.secure_url | append: '"},'
+      assign position = position | plus: 1
+      assign breadcrumb_items = breadcrumb_items | append: '{"@type":"ListItem","position":' | append: position | append: ',"name":"' | append: blog.title | escape | append: '","item":"' | append: blog.url | prepend: shop.secure_url | append: '"},'
+      assign position = position | plus: 1
+      assign breadcrumb_items = breadcrumb_items | append: '{"@type":"ListItem","position":' | append: position | append: ',"name":"' | append: article.title | escape | append: '","item":"' | append: article.url | prepend: shop.secure_url | append: '"}'
+  endcase
+%}
+
+{% if breadcrumb_items != blank %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {{ breadcrumb_items }}
+  ]
+}
+</script>
+{% endif %}

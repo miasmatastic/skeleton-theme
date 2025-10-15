@@ -1,0 +1,40 @@
+{% comment %}
+  Website Schema Generator
+  Generates website and sitelinks searchbox structured data
+{% endcomment %}
+
+{% render 'schema-config' %}
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite", 
+  "@id": "{{ schema_site_url }}#website",
+  "name": "{{ schema_site_name | escape }}",
+  "alternateName": "{{ schema_business_name | escape }}",
+  "description": "{{ schema_business_description | escape }}",
+  "url": "{{ schema_site_url }}",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "{{ schema_site_url }}/search?q={search_term_string}"
+    },
+    "query-input": "required name=search_term_string"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "@id": "{{ schema_site_url }}#organization"
+  },
+  "copyrightYear": "{{ 'now' | date: '%Y' }}",
+  "copyrightHolder": {
+    "@type": "Organization",
+    "@id": "{{ schema_site_url }}#organization"
+  },
+  "inLanguage": "en-US",
+  "isPartOf": {
+    "@type": "WebSite",
+    "@id": "{{ schema_site_url }}#website"
+  }
+}
+</script>

@@ -1,0 +1,361 @@
+{% comment %}
+  🎨 Global Color Scheme Control Panel
+  
+  This section provides quick access to global color scheme controls in the Shopify editor.
+  It appears in the sidebar and allows real-time color adjustments across the entire theme.
+  
+  Features:
+  - Live preview of color changes
+  - Sync with existing CSS variables system
+  - Quick preset color schemes
+  - Individual brand color controls
+  - Accessibility contrast checking
+{% endcomment %}
+
+{% liquid
+  comment 
+    This section only renders content in the theme editor for live preview.
+    In the storefront, it only updates CSS variables.
+  endcomment
+%}
+
+{% comment %} Update CSS Variables with new color values {% endcomment %}
+<style>
+  :root {
+    /* Override brand colors with section settings */
+    --brand-primary: {{ section.settings.brand_primary | default: settings.brand_primary | default: '#3b82f6' }};
+    --brand-secondary: {{ section.settings.brand_secondary | default: settings.brand_secondary | default: '#10b981' }};
+    --brand-accent: {{ section.settings.brand_accent | default: settings.brand_accent | default: '#f59e0b' }};
+    --brand-danger: {{ section.settings.brand_danger | default: settings.brand_danger | default: '#ef4444' }};
+    --brand-success: {{ section.settings.brand_success | default: settings.brand_success | default: '#22c55e' }};
+    
+    /* Base colors */
+    --color-base-background: {{ section.settings.base_background | default: settings.color_base_background | default: '#ffffff' }};
+    --color-base-text: {{ section.settings.base_text | default: settings.color_base_text | default: '#1a1a1a' }};
+    --color-base-text-secondary: {{ section.settings.base_text_secondary | default: settings.color_base_text_secondary | default: '#6b7280' }};
+    --color-base-border: {{ section.settings.base_border | default: settings.color_base_border | default: '#e5e7eb' }};
+    
+    /* Legacy color overrides for backward compatibility */
+    --color-background: var(--color-base-background);
+    --color-foreground: var(--color-base-text);
+    --color-accent: var(--brand-primary);
+    
+    /* Product colors */
+    --color-product-sale: {{ section.settings.product_sale | default: settings.color_product_sale | default: '#dc2626' }};
+    --color-product-sold-out: {{ section.settings.product_sold_out | default: settings.color_product_sold_out | default: '#6b7280' }};
+    --color-product-new: {{ section.settings.product_new | default: settings.color_product_new | default: '#059669' }};
+    --color-product-featured: {{ section.settings.product_featured | default: settings.color_product_featured | default: '#7c3aed' }};
+  }
+  
+  /* Apply color scheme to section when in editor */
+  {% if request.design_mode %}
+  .color-scheme-preview {
+    padding: 2rem;
+    margin: 1rem 0;
+    border-radius: 12px;
+    background: var(--color-base-background);
+    color: var(--color-base-text);
+    border: 2px solid var(--color-base-border);
+  }
+  
+  .color-scheme-preview h3 {
+    color: var(--brand-primary);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .color-scheme-preview p {
+    color: var(--color-base-text-secondary);
+    margin-bottom: 1rem;
+  }
+  
+  .color-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  .color-preview-item {
+    text-align: center;
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .color-preview-item.primary {
+    background: var(--brand-primary);
+    color: white;
+  }
+  
+  .color-preview-item.secondary {
+    background: var(--brand-secondary);
+    color: white;
+  }
+  
+  .color-preview-item.accent {
+    background: var(--brand-accent);
+    color: white;
+  }
+  
+  .color-preview-item.danger {
+    background: var(--brand-danger);
+    color: white;
+  }
+  
+  .color-preview-item.success {
+    background: var(--brand-success);
+    color: white;
+  }
+  
+  .preset-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  .preset-button {
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+  }
+  
+  .preset-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  
+  .preset-button.blue-scheme {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+  }
+  
+  .preset-button.green-scheme {
+    background: linear-gradient(135deg, #10b981, #047857);
+    color: white;
+  }
+  
+  .preset-button.purple-scheme {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: white;
+  }
+  
+  .preset-button.orange-scheme {
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    color: white;
+  }
+  
+  .preset-button.dark-scheme {
+    background: linear-gradient(135deg, #374151, #1f2937);
+    color: white;
+  }
+  {% endif %}
+</style>
+
+{% comment %} Load interactive JavaScript for theme editor {% endcomment %}
+{% if request.design_mode %}
+  <script src="{{ 'global-color-controls.js' | asset_url }}" defer></script>
+{% endif %}
+
+{% comment %} Only show preview content in the theme editor {% endcomment %}
+{% if request.design_mode %}
+<div class="color-scheme-preview">
+  <h3>🎨 Live Color Preview</h3>
+  <p>This preview shows how your color scheme looks. Changes apply globally across your entire theme.</p>
+  
+  <div class="color-preview-grid">
+    <div class="color-preview-item primary">Primary</div>
+    <div class="color-preview-item secondary">Secondary</div>
+    <div class="color-preview-item accent">Accent</div>
+    <div class="color-preview-item danger">Danger</div>
+    <div class="color-preview-item success">Success</div>
+  </div>
+  
+  <div class="preset-buttons">
+    <div class="preset-button blue-scheme">
+      <strong>Professional Blue</strong><br>
+      <small>Tech & Business</small>
+    </div>
+    <div class="preset-button green-scheme">
+      <strong>Nature Green</strong><br>
+      <small>Eco & Health</small>
+    </div>
+    <div class="preset-button purple-scheme">
+      <strong>Creative Purple</strong><br>
+      <small>Art & Design</small>
+    </div>
+    <div class="preset-button orange-scheme">
+      <strong>Energetic Orange</strong><br>
+      <small>Sports & Energy</small>
+    </div>
+    <div class="preset-button dark-scheme">
+      <strong>Luxury Dark</strong><br>
+      <small>Premium & Elegant</small>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "🎨 Global Color Controls",
+  "tag": "section",
+  "class": "global-color-controls",
+  "settings": [
+    {
+      "type": "header",
+      "content": "🌈 Brand Colors"
+    },
+    {
+      "type": "paragraph",
+      "content": "These colors apply globally across your entire theme. Changes here will update buttons, links, accents, and all branded elements."
+    },
+    {
+      "type": "color",
+      "id": "brand_primary",
+      "label": "Primary Brand Color",
+      "default": "#3b82f6",
+      "info": "Main brand color for buttons, links, and primary elements"
+    },
+    {
+      "type": "color",
+      "id": "brand_secondary",
+      "label": "Secondary Brand Color", 
+      "default": "#10b981",
+      "info": "Supporting brand color for variety and emphasis"
+    },
+    {
+      "type": "color",
+      "id": "brand_accent",
+      "label": "Accent Color",
+      "default": "#f59e0b",
+      "info": "Highlight color for CTAs and special elements"
+    },
+    {
+      "type": "color",
+      "id": "brand_danger",
+      "label": "Error/Warning Color",
+      "default": "#ef4444",
+      "info": "Used for errors, warnings, and urgent notifications"
+    },
+    {
+      "type": "color",
+      "id": "brand_success",
+      "label": "Success Color",
+      "default": "#22c55e",
+      "info": "Used for confirmations and positive actions"
+    },
+    {
+      "type": "header",
+      "content": "🖼️ Base Colors"
+    },
+    {
+      "type": "paragraph",
+      "content": "Foundation colors that affect the overall appearance and readability of your site."
+    },
+    {
+      "type": "color",
+      "id": "base_background",
+      "label": "Background Color",
+      "default": "#ffffff",
+      "info": "Main page background color"
+    },
+    {
+      "type": "color",
+      "id": "base_text",
+      "label": "Primary Text Color",
+      "default": "#1a1a1a",
+      "info": "Main text color for headings and content"
+    },
+    {
+      "type": "color",
+      "id": "base_text_secondary",
+      "label": "Secondary Text Color",
+      "default": "#6b7280",
+      "info": "Muted text for descriptions and captions"
+    },
+    {
+      "type": "color",
+      "id": "base_border",
+      "label": "Border Color",
+      "default": "#e5e7eb",
+      "info": "Default border color for cards and dividers"
+    },
+    {
+      "type": "header",
+      "content": "🏷️ Product Badge Colors"
+    },
+    {
+      "type": "paragraph",
+      "content": "Colors used for product badges and status indicators."
+    },
+    {
+      "type": "color",
+      "id": "product_sale",
+      "label": "Sale Badge Color",
+      "default": "#dc2626",
+      "info": "Color for sale and discount badges"
+    },
+    {
+      "type": "color",
+      "id": "product_sold_out",
+      "label": "Sold Out Color",
+      "default": "#6b7280",
+      "info": "Color when products are unavailable"
+    },
+    {
+      "type": "color",
+      "id": "product_new",
+      "label": "New Product Badge",
+      "default": "#059669",
+      "info": "Color for new arrival badges"
+    },
+    {
+      "type": "color",
+      "id": "product_featured",
+      "label": "Featured Product Badge",
+      "default": "#7c3aed",
+      "info": "Color for featured product highlights"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Quick Presets"
+    },
+    {
+      "type": "paragraph",
+      "content": "Use these preset buttons in the preview above to quickly apply professional color schemes. You can then fine-tune individual colors as needed."
+    },
+    {
+      "type": "checkbox",
+      "id": "sync_with_global_settings",
+      "label": "Sync with Global Theme Settings",
+      "default": true,
+      "info": "When enabled, changes here will update the global theme color settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_contrast_warnings",
+      "label": "Show Accessibility Contrast Warnings",
+      "default": true,
+      "info": "Display warnings when color combinations may affect readability"
+    }
+  ],
+  "presets": [
+    {
+      "name": "🎨 Global Color Controls",
+      "category": "Theme"
+    }
+  ],
+  "disabled_on": {
+    "groups": ["header", "footer", "aside"]
+  }
+}
+{% endschema %}
