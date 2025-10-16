@@ -1,0 +1,400 @@
+{% comment %}
+  Typography CSS Variables Renderer
+  Generates responsive typography utilities and classes
+  
+  Features:
+  - Utility classes for all typography tokens
+  - Responsive behavior with clamp()
+  - Accessibility optimizations
+  - Performance-conscious CSS
+  - Integration with existing color system
+{% endcomment %}
+
+{% liquid
+  comment 'Load typography configuration'
+  render 'typography-config'
+  
+  comment 'Generate utility classes for each token'
+  assign typography_tokens = 'display-1,display-2,display-3,heading-1,heading-2,heading-3,heading-4,heading-5,heading-6,body-large,body,body-small,subtitle-1,subtitle-2,caption,overline,button' | split: ','
+%}
+
+<style>
+  /* ==========================================================================
+     Typography System - CSS Variables & Utilities
+     ========================================================================== */
+
+  /* Base Typography Styles */
+  .typography-base {
+    font-family: var(--font-primary);
+    font-display: {{ settings.typography_font_display | default: 'swap' }};
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  }
+
+  /* Typography Token Classes */
+  {% for token in typography_tokens %}
+    .typography-{{ token }},
+    .text-{{ token }} {
+      font-family: {% if token contains 'display' %}var(--font-display){% elsif token contains 'heading' %}var(--font-heading){% elsif token contains 'button' or token contains 'overline' or token contains 'caption' %}var(--font-ui){% else %}var(--font-primary){% endif %};
+      font-size: var(--typography-{{ token }}-size);
+      line-height: var(--typography-{{ token }}-line-height);
+      font-weight: var(--typography-{{ token }}-weight);
+      letter-spacing: var(--typography-{{ token }}-spacing);
+      margin: 0;
+      transition: var(--typography-motion);
+    }
+  {% endfor %}
+
+  /* Semantic Typography Classes */
+  .hero-text { @extend .typography-display-1; }
+  .hero-subtitle { @extend .typography-display-2; }
+  .section-title { @extend .typography-heading-1; }
+  .section-subtitle { @extend .typography-subtitle-1; }
+  .card-title { @extend .typography-heading-3; }
+  .card-text { @extend .typography-body; }
+  .meta-text { @extend .typography-caption; }
+  .label-text { @extend .typography-overline; }
+  .button-text { @extend .typography-button; }
+
+  /* Typography Modifiers */
+  .text-center { text-align: center; }
+  .text-left { text-align: left; }
+  .text-right { text-align: right; }
+  .text-justify { text-align: justify; }
+
+  .text-uppercase { 
+    text-transform: uppercase; 
+    letter-spacing: 0.1em;
+  }
+  .text-lowercase { text-transform: lowercase; }
+  .text-capitalize { text-transform: capitalize; }
+
+  .text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .text-break {
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .text-nowrap { white-space: nowrap; }
+
+  /* Font Weight Utilities */
+  .font-light { font-weight: 300; }
+  .font-normal { font-weight: 400; }
+  .font-medium { font-weight: 500; }
+  .font-semibold { font-weight: 600; }
+  .font-bold { font-weight: 700; }
+  .font-extrabold { font-weight: 800; }
+
+  /* Font Style Utilities */
+  .italic { font-style: italic; }
+  .not-italic { font-style: normal; }
+
+  /* Line Height Utilities */
+  .leading-none { line-height: 1; }
+  .leading-tight { line-height: 1.25; }
+  .leading-snug { line-height: 1.375; }
+  .leading-normal { line-height: 1.5; }
+  .leading-relaxed { line-height: 1.625; }
+  .leading-loose { line-height: 2; }
+
+  /* Letter Spacing Utilities */
+  .tracking-tighter { letter-spacing: -0.05em; }
+  .tracking-tight { letter-spacing: -0.025em; }
+  .tracking-normal { letter-spacing: 0; }
+  .tracking-wide { letter-spacing: 0.025em; }
+  .tracking-wider { letter-spacing: 0.05em; }
+  .tracking-widest { letter-spacing: 0.1em; }
+
+  /* Text Color Integration with Color System */
+  .text-primary { color: var(--color-primary); }
+  .text-secondary { color: var(--color-secondary); }
+  .text-accent { color: var(--color-accent); }
+  .text-neutral { color: var(--color-neutral); }
+  .text-success { color: var(--color-success); }
+  .text-warning { color: var(--color-warning); }
+  .text-error { color: var(--color-error); }
+  .text-info { color: var(--color-info); }
+
+  /* Text Opacity Utilities */
+  .text-opacity-100 { opacity: 1; }
+  .text-opacity-90 { opacity: 0.9; }
+  .text-opacity-80 { opacity: 0.8; }
+  .text-opacity-70 { opacity: 0.7; }
+  .text-opacity-60 { opacity: 0.6; }
+  .text-opacity-50 { opacity: 0.5; }
+  .text-opacity-40 { opacity: 0.4; }
+  .text-opacity-30 { opacity: 0.3; }
+  .text-opacity-20 { opacity: 0.2; }
+  .text-opacity-10 { opacity: 0.1; }
+
+  /* Responsive Typography Utilities */
+  @media screen and (max-width: 768px) {
+    .typography-display-1,
+    .typography-display-2,
+    .typography-display-3 {
+      font-size: calc(var(--typography-{{ token }}-size) * 0.85);
+    }
+    
+    .typography-heading-1,
+    .typography-heading-2 {
+      font-size: calc(var(--typography-{{ token }}-size) * 0.9);
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .typography-display-1,
+    .typography-display-2,
+    .typography-display-3 {
+      font-size: calc(var(--typography-{{ token }}-size) * 0.75);
+    }
+  }
+
+  /* Typography Component Styles */
+  .typography-content {
+    max-width: 65ch;
+    
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.5em;
+      margin-bottom: 0.5em;
+      font-family: var(--font-heading);
+    }
+    
+    h1 { @extend .typography-heading-1; }
+    h2 { @extend .typography-heading-2; }
+    h3 { @extend .typography-heading-3; }
+    h4 { @extend .typography-heading-4; }
+    h5 { @extend .typography-heading-5; }
+    h6 { @extend .typography-heading-6; }
+    
+    p {
+      @extend .typography-body;
+      margin-bottom: 1em;
+    }
+    
+    .lead {
+      @extend .typography-body-large;
+      margin-bottom: 1.5em;
+    }
+    
+    small, .small {
+      @extend .typography-body-small;
+    }
+    
+    blockquote {
+      @extend .typography-body-large;
+      font-style: italic;
+      border-left: 4px solid var(--color-accent);
+      padding-left: 1.5rem;
+      margin: 2rem 0;
+    }
+    
+    ul, ol {
+      @extend .typography-body;
+      padding-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    li {
+      margin-bottom: 0.25rem;
+    }
+  }
+
+  /* Advanced Typography Features */
+  .drop-cap::first-letter {
+    float: left;
+    font-size: 3em;
+    line-height: 0.8;
+    margin: 0.1em 0.1em 0 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-shadow-sm {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .text-shadow-lg {
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Performance Optimizations */
+  .typography-optimized {
+    contain: layout style;
+    will-change: auto;
+  }
+
+  /* Accessibility Enhancements */
+  @media (prefers-contrast: high) {
+    .typography-base {
+      filter: contrast(1.2);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
+
+  /* Print Styles */
+  @media print {
+    .typography-display-1,
+    .typography-display-2,
+    .typography-display-3 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    
+    .typography-heading-1,
+    .typography-heading-2,
+    .typography-heading-3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .typography-body,
+    .typography-body-large,
+    .typography-body-small {
+      font-size: 12pt;
+      line-height: 1.5;
+    }
+  }
+
+  /* Dark Mode Typography Adjustments */
+  @media (prefers-color-scheme: dark) {
+    .typography-base {
+      -webkit-font-smoothing: subpixel-antialiased;
+    }
+    
+    .text-gradient {
+      background: linear-gradient(135deg, var(--color-primary-light), var(--color-accent-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  }
+
+  /* Focus States for Interactive Typography */
+  a.typography-heading-1:focus,
+  a.typography-heading-2:focus,
+  a.typography-heading-3:focus,
+  button.typography-button:focus {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  /* Typography Animation Classes */
+  .animate-fade-in {
+    opacity: 0;
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  .animate-slide-up {
+    transform: translateY(20px);
+    opacity: 0;
+    animation: slideUp 0.6s ease-out forwards;
+  }
+
+  .animate-scale-in {
+    transform: scale(0.95);
+    opacity: 0;
+    animation: scaleIn 0.4s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes scaleIn {
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  /* Component-Specific Typography */
+  .card .typography-heading-3 {
+    margin-bottom: 0.75rem;
+  }
+
+  .hero .typography-display-1 {
+    margin-bottom: 1rem;
+  }
+
+  .hero .typography-subtitle-1 {
+    margin-bottom: 2rem;
+    opacity: 0.9;
+  }
+
+  .button .typography-button {
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .nav .typography-body {
+    font-weight: 500;
+  }
+
+  /* Utility Combinations */
+  .text-center-mobile {
+    @media screen and (max-width: 768px) {
+      text-align: center;
+    }
+  }
+
+  .text-left-desktop {
+    @media screen and (min-width: 769px) {
+      text-align: left;
+    }
+  }
+
+  /* Typography Debug Mode (development only) */
+  {% if settings.typography_debug_mode %}
+  .typography-debug * {
+    outline: 1px solid rgba(255, 0, 0, 0.2);
+    position: relative;
+  }
+
+  .typography-debug *::before {
+    content: attr(class);
+    position: absolute;
+    top: -1.5em;
+    left: 0;
+    font-size: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 2px 4px;
+    border-radius: 2px;
+    z-index: 1000;
+  }
+  {% endif %}
+</style>

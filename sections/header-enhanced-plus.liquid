@@ -17,14 +17,14 @@ Features: Multi-row layout, advanced positioning, search integration, localizati
   endif
 -%}
 
-<div class="header-enhanced-plus-wrapper{% if transparent_header %} header--transparent{% endif %}" 
+<div class="header-enhanced-plus-wrapper{% if transparent_header %} header--transparent{% endif %}{% if section.settings.enable_sticky %} header--sticky{% endif %}" 
      data-header-component
      data-transparent="{{ transparent_header }}"
      data-sticky-mode="{{ section.settings.sticky_mode }}"
      data-hide-on-scroll="{{ section.settings.hide_on_scroll }}">
   
   <!-- Row 1: Primary Header -->
-  <header class="header-enhanced-plus header-row-1{% if section.settings.enable_sticky %} header--sticky{% endif %}"
+  <header class="header-enhanced-plus header-row-1"
           role="banner"
           data-header-row="1">
     
@@ -257,18 +257,33 @@ Features: Multi-row layout, advanced positioning, search integration, localizati
     z-index: var(--z-header, 100);
   }
 
-
-  /* Sticky Header */
-  .header--sticky {
+  /* Sticky Header System - Coordinated Multi-Row */
+  .header-enhanced-plus-wrapper.header--sticky {
     position: sticky;
     top: 0;
     transition: transform 0.3s ease;
   }
 
-  .header--hidden {
+  .header-enhanced-plus-wrapper.header--hidden {
     transform: translateY(-100%);
-    /* gap: var(--header-spacing);
-    height: var(--header-height-row1); */
+  }
+
+  /* Individual row positioning within sticky wrapper */
+  .header-row-1,
+  .header-row-2 {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Legacy sticky class support for single row */
+  .header--sticky:not(.header-enhanced-plus-wrapper) {
+    position: sticky;
+    top: 0;
+    transition: transform 0.3s ease;
+  }
+
+  .header--hidden:not(.header-enhanced-plus-wrapper) {
+    transform: translateY(-100%);
   }
   .header__container {
     /* max-width is set dynamically in the <style> tag above */
@@ -369,6 +384,9 @@ class HeaderEnhancedPlus extends HTMLElement {
   constructor() {
     super();
     this.header = this.querySelector('.header-enhanced-plus');
+    this.headerWrapper = this; // The whole component wrapper
+    this.row1 = this.querySelector('.header-row-1');
+    this.row2 = this.querySelector('.header-row-2');
     this.transparentMode = this.dataset.transparent === 'true';
     this.stickyMode = this.dataset.stickyMode;
     this.hideOnScroll = this.dataset.hideOnScroll === 'true';
@@ -391,9 +409,12 @@ class HeaderEnhancedPlus extends HTMLElement {
 
   setupStickyBehavior() {
     if (this.stickyMode === 'never') {
-      this.header.classList.remove('header--sticky');
+      this.headerWrapper.classList.remove('header--sticky');
       return;
     }
+
+    // Apply sticky to the wrapper, not individual rows
+    this.headerWrapper.classList.add('header--sticky');
 
     if (this.stickyMode === 'scroll-up' && this.hideOnScroll) {
       this.setupIntersectionObserver();
@@ -404,9 +425,9 @@ class HeaderEnhancedPlus extends HTMLElement {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          this.header.classList.remove('header--scrolled');
+          this.headerWrapper.classList.remove('header--scrolled');
         } else {
-          this.header.classList.add('header--scrolled');
+          this.headerWrapper.classList.add('header--scrolled');
         }
       });
     }, {
@@ -439,7 +460,7 @@ class HeaderEnhancedPlus extends HTMLElement {
     const currentScrollY = window.scrollY;
     
     if (currentScrollY < this.scrollThreshold) {
-      this.header.classList.remove('header--hidden');
+      this.headerWrapper.classList.remove('header--hidden');
       return;
     }
 
@@ -447,13 +468,13 @@ class HeaderEnhancedPlus extends HTMLElement {
       // Scrolling up
       if (!this.isScrollingUp) {
         this.isScrollingUp = true;
-        this.header.classList.remove('header--hidden');
+        this.headerWrapper.classList.remove('header--hidden');
       }
     } else {
       // Scrolling down
       if (this.isScrollingUp) {
         this.isScrollingUp = false;
-        this.header.classList.add('header--hidden');
+        this.headerWrapper.classList.add('header--hidden');
       }
     }
 
@@ -554,8 +575,18 @@ class HeaderEnhancedPlus extends HTMLElement {
   }
 
   updateCustomProperties() {
-    const headerHeight = this.header.offsetHeight;
-    document.documentElement.style.setProperty('--header-actual-height', `${headerHeight}px`);
+    // Calculate total header height including both rows
+    let totalHeight = 0;
+    
+    if (this.row1) {
+      totalHeight += this.row1.offsetHeight;
+    }
+    
+    if (this.row2 && this.row2.offsetHeight > 0) {
+      totalHeight += this.row2.offsetHeight;
+    }
+    
+    document.documentElement.style.setProperty('--header-actual-height', `${totalHeight}px`);
   }
 }
 

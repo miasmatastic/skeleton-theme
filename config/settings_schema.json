@@ -8,55 +8,379 @@
     "theme_support_url": "https://purejunkmedia.com/support"
   },
   {
-    "name": "t:general.typography",
+    "name": "Global Typography System",
     "settings": [
       {
         "type": "header",
-        "content": "t:general.fonts"
+        "content": "🎯 Typography System Controls"
+      },
+      {
+        "type": "checkbox",
+        "id": "typography_system_enabled",
+        "label": "Enable Typography System",
+        "default": true,
+        "info": "Activate the advanced typography system with semantic tokens"
+      },
+      {
+        "type": "checkbox",
+        "id": "typography_debug_mode",
+        "label": "Debug Mode",
+        "default": false,
+        "info": "Show typography token information for development"
+      },
+      {
+        "type": "header",
+        "content": "📝 Shopify Font System"
       },
       {
         "type": "font_picker",
-        "id": "type_primary_font",
-        "default": "work_sans_n4",
-        "label": "t:general.primary"
+        "id": "typography_font_primary",
+        "default": "helvetica_neue_n4",
+        "label": "Primary Font Family",
+        "info": "Used for body text and general content"
       },
       {
         "type": "font_picker",
-        "id": "type_secondary_font",
-        "default": "work_sans_n6",
-        "label": "t:general.secondary"
+        "id": "typography_font_heading",
+        "default": "helvetica_neue_n6",
+        "label": "Heading Font Family",
+        "info": "Used for section headings and titles"
+      },
+      {
+        "type": "font_picker",
+        "id": "typography_font_display_custom",
+        "label": "Display Font Family",
+        "default": "helvetica_neue_n7",
+        "info": "Used for hero text and large displays (inherits heading if not set)"
+      },
+      {
+        "type": "font_picker",
+        "id": "typography_font_ui",
+        "label": "UI Font Family",
+        "default": "helvetica_neue_n5",
+        "info": "Used for buttons, captions, and interface elements (inherits primary if not set)"
       },
       {
         "type": "header",
         "content": "🎨 Adobe Fonts Integration"
       },
       {
+        "type": "checkbox",
+        "id": "typography_adobe_fonts_enabled",
+        "label": "Enable Adobe Fonts",
+        "default": false,
+        "info": "Use Adobe Fonts instead of Shopify font picker"
+      },
+      {
         "type": "text",
-        "id": "adobe_heading_font",
+        "id": "typography_adobe_fonts_kit_id",
+        "label": "Adobe Fonts Kit ID",
+        "placeholder": "abc123def",
+        "info": "Your Adobe Fonts web project kit ID (found in your Adobe Fonts dashboard)"
+      },
+      {
+        "type": "text",
+        "id": "typography_adobe_fonts_project_id",
+        "label": "Adobe Fonts Project ID",
+        "placeholder": "12345678",
+        "info": "Your Adobe Fonts project ID (optional, for advanced tracking)"
+      },
+      {
+        "type": "text",
+        "id": "typography_adobe_primary",
+        "label": "Adobe Primary Font",
+        "placeholder": "source-sans-pro",
+        "info": "Adobe font family name for primary text (CSS font-family name)"
+      },
+      {
+        "type": "text",
+        "id": "typography_adobe_heading",
         "label": "Adobe Heading Font",
-        "placeholder": "proxima-nova, 'Helvetica Neue', Arial, sans-serif",
-        "info": "Your primary Adobe heading font with fallbacks. Include quotes around multi-word font names."
+        "placeholder": "proxima-nova",
+        "info": "Adobe font family name for headings"
       },
       {
         "type": "text",
-        "id": "adobe_body_font",
-        "label": "Adobe Body Font",
-        "placeholder": "source-sans-pro, Georgia, serif",
-        "info": "Your primary Adobe body font with fallbacks"
-      },
-      {
-        "type": "text",
-        "id": "adobe_display_font",
+        "id": "typography_adobe_display",
         "label": "Adobe Display Font",
-        "placeholder": "futura-pt, Impact, sans-serif",
-        "info": "Your primary Adobe display font for special headings"
+        "placeholder": "futura-pt",
+        "info": "Adobe font family name for display text (hero sections)"
       },
       {
         "type": "text",
-        "id": "adobe_accent_font",
-        "label": "Adobe Accent Font",
-        "placeholder": "bebas-neue, 'Arial Black', sans-serif",
-        "info": "Your Adobe accent font for emphasis and CTAs"
+        "id": "typography_adobe_ui",
+        "label": "Adobe UI Font",
+        "placeholder": "sofia-pro",
+        "info": "Adobe font family name for UI elements"
+      },
+      {
+        "type": "header",
+        "content": "📏 Typography Scale & Sizing"
+      },
+      {
+        "type": "range",
+        "id": "typography_scale_base",
+        "label": "Base Scale Multiplier",
+        "min": 0.8,
+        "max": 1.4,
+        "step": 0.1,
+        "default": 1,
+        "info": "Adjusts the size of all typography tokens proportionally"
+      },
+      {
+        "type": "select",
+        "id": "typography_scale_ratio",
+        "label": "Typography Scale Ratio",
+        "options": [
+          { "value": "1.125", "label": "Minor Second (1.125)" },
+          { "value": "1.2", "label": "Minor Third (1.2)" },
+          { "value": "1.25", "label": "Major Third (1.25)" },
+          { "value": "1.333", "label": "Perfect Fourth (1.333)" },
+          { "value": "1.414", "label": "Augmented Fourth (1.414)" },
+          { "value": "1.5", "label": "Perfect Fifth (1.5)" },
+          { "value": "1.618", "label": "Golden Ratio (1.618)" }
+        ],
+        "default": "1.25",
+        "info": "Mathematical ratio between typography token sizes"
+      },
+      {
+        "type": "header",
+        "content": "⚡ Performance & Loading"
+      },
+      {
+        "type": "checkbox",
+        "id": "typography_preload_fonts",
+        "label": "Preload Font Files",
+        "default": true,
+        "info": "Improve loading performance by preloading critical fonts"
+      },
+      {
+        "type": "select",
+        "id": "typography_font_display",
+        "label": "Font Display Strategy",
+        "options": [
+          { "value": "auto", "label": "Auto" },
+          { "value": "block", "label": "Block" },
+          { "value": "swap", "label": "Swap" },
+          { "value": "fallback", "label": "Fallback" },
+          { "value": "optional", "label": "Optional" }
+        ],
+        "default": "swap",
+        "info": "How fonts should load and display (swap recommended for performance)"
+      },
+      {
+        "type": "header",
+        "content": "♿ Accessibility & Inclusion"
+      },
+      {
+        "type": "checkbox",
+        "id": "typography_high_contrast",
+        "label": "High Contrast Mode",
+        "default": false,
+        "info": "Enhance text contrast for better accessibility"
+      },
+      {
+        "type": "checkbox",
+        "id": "typography_large_text",
+        "label": "Large Text Support",
+        "default": false,
+        "info": "Increase base font sizes for better readability"
+      },
+      {
+        "type": "checkbox",
+        "id": "typography_reduce_motion",
+        "label": "Reduce Motion",
+        "default": false,
+        "info": "Disable typography animations for users who prefer reduced motion"
+      },
+      {
+        "type": "checkbox",
+        "id": "typography_focus_indicators",
+        "label": "Enhanced Focus Indicators",
+        "default": true,
+        "info": "Show clear focus outlines for keyboard navigation"
+      },
+      {
+        "type": "header",
+        "content": "🎛️ Advanced Typography Controls"
+      },
+      {
+        "type": "range",
+        "id": "typography_line_height_base",
+        "label": "Base Line Height",
+        "min": 1.2,
+        "max": 2.0,
+        "step": 0.1,
+        "default": 1.6,
+        "info": "Default line height for body text"
+      },
+      {
+        "type": "range",
+        "id": "typography_letter_spacing_base",
+        "label": "Base Letter Spacing",
+        "min": -0.1,
+        "max": 0.1,
+        "step": 0.1,
+        "default": 0,
+        "unit": "em",
+        "info": "Default letter spacing for body text"
+      },
+      {
+        "type": "select",
+        "id": "typography_text_rendering",
+        "label": "Text Rendering",
+        "options": [
+          { "value": "auto", "label": "Auto" },
+          { "value": "optimizeSpeed", "label": "Optimize Speed" },
+          { "value": "optimizeLegibility", "label": "Optimize Legibility" },
+          { "value": "geometricPrecision", "label": "Geometric Precision" }
+        ],
+        "default": "optimizeLegibility",
+        "info": "How the browser should render text for best appearance"
+      },
+      {
+        "type": "checkbox",
+        "id": "typography_font_smoothing",
+        "label": "Font Smoothing",
+        "default": true,
+        "info": "Enable anti-aliasing for smoother font rendering"
+      }
+    ]
+  },
+  {
+    "name": "Typography Token Customization",
+    "settings": [
+      {
+        "type": "header",
+        "content": "🎯 Display Typography (Hero Content)"
+      },
+      {
+        "type": "range",
+        "id": "typography_display_1_size_min",
+        "label": "Display 1 - Minimum Size",
+        "min": 2,
+        "max": 8,
+        "step": 0.5,
+        "default": 3.5,
+        "unit": "rem",
+        "info": "Minimum size for Display 1 text (mobile)"
+      },
+      {
+        "type": "range",
+        "id": "typography_display_1_size_max",
+        "label": "Display 1 - Maximum Size",
+        "min": 4,
+        "max": 12,
+        "step": 0.5,
+        "default": 6,
+        "unit": "rem",
+        "info": "Maximum size for Display 1 text (desktop)"
+      },
+      {
+        "type": "range",
+        "id": "typography_display_2_size_min",
+        "label": "Display 2 - Minimum Size",
+        "min": 1.5,
+        "max": 6,
+        "step": 0.5,
+        "default": 2.5,
+        "unit": "rem",
+        "info": "Minimum size for Display 2 text (mobile)"
+      },
+      {
+        "type": "range",
+        "id": "typography_display_2_size_max",
+        "label": "Display 2 - Maximum Size",
+        "min": 3,
+        "max": 8,
+        "step": 0.5,
+        "default": 4.5,
+        "unit": "rem",
+        "info": "Maximum size for Display 2 text (desktop)"
+      },
+      {
+        "type": "header",
+        "content": "📝 Heading Typography"
+      },
+      {
+        "type": "range",
+        "id": "typography_heading_1_size_min",
+        "label": "Heading 1 - Minimum Size",
+        "min": 1.5,
+        "max": 4,
+        "step": 0.1,
+        "default": 2.2,
+        "unit": "rem",
+        "info": "Minimum size for H1 headings (mobile)"
+      },
+      {
+        "type": "range",
+        "id": "typography_heading_1_size_max",
+        "label": "Heading 1 - Maximum Size",
+        "min": 2,
+        "max": 6,
+        "step": 0.1,
+        "default": 3,
+        "unit": "rem",
+        "info": "Maximum size for H1 headings (desktop)"
+      },
+      {
+        "type": "range",
+        "id": "typography_heading_2_size_min",
+        "label": "Heading 2 - Minimum Size",
+        "min": 1.2,
+        "max": 3,
+        "step": 0.1,
+        "default": 1.9,
+        "unit": "rem",
+        "info": "Minimum size for H2 headings (mobile)"
+      },
+      {
+        "type": "range",
+        "id": "typography_heading_2_size_max",
+        "label": "Heading 2 - Maximum Size",
+        "min": 1.7,
+        "max": 4,
+        "step": 0.1,
+        "default": 2.5,
+        "unit": "rem",
+        "info": "Maximum size for H2 headings (desktop)"
+      },
+      {
+        "type": "header",
+        "content": "📄 Body Typography"
+      },
+      {
+        "type": "range",
+        "id": "typography_body_size_min",
+        "label": "Body Text - Minimum Size",
+        "min": 0.8,
+        "max": 1.5,
+        "step": 0.1,
+        "default": 1,
+        "unit": "rem",
+        "info": "Minimum size for body text (mobile)"
+      },
+      {
+        "type": "range",
+        "id": "typography_body_size_max",
+        "label": "Body Text - Maximum Size",
+        "min": 1,
+        "max": 2,
+        "step": 0.1,
+        "default": 1.1,
+        "unit": "rem",
+        "info": "Maximum size for body text (desktop)"
+      },
+      {
+        "type": "range",
+        "id": "typography_body_line_height",
+        "label": "Body Text - Line Height",
+        "min": 1.2,
+        "max": 2.2,
+        "step": 0.1,
+        "default": 1.6,
+        "info": "Line height for optimal body text readability"
       }
     ]
   },

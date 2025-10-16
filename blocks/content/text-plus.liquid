@@ -1,0 +1,551 @@
+{% comment %}
+  Text+ Block - Advanced Typography Block
+  Provides professional typography controls with preset and custom modes
+  
+  Features:
+  - Typography token presets (display-1, heading-1, body, etc.)
+  - Custom typography controls (size, weight, spacing, etc.)
+  - Adobe Fonts + Shopify Fonts support
+  - Responsive typography scaling
+  - Accessibility optimizations
+  - Animation and effects
+  - Content formatting options
+{% endcomment %}
+
+{% liquid
+  comment 'Block Settings'
+  assign text_content = block.settings.text_content | default: 'Enter your text here...'
+  assign text_preset = block.settings.text_preset | default: 'body'
+  assign custom_mode = block.settings.custom_mode | default: false
+  
+  comment 'Custom Typography Settings (when custom_mode is true)'
+  assign custom_font_family = block.settings.custom_font_family
+  assign custom_font_size = block.settings.custom_font_size
+  assign custom_font_weight = block.settings.custom_font_weight
+  assign custom_line_height = block.settings.custom_line_height
+  assign custom_letter_spacing = block.settings.custom_letter_spacing
+  
+  comment 'Styling Options'
+  assign text_color = block.settings.text_color | default: 'inherit'
+  assign text_alignment = block.settings.text_alignment | default: 'left'
+  assign text_transform = block.settings.text_transform | default: 'none'
+  assign text_decoration = block.settings.text_decoration | default: 'none'
+  
+  comment 'Advanced Options'
+  assign text_shadow = block.settings.text_shadow | default: 'none'
+  assign text_gradient = block.settings.text_gradient | default: false
+  assign text_gradient_colors = block.settings.text_gradient_colors | default: 'primary'
+  assign drop_cap = block.settings.drop_cap | default: false
+  assign small_caps = block.settings.small_caps | default: false
+  
+  comment 'Animation & Effects'
+  assign text_animation = block.settings.text_animation | default: 'none'
+  assign animation_delay = block.settings.animation_delay | default: 0
+  assign hover_effects = block.settings.hover_effects | default: false
+  
+  comment 'Responsive Settings'
+  assign mobile_font_size = block.settings.mobile_font_size
+  assign tablet_font_size = block.settings.tablet_font_size
+  assign responsive_alignment = block.settings.responsive_alignment | default: false
+  assign mobile_alignment = block.settings.mobile_alignment | default: 'center'
+  
+  comment 'Accessibility Settings'
+  assign semantic_tag = block.settings.semantic_tag | default: 'p'
+  assign aria_label = block.settings.aria_label
+  assign high_contrast = block.settings.high_contrast | default: false
+  
+  comment 'Build CSS Classes'
+  assign css_classes = ''
+  
+  if custom_mode == false
+    assign css_classes = css_classes | append: ' text-' | append: text_preset
+  endif
+  
+  assign css_classes = css_classes | append: ' text-' | append: text_alignment
+  
+  if text_transform != 'none'
+    assign css_classes = css_classes | append: ' text-' | append: text_transform
+  endif
+  
+  if text_decoration != 'none'
+    assign css_classes = css_classes | append: ' text-' | append: text_decoration
+  endif
+  
+  if text_shadow != 'none'
+    assign css_classes = css_classes | append: ' text-shadow-' | append: text_shadow
+  endif
+  
+  if text_gradient
+    assign css_classes = css_classes | append: ' text-gradient-' | append: text_gradient_colors
+  endif
+  
+  if drop_cap
+    assign css_classes = css_classes | append: ' drop-cap'
+  endif
+  
+  if small_caps
+    assign css_classes = css_classes | append: ' small-caps'
+  endif
+  
+  if text_animation != 'none'
+    assign css_classes = css_classes | append: ' animate-' | append: text_animation
+  endif
+  
+  if hover_effects
+    assign css_classes = css_classes | append: ' hover-effects'
+  endif
+  
+  if responsive_alignment
+    assign css_classes = css_classes | append: ' sm:text-' | append: mobile_alignment
+  endif
+  
+  if high_contrast
+    assign css_classes = css_classes | append: ' high-contrast'
+  endif
+  
+  comment 'Generate Unique ID for custom styles'
+  assign block_id = 'text-block-' | append: block.id
+%}
+
+{% comment 'Render Typography Configuration' %}
+{% render 'typography-config' %}
+
+{% comment 'Custom Typography Styles (when custom mode is enabled)' %}
+{% if custom_mode %}
+  <style>
+    #{{ block_id }} {
+      {% if custom_font_family != blank %}
+        font-family: {{ custom_font_family | font_face }}, var(--font-fallback) !important;
+      {% endif %}
+      
+      {% if custom_font_size != blank %}
+        font-size: {{ custom_font_size }}px !important;
+      {% endif %}
+      
+      {% if custom_font_weight != blank %}
+        font-weight: {{ custom_font_weight }} !important;
+      {% endif %}
+      
+      {% if custom_line_height != blank %}
+        line-height: {{ custom_line_height }} !important;
+      {% endif %}
+      
+      {% if custom_letter_spacing != blank %}
+        letter-spacing: {{ custom_letter_spacing }}em !important;
+      {% endif %}
+      
+      {% comment 'Responsive Custom Sizes' %}
+      {% if mobile_font_size != blank %}
+        @media (max-width: 768px) {
+          font-size: {{ mobile_font_size }}px !important;
+        }
+      {% endif %}
+      
+      {% if tablet_font_size != blank %}
+        @media (min-width: 769px) and (max-width: 1024px) {
+          font-size: {{ tablet_font_size }}px !important;
+        }
+      {% endif %}
+    }
+    
+    {% comment 'Animation Delay' %}
+    {% if animation_delay > 0 %}
+      #{{ block_id }} {
+        animation-delay: {{ animation_delay }}ms;
+      }
+    {% endif %}
+    
+    {% comment 'Hover Effects' %}
+    {% if hover_effects %}
+      #{{ block_id }}:hover {
+        transform: translateY(-2px);
+        transition: transform 0.3s ease;
+      }
+    {% endif %}
+    
+    {% comment 'High Contrast Mode' %}
+    {% if high_contrast %}
+      @media (prefers-contrast: high) {
+        #{{ block_id }} {
+          filter: contrast(1.5);
+          font-weight: 600;
+        }
+      }
+    {% endif %}
+  </style>
+{% endif %}
+
+{% comment 'Block Output' %}
+<div class="text-plus-block" id="{{ block_id }}-container">
+  <{{ semantic_tag }}
+    id="{{ block_id }}"
+    class="text-plus-content{{ css_classes }}"
+    {% if text_color != 'inherit' %}style="color: {{ text_color }}"{% endif %}
+    {% if aria_label != blank %}aria-label="{{ aria_label }}"{% endif %}
+    {% if semantic_tag == 'h1' or semantic_tag == 'h2' or semantic_tag == 'h3' %}role="heading"{% endif %}
+  >
+    {{ text_content }}
+  </{{ semantic_tag }}>
+</div>
+
+{% comment 'Block Schema' %}
+{% schema %}
+{
+  "name": "Text+",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "text_content",
+      "label": "Text Content",
+      "default": "<p>Enter your text here...</p>",
+      "info": "Rich text editor with formatting options"
+    },
+    {
+      "type": "header",
+      "content": "Typography Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_mode",
+      "label": "Enable Custom Typography",
+      "default": false,
+      "info": "Toggle between preset tokens and custom typography controls"
+    },
+    {
+      "type": "select",
+      "id": "text_preset",
+      "label": "Typography Preset",
+      "options": [
+        { "value": "display-1", "label": "Display 1 (Hero)" },
+        { "value": "display-2", "label": "Display 2 (Large Hero)" },
+        { "value": "display-3", "label": "Display 3 (Small Hero)" },
+        { "value": "heading-1", "label": "Heading 1" },
+        { "value": "heading-2", "label": "Heading 2" },
+        { "value": "heading-3", "label": "Heading 3" },
+        { "value": "heading-4", "label": "Heading 4" },
+        { "value": "heading-5", "label": "Heading 5" },
+        { "value": "heading-6", "label": "Heading 6" },
+        { "value": "body-large", "label": "Body Large" },
+        { "value": "body", "label": "Body" },
+        { "value": "body-small", "label": "Body Small" },
+        { "value": "subtitle-1", "label": "Subtitle 1" },
+        { "value": "subtitle-2", "label": "Subtitle 2" },
+        { "value": "caption", "label": "Caption" },
+        { "value": "overline", "label": "Overline" },
+        { "value": "button", "label": "Button Text" }
+      ],
+      "default": "body",
+      "info": "Choose a predefined typography style"
+    },
+    {
+      "type": "header",
+      "content": "Custom Typography (when enabled)"
+    },
+    {
+      "type": "font_picker",
+      "id": "custom_font_family",
+      "label": "Custom Font Family",
+      "info": "Override the preset font family"
+    },
+    {
+      "type": "range",
+      "id": "custom_font_size",
+      "label": "Custom Font Size (px)",
+      "min": 10,
+      "max": 120,
+      "step": 1,
+      "info": "Override the preset font size"
+    },
+    {
+      "type": "select",
+      "id": "custom_font_weight",
+      "label": "Custom Font Weight",
+      "options": [
+        { "value": "100", "label": "Thin (100)" },
+        { "value": "200", "label": "Extra Light (200)" },
+        { "value": "300", "label": "Light (300)" },
+        { "value": "400", "label": "Normal (400)" },
+        { "value": "500", "label": "Medium (500)" },
+        { "value": "600", "label": "Semi Bold (600)" },
+        { "value": "700", "label": "Bold (700)" },
+        { "value": "800", "label": "Extra Bold (800)" },
+        { "value": "900", "label": "Black (900)" }
+      ],
+      "info": "Override the preset font weight"
+    },
+    {
+      "type": "range",
+      "id": "custom_line_height",
+      "label": "Custom Line Height",
+      "min": 0.8,
+      "max": 3.0,
+      "step": 0.1,
+      "info": "Override the preset line height"
+    },
+    {
+      "type": "range",
+      "id": "custom_letter_spacing",
+      "label": "Custom Letter Spacing (em)",
+      "min": -0.1,
+      "max": 0.5,
+      "step": 0.01,
+      "info": "Override the preset letter spacing"
+    },
+    {
+      "type": "header",
+      "content": "Text Styling"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "info": "Override the default text color"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" },
+        { "value": "justify", "label": "Justify" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "text_transform",
+      "label": "Text Transform",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "uppercase", "label": "UPPERCASE" },
+        { "value": "lowercase", "label": "lowercase" },
+        { "value": "capitalize", "label": "Capitalize" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "select",
+      "id": "text_decoration",
+      "label": "Text Decoration",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "underline", "label": "Underline" },
+        { "value": "line-through", "label": "Strike Through" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "header",
+      "content": "Advanced Effects"
+    },
+    {
+      "type": "select",
+      "id": "text_shadow",
+      "label": "Text Shadow",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "sm", "label": "Small" },
+        { "value": "", "label": "Medium" },
+        { "value": "md", "label": "Medium Plus" },
+        { "value": "lg", "label": "Large" },
+        { "value": "xl", "label": "Extra Large" },
+        { "value": "2xl", "label": "2X Large" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "checkbox",
+      "id": "text_gradient",
+      "label": "Enable Gradient Text",
+      "default": false,
+      "info": "Apply gradient colors to text"
+    },
+    {
+      "type": "select",
+      "id": "text_gradient_colors",
+      "label": "Gradient Colors",
+      "options": [
+        { "value": "primary", "label": "Primary Colors" },
+        { "value": "accent", "label": "Accent Colors" },
+        { "value": "rainbow", "label": "Rainbow Colors" }
+      ],
+      "default": "primary",
+      "info": "Choose gradient color scheme"
+    },
+    {
+      "type": "checkbox",
+      "id": "drop_cap",
+      "label": "Enable Drop Cap",
+      "default": false,
+      "info": "Large first letter effect"
+    },
+    {
+      "type": "checkbox",
+      "id": "small_caps",
+      "label": "Enable Small Caps",
+      "default": false,
+      "info": "Small capitals variant"
+    },
+    {
+      "type": "header",
+      "content": "Animation & Interaction"
+    },
+    {
+      "type": "select",
+      "id": "text_animation",
+      "label": "Animation Effect",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "fade-in", "label": "Fade In" },
+        { "value": "slide-up", "label": "Slide Up" },
+        { "value": "scale-in", "label": "Scale In" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "animation_delay",
+      "label": "Animation Delay (ms)",
+      "min": 0,
+      "max": 2000,
+      "step": 100,
+      "default": 0,
+      "info": "Delay before animation starts"
+    },
+    {
+      "type": "checkbox",
+      "id": "hover_effects",
+      "label": "Enable Hover Effects",
+      "default": false,
+      "info": "Interactive hover animations"
+    },
+    {
+      "type": "header",
+      "content": "Responsive Settings"
+    },
+    {
+      "type": "range",
+      "id": "mobile_font_size",
+      "label": "Mobile Font Size (px)",
+      "min": 10,
+      "max": 80,
+      "step": 1,
+      "info": "Font size on mobile devices"
+    },
+    {
+      "type": "range",
+      "id": "tablet_font_size",
+      "label": "Tablet Font Size (px)",
+      "min": 10,
+      "max": 100,
+      "step": 1,
+      "info": "Font size on tablet devices"
+    },
+    {
+      "type": "checkbox",
+      "id": "responsive_alignment",
+      "label": "Responsive Text Alignment",
+      "default": false,
+      "info": "Different alignment on mobile"
+    },
+    {
+      "type": "select",
+      "id": "mobile_alignment",
+      "label": "Mobile Text Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center",
+      "info": "Text alignment on mobile devices"
+    },
+    {
+      "type": "header",
+      "content": "Accessibility & SEO"
+    },
+    {
+      "type": "select",
+      "id": "semantic_tag",
+      "label": "HTML Semantic Tag",
+      "options": [
+        { "value": "p", "label": "Paragraph (p)" },
+        { "value": "h1", "label": "Heading 1 (h1)" },
+        { "value": "h2", "label": "Heading 2 (h2)" },
+        { "value": "h3", "label": "Heading 3 (h3)" },
+        { "value": "h4", "label": "Heading 4 (h4)" },
+        { "value": "h5", "label": "Heading 5 (h5)" },
+        { "value": "h6", "label": "Heading 6 (h6)" },
+        { "value": "span", "label": "Span (span)" },
+        { "value": "div", "label": "Div (div)" },
+        { "value": "blockquote", "label": "Blockquote" },
+        { "value": "figcaption", "label": "Figure Caption" }
+      ],
+      "default": "p",
+      "info": "Choose the appropriate HTML tag for SEO and accessibility"
+    },
+    {
+      "type": "text",
+      "id": "aria_label",
+      "label": "ARIA Label",
+      "info": "Accessibility label for screen readers"
+    },
+    {
+      "type": "checkbox",
+      "id": "high_contrast",
+      "label": "High Contrast Mode",
+      "default": false,
+      "info": "Enhanced contrast for accessibility"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Text+",
+      "settings": {
+        "text_content": "<p>This is a Text+ block with advanced typography controls.</p>",
+        "text_preset": "body",
+        "text_alignment": "left"
+      }
+    },
+    {
+      "name": "Hero Title",
+      "settings": {
+        "text_content": "<h1>Hero Title</h1>",
+        "text_preset": "display-1",
+        "text_alignment": "center",
+        "semantic_tag": "h1",
+        "text_animation": "fade-in"
+      }
+    },
+    {
+      "name": "Section Heading",
+      "settings": {
+        "text_content": "<h2>Section Heading</h2>",
+        "text_preset": "heading-1",
+        "text_alignment": "left",
+        "semantic_tag": "h2"
+      }
+    },
+    {
+      "name": "Subtitle",
+      "settings": {
+        "text_content": "<p>Supporting subtitle text</p>",
+        "text_preset": "subtitle-1",
+        "text_alignment": "center",
+        "semantic_tag": "p"
+      }
+    },
+    {
+      "name": "Body Text",
+      "settings": {
+        "text_content": "<p>Body text for content sections with optimal readability.</p>",
+        "text_preset": "body",
+        "text_alignment": "left",
+        "semantic_tag": "p"
+      }
+    }
+  ]
+}
+{% endschema %}

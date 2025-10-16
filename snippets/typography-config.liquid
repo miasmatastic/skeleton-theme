@@ -1,0 +1,230 @@
+{% comment %}
+  Typography Token Configuration System
+  Defines semantic typography tokens with responsive scaling
+  
+  Available Tokens:
+  - display-1, display-2, display-3 (Hero content)
+  - heading-1 through heading-6 (Section headings)
+  - body-large, body, body-small (Body text)
+  - caption, overline, button (UI elements)
+  - subtitle-1, subtitle-2 (Supporting text)
+  
+  Features:
+  - Responsive scaling with clamp()
+  - Adobe Fonts + Shopify Fonts dual integration
+  - Accessibility optimized
+  - Performance conscious loading
+{% endcomment %}
+
+{% liquid
+  comment 'Typography Token Definitions'
+  comment 'Each token has: base size, scale ratio, line height, weight, letter spacing'
+  
+  assign typography_tokens = '' | split: ''
+  
+  comment 'Display Tokens - Hero Content'
+  assign display_1 = 'display-1|clamp(3.5rem, 8vw, 6rem)|1.1|700|normal' | split: '|'
+  assign display_2 = 'display-2|clamp(2.5rem, 6vw, 4.5rem)|1.15|600|normal' | split: '|'
+  assign display_3 = 'display-3|clamp(2rem, 5vw, 3.5rem)|1.2|600|normal' | split: '|'
+  
+  comment 'Heading Tokens - Section Hierarchy'
+  assign heading_1 = 'heading-1|clamp(2.25rem, 4vw, 3rem)|1.25|600|normal' | split: '|'
+  assign heading_2 = 'heading-2|clamp(1.875rem, 3.5vw, 2.5rem)|1.3|600|normal' | split: '|'
+  assign heading_3 = 'heading-3|clamp(1.5rem, 3vw, 2rem)|1.35|500|normal' | split: '|'
+  assign heading_4 = 'heading-4|clamp(1.25rem, 2.5vw, 1.5rem)|1.4|500|normal' | split: '|'
+  assign heading_5 = 'heading-5|clamp(1.125rem, 2vw, 1.25rem)|1.45|500|normal' | split: '|'
+  assign heading_6 = 'heading-6|clamp(1rem, 1.5vw, 1.125rem)|1.5|500|normal' | split: '|'
+  
+  comment 'Body Tokens - Content Text'
+  assign body_large = 'body-large|clamp(1.125rem, 2vw, 1.25rem)|1.6|400|normal' | split: '|'
+  assign body = 'body|clamp(1rem, 1.5vw, 1.125rem)|1.65|400|normal' | split: '|'
+  assign body_small = 'body-small|clamp(0.875rem, 1.25vw, 1rem)|1.7|400|normal' | split: '|'
+  
+  comment 'Subtitle Tokens - Supporting Text'
+  assign subtitle_1 = 'subtitle-1|clamp(1.125rem, 2vw, 1.25rem)|1.5|400|normal' | split: '|'
+  assign subtitle_2 = 'subtitle-2|clamp(1rem, 1.5vw, 1.125rem)|1.55|400|normal' | split: '|'
+  
+  comment 'UI Tokens - Interface Elements'
+  assign caption = 'caption|clamp(0.75rem, 1vw, 0.875rem)|1.5|400|normal' | split: '|'
+  assign overline = 'overline|clamp(0.75rem, 1vw, 0.875rem)|1.5|500|0.1em' | split: '|'
+  assign button = 'button|clamp(0.875rem, 1.25vw, 1rem)|1.4|500|0.025em' | split: '|'
+  
+  comment 'Compile token list'
+  assign typography_tokens = typography_tokens 
+    | concat: display_1 | concat: display_2 | concat: display_3
+    | concat: heading_1 | concat: heading_2 | concat: heading_3 | concat: heading_4 | concat: heading_5 | concat: heading_6
+    | concat: body_large | concat: body | concat: body_small
+    | concat: subtitle_1 | concat: subtitle_2
+    | concat: caption | concat: overline | concat: button
+  
+  comment 'Font Family Configuration'
+  assign adobe_fonts_enabled = settings.typography_adobe_fonts_enabled | default: false
+  assign adobe_fonts_kit_id = settings.typography_adobe_fonts_kit_id | default: ''
+  assign adobe_fonts_project_id = settings.typography_adobe_fonts_project_id | default: ''
+  
+  comment 'Font Stack Definitions'
+  assign font_stack_primary = settings.typography_font_primary | default: 'helvetica_neue_n4'
+  assign font_stack_heading = settings.typography_font_heading | default: font_stack_primary
+  assign font_stack_display = settings.typography_font_display | default: font_stack_heading
+  assign font_stack_ui = settings.typography_font_ui | default: font_stack_primary
+  
+  comment 'Adobe Fonts Mapping (if enabled)'
+  if adobe_fonts_enabled and adobe_fonts_kit_id != blank
+    assign adobe_primary = settings.typography_adobe_primary | default: ''
+    assign adobe_heading = settings.typography_adobe_heading | default: adobe_primary
+    assign adobe_display = settings.typography_adobe_display | default: adobe_heading
+    assign adobe_ui = settings.typography_adobe_ui | default: adobe_primary
+    
+    if adobe_primary != blank
+      assign font_stack_primary = adobe_primary
+    endif
+    if adobe_heading != blank
+      assign font_stack_heading = adobe_heading
+    endif
+    if adobe_display != blank
+      assign font_stack_display = adobe_display
+    endif
+    if adobe_ui != blank
+      assign font_stack_ui = adobe_ui
+    endif
+  endif
+  
+  comment 'Performance Settings'
+  assign typography_preload_fonts = settings.typography_preload_fonts | default: true
+  assign typography_font_display = settings.typography_font_display | default: 'swap'
+  assign typography_reduce_motion = settings.typography_reduce_motion | default: false
+  
+  comment 'Accessibility Settings'
+  assign typography_high_contrast = settings.typography_high_contrast | default: false
+  assign typography_large_text = settings.typography_large_text | default: false
+  assign typography_focus_indicators = settings.typography_focus_indicators | default: true
+%}
+
+{% comment %}
+  Token Renderer Function
+  Usage: {% render 'typography-config' with 'display-1' as token_name %}
+{% endcomment %}
+
+{% if token_name %}
+  {% for token_data in typography_tokens %}
+    {% assign token_parts = token_data | split: '|' %}
+    {% if token_parts[0] == token_name %}
+      {% assign token_size = token_parts[1] %}
+      {% assign token_line_height = token_parts[2] %}
+      {% assign token_weight = token_parts[3] %}
+      {% assign token_letter_spacing = token_parts[4] %}
+      
+      {% comment 'Determine font family based on token type' %}
+      {% assign token_family = font_stack_primary %}
+      {% if token_name contains 'display' %}
+        {% assign token_family = font_stack_display %}
+      {% elsif token_name contains 'heading' %}
+        {% assign token_family = font_stack_heading %}
+      {% elsif token_name contains 'button' or token_name contains 'overline' or token_name contains 'caption' %}
+        {% assign token_family = font_stack_ui %}
+      {% endif %}
+      
+      {% comment 'Apply accessibility adjustments' %}
+      {% if typography_large_text %}
+        {% assign size_multiplier = 1.25 %}
+      {% else %}
+        {% assign size_multiplier = 1 %}
+      {% endif %}
+      
+      {% comment 'Output CSS custom properties' %}
+      <style>
+        .typography-{{ token_name }} {
+          font-family: {{ token_family | font_face: font_weight: token_weight }}, var(--font-fallback);
+          font-size: calc({{ token_size }} * {{ size_multiplier }});
+          line-height: {{ token_line_height }};
+          font-weight: {{ token_weight }};
+          letter-spacing: {{ token_letter_spacing }};
+          font-display: {{ typography_font_display }};
+          
+          {% if typography_reduce_motion %}
+          transition: none !important;
+          {% endif %}
+          
+          {% if typography_high_contrast %}
+          filter: contrast(1.2);
+          {% endif %}
+        }
+      </style>
+      {% break %}
+    {% endif %}
+  {% endfor %}
+{% else %}
+  {% comment 'Render all tokens as CSS variables' %}
+  <style>
+    :root {
+      {% comment 'Font families' %}
+      --font-primary: {{ font_stack_primary | font_face }}, var(--font-fallback);
+      --font-heading: {{ font_stack_heading | font_face }}, var(--font-fallback);
+      --font-display: {{ font_stack_display | font_face }}, var(--font-fallback);
+      --font-ui: {{ font_stack_ui | font_face }}, var(--font-fallback);
+      
+      {% comment 'Fallback font stack' %}
+      --font-fallback: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      
+      {% comment 'Typography scale multipliers' %}
+      --typography-scale-base: {% if typography_large_text %}1.25{% else %}1{% endif %};
+      --typography-motion: {% if typography_reduce_motion %}none{% else %}all 0.2s ease{% endif %};
+      
+      {% comment 'Token CSS Variables' %}
+      {% for token_data in typography_tokens %}
+        {% assign token_parts = token_data | split: '|' %}
+        {% assign token_name = token_parts[0] %}
+        {% assign token_size = token_parts[1] %}
+        {% assign token_line_height = token_parts[2] %}
+        {% assign token_weight = token_parts[3] %}
+        {% assign token_letter_spacing = token_parts[4] %}
+        
+        --typography-{{ token_name }}-size: calc({{ token_size }} * var(--typography-scale-base));
+        --typography-{{ token_name }}-line-height: {{ token_line_height }};
+        --typography-{{ token_name }}-weight: {{ token_weight }};
+        --typography-{{ token_name }}-spacing: {{ token_letter_spacing }};
+      {% endfor %}
+    }
+    
+    {% comment 'Accessibility enhancements' %}
+    {% if typography_focus_indicators %}
+    *:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 2px;
+      border-radius: 3px;
+    }
+    {% endif %}
+    
+    {% comment 'Reduced motion support' %}
+    @media (prefers-reduced-motion: reduce) {
+      :root {
+        --typography-motion: none;
+      }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+    
+    {% comment 'High contrast support' %}
+    @media (prefers-contrast: high) {
+      :root {
+        --typography-contrast: 1.2;
+      }
+      * {
+        filter: contrast(var(--typography-contrast, 1));
+      }
+    }
+  </style>
+  
+  {% comment 'Adobe Fonts Integration' %}
+  {% if adobe_fonts_enabled and adobe_fonts_kit_id != blank %}
+    <link rel="stylesheet" href="https://use.typekit.net/{{ adobe_fonts_kit_id }}.css">
+    
+    {% if typography_preload_fonts %}
+      <link rel="preload" href="https://use.typekit.net/{{ adobe_fonts_kit_id }}.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+      <noscript><link rel="stylesheet" href="https://use.typekit.net/{{ adobe_fonts_kit_id }}.css"></noscript>
+    {% endif %}
+  {% endif %}
+{% endif %}

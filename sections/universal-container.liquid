@@ -10,7 +10,10 @@
   - Animation support
 {% endcomment %}
 
-{% comment %} Load Universal Blocks CSS {% endcomment %}
+{% comment %} Load Typography System and Universal Blocks CSS {% endcomment %}
+{% render 'typography-config' %}
+{% render 'typography-renderer' %}
+{{ 'typography-utilities.css' | asset_url | stylesheet_tag }}
 {{ 'universal-blocks.css' | asset_url | stylesheet_tag }}
 
 {% liquid

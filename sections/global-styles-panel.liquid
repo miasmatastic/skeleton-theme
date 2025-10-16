@@ -1,0 +1,1179 @@
+{% comment %}
+  Global Styles Control Panel
+  Unified interface for managing colors and typography across the theme
+  
+  Features:
+  - Color system controls (existing integration)
+  - Typography system controls (new)
+  - Adobe Fonts integration
+  - Real-time preview
+  - Preset management
+  - Accessibility controls
+  - Performance optimizations
+{% endcomment %}
+
+{% liquid
+  comment 'Load existing color controls and typography config'
+  render 'color-utilities'
+  render 'typography-config'
+  
+  comment 'Global Styles Settings'
+  assign global_styles_enabled = settings.global_styles_enabled | default: true
+  assign show_advanced_controls = settings.global_styles_advanced | default: false
+  assign live_preview = settings.global_styles_live_preview | default: true
+  
+  comment 'Color System Status'
+  assign color_system_active = settings.color_system_enabled | default: true
+  
+  comment 'Typography System Status'
+  assign typography_system_active = settings.typography_system_enabled | default: true
+  
+  comment 'Adobe Fonts Status'
+  assign adobe_fonts_enabled = settings.typography_adobe_fonts_enabled | default: false
+  assign adobe_fonts_kit_id = settings.typography_adobe_fonts_kit_id | default: ''
+%}
+
+{% if global_styles_enabled %}
+<div class="global-styles-panel" id="global-styles-control">
+  
+  {% comment 'Panel Header' %}
+  <div class="global-styles-header">
+    <h2 class="global-styles-title text-heading-3">Global Styles</h2>
+    <p class="global-styles-description text-body-small">
+      Manage colors and typography across your entire theme from one unified control panel.
+    </p>
+    
+    {% comment 'Quick Status Indicators' %}
+    <div class="global-styles-status">
+      <div class="status-indicator {% if color_system_active %}active{% endif %}">
+        <span class="status-dot"></span>
+        <span class="text-caption">Colors</span>
+      </div>
+      <div class="status-indicator {% if typography_system_active %}active{% endif %}">
+        <span class="status-dot"></span>
+        <span class="text-caption">Typography</span>
+      </div>
+      <div class="status-indicator {% if adobe_fonts_enabled %}active{% endif %}">
+        <span class="status-dot"></span>
+        <span class="text-caption">Adobe Fonts</span>
+      </div>
+    </div>
+  </div>
+
+  {% comment 'Color Controls Section' %}
+  <div class="global-styles-section" id="color-controls-section">
+    <div class="section-header">
+      <h3 class="section-title text-heading-4">Color System</h3>
+      <button class="section-toggle" data-target="color-controls" aria-expanded="true">
+        <span class="sr-only">Toggle color controls</span>
+        <svg class="toggle-icon" width="16" height="16" viewBox="0 0 16 16">
+          <path d="M8 12l-4-4h8z"/>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="section-content" id="color-controls">
+      {% comment 'Color Palette Management' %}
+      <div class="control-group">
+        <label class="control-label text-overline">Primary Colors</label>
+        <div class="color-grid">
+          <div class="color-control">
+            <label for="color-primary" class="text-caption">Primary</label>
+            <input type="color" id="color-primary" name="color-primary" 
+                   value="{{ settings.color_primary | default: '#007bff' }}"
+                   data-color-role="primary" class="color-picker">
+            <span class="color-value text-caption">{{ settings.color_primary | default: '#007bff' }}</span>
+          </div>
+          
+          <div class="color-control">
+            <label for="color-secondary" class="text-caption">Secondary</label>
+            <input type="color" id="color-secondary" name="color-secondary" 
+                   value="{{ settings.color_secondary | default: '#6c757d' }}"
+                   data-color-role="secondary" class="color-picker">
+            <span class="color-value text-caption">{{ settings.color_secondary | default: '#6c757d' }}</span>
+          </div>
+          
+          <div class="color-control">
+            <label for="color-accent" class="text-caption">Accent</label>
+            <input type="color" id="color-accent" name="color-accent" 
+                   value="{{ settings.color_accent | default: '#28a745' }}"
+                   data-color-role="accent" class="color-picker">
+            <span class="color-value text-caption">{{ settings.color_accent | default: '#28a745' }}</span>
+          </div>
+        </div>
+      </div>
+
+      {% comment 'Neutral Colors' %}
+      <div class="control-group">
+        <label class="control-label text-overline">Neutral Colors</label>
+        <div class="color-grid">
+          <div class="color-control">
+            <label for="color-text" class="text-caption">Text</label>
+            <input type="color" id="color-text" name="color-text" 
+                   value="{{ settings.color_text | default: '#333333' }}"
+                   data-color-role="text" class="color-picker">
+            <span class="color-value text-caption">{{ settings.color_text | default: '#333333' }}</span>
+          </div>
+          
+          <div class="color-control">
+            <label for="color-background" class="text-caption">Background</label>
+            <input type="color" id="color-background" name="color-background" 
+                   value="{{ settings.color_background | default: '#ffffff' }}"
+                   data-color-role="background" class="color-picker">
+            <span class="color-value text-caption">{{ settings.color_background | default: '#ffffff' }}</span>
+          </div>
+          
+          <div class="color-control">
+            <label for="color-surface" class="text-caption">Surface</label>
+            <input type="color" id="color-surface" name="color-surface" 
+                   value="{{ settings.color_surface | default: '#f8f9fa' }}"
+                   data-color-role="surface" class="color-picker">
+            <span class="color-value text-caption">{{ settings.color_surface | default: '#f8f9fa' }}</span>
+          </div>
+        </div>
+      </div>
+
+      {% comment 'Color Presets' %}
+      <div class="control-group">
+        <label class="control-label text-overline">Color Presets</label>
+        <div class="preset-grid">
+          <button class="preset-option" data-preset="modern" title="Modern">
+            <div class="preset-colors">
+              <span style="background: #007bff;"></span>
+              <span style="background: #28a745;"></span>
+              <span style="background: #ffc107;"></span>
+            </div>
+            <span class="preset-name text-caption">Modern</span>
+          </button>
+          
+          <button class="preset-option" data-preset="warm" title="Warm">
+            <div class="preset-colors">
+              <span style="background: #ff6b35;"></span>
+              <span style="background: #f7931e;"></span>
+              <span style="background: #c5d86d;"></span>
+            </div>
+            <span class="preset-name text-caption">Warm</span>
+          </button>
+          
+          <button class="preset-option" data-preset="cool" title="Cool">
+            <div class="preset-colors">
+              <span style="background: #4a90e2;"></span>
+              <span style="background: #7b68ee;"></span>
+              <span style="background: #20b2aa;"></span>
+            </div>
+            <span class="preset-name text-caption">Cool</span>
+          </button>
+          
+          <button class="preset-option" data-preset="monochrome" title="Monochrome">
+            <div class="preset-colors">
+              <span style="background: #333333;"></span>
+              <span style="background: #666666;"></span>
+              <span style="background: #999999;"></span>
+            </div>
+            <span class="preset-name text-caption">Mono</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% comment 'Typography Controls Section' %}
+  <div class="global-styles-section" id="typography-controls-section">
+    <div class="section-header">
+      <h3 class="section-title text-heading-4">Typography System</h3>
+      <button class="section-toggle" data-target="typography-controls" aria-expanded="true">
+        <span class="sr-only">Toggle typography controls</span>
+        <svg class="toggle-icon" width="16" height="16" viewBox="0 0 16 16">
+          <path d="M8 12l-4-4h8z"/>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="section-content" id="typography-controls">
+      {% comment 'Font Family Controls' %}
+      <div class="control-group">
+        <label class="control-label text-overline">Font Families</label>
+        
+        <div class="font-control">
+          <label for="font-primary" class="text-caption">Primary Font</label>
+          <select id="font-primary" name="font-primary" class="font-picker" data-font-role="primary">
+            <option value="helvetica_neue_n4" {% if settings.typography_font_primary == 'helvetica_neue_n4' %}selected{% endif %}>Helvetica Neue</option>
+            <option value="georgia_n4" {% if settings.typography_font_primary == 'georgia_n4' %}selected{% endif %}>Georgia</option>
+            <option value="arial_n4" {% if settings.typography_font_primary == 'arial_n4' %}selected{% endif %}>Arial</option>
+            <option value="times_new_roman_n4" {% if settings.typography_font_primary == 'times_new_roman_n4' %}selected{% endif %}>Times New Roman</option>
+          </select>
+        </div>
+        
+        <div class="font-control">
+          <label for="font-heading" class="text-caption">Heading Font</label>
+          <select id="font-heading" name="font-heading" class="font-picker" data-font-role="heading">
+            <option value="inherit" {% if settings.typography_font_heading == 'inherit' %}selected{% endif %}>Same as Primary</option>
+            <option value="helvetica_neue_n4" {% if settings.typography_font_heading == 'helvetica_neue_n4' %}selected{% endif %}>Helvetica Neue</option>
+            <option value="georgia_n4" {% if settings.typography_font_heading == 'georgia_n4' %}selected{% endif %}>Georgia</option>
+            <option value="arial_n4" {% if settings.typography_font_heading == 'arial_n4' %}selected{% endif %}>Arial</option>
+            <option value="times_new_roman_n4" {% if settings.typography_font_heading == 'times_new_roman_n4' %}selected{% endif %}>Times New Roman</option>
+          </select>
+        </div>
+        
+        <div class="font-control">
+          <label for="font-display" class="text-caption">Display Font</label>
+          <select id="font-display" name="font-display" class="font-picker" data-font-role="display">
+            <option value="inherit" {% if settings.typography_font_display == 'inherit' %}selected{% endif %}>Same as Heading</option>
+            <option value="helvetica_neue_n4" {% if settings.typography_font_display == 'helvetica_neue_n4' %}selected{% endif %}>Helvetica Neue</option>
+            <option value="georgia_n4" {% if settings.typography_font_display == 'georgia_n4' %}selected{% endif %}>Georgia</option>
+            <option value="arial_n4" {% if settings.typography_font_display == 'arial_n4' %}selected{% endif %}>Arial</option>
+            <option value="times_new_roman_n4" {% if settings.typography_font_display == 'times_new_roman_n4' %}selected{% endif %}>Times New Roman</option>
+          </select>
+        </div>
+      </div>
+
+      {% comment 'Adobe Fonts Integration' %}
+      <div class="control-group">
+        <label class="control-label text-overline">Adobe Fonts</label>
+        
+        <div class="adobe-fonts-control">
+          <label class="checkbox-control">
+            <input type="checkbox" id="adobe-fonts-enabled" name="adobe-fonts-enabled" 
+                   {% if adobe_fonts_enabled %}checked{% endif %} data-toggle="adobe-fonts">
+            <span class="checkmark"></span>
+            <span class="text-caption">Enable Adobe Fonts</span>
+          </label>
+        </div>
+        
+        <div class="adobe-fonts-settings" id="adobe-fonts-settings" {% unless adobe_fonts_enabled %}style="display: none;"{% endunless %}>
+          <div class="input-control">
+            <label for="adobe-kit-id" class="text-caption">Adobe Fonts Kit ID</label>
+            <input type="text" id="adobe-kit-id" name="adobe-kit-id" 
+                   value="{{ adobe_fonts_kit_id }}" 
+                   placeholder="e.g., abc123"
+                   class="text-input">
+            <small class="text-caption help-text">Find your Kit ID in your Adobe Fonts project</small>
+          </div>
+          
+          <div class="adobe-font-mapping">
+            <label class="text-caption">Font Mapping</label>
+            <div class="font-mapping-grid">
+              <div class="mapping-control">
+                <label for="adobe-primary" class="text-caption">Primary</label>
+                <input type="text" id="adobe-primary" name="adobe-primary" 
+                       value="{{ settings.typography_adobe_primary }}" 
+                       placeholder="font-family-name"
+                       class="text-input">
+              </div>
+              
+              <div class="mapping-control">
+                <label for="adobe-heading" class="text-caption">Heading</label>
+                <input type="text" id="adobe-heading" name="adobe-heading" 
+                       value="{{ settings.typography_adobe_heading }}" 
+                       placeholder="font-family-name"
+                       class="text-input">
+              </div>
+              
+              <div class="mapping-control">
+                <label for="adobe-display" class="text-caption">Display</label>
+                <input type="text" id="adobe-display" name="adobe-display" 
+                       value="{{ settings.typography_adobe_display }}" 
+                       placeholder="font-family-name"
+                       class="text-input">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% comment 'Typography Scale Controls' %}
+      <div class="control-group">
+        <label class="control-label text-overline">Typography Scale</label>
+        
+        <div class="scale-control">
+          <label for="typography-scale" class="text-caption">Base Scale Multiplier</label>
+          <input type="range" id="typography-scale" name="typography-scale" 
+                 min="0.8" max="1.4" step="0.05" 
+                 value="{{ settings.typography_scale_base | default: 1 }}"
+                 class="range-input" data-role="typography-scale">
+          <span class="scale-value text-caption">{{ settings.typography_scale_base | default: 1 }}x</span>
+        </div>
+        
+        <div class="preview-text" id="typography-preview">
+          <div class="preview-item">
+            <span class="text-display-1">Display Text</span>
+            <span class="preview-label text-caption">Display 1</span>
+          </div>
+          <div class="preview-item">
+            <span class="text-heading-1">Heading Text</span>
+            <span class="preview-label text-caption">Heading 1</span>
+          </div>
+          <div class="preview-item">
+            <span class="text-body">Body text for content and readability.</span>
+            <span class="preview-label text-caption">Body</span>
+          </div>
+          <div class="preview-item">
+            <span class="text-caption">Caption and small text</span>
+            <span class="preview-label text-caption">Caption</span>
+          </div>
+        </div>
+      </div>
+
+      {% comment 'Typography Presets' %}
+      <div class="control-group">
+        <label class="control-label text-overline">Typography Presets</label>
+        <div class="preset-grid">
+          <button class="preset-option" data-preset="modern" title="Modern Typography">
+            <div class="preset-preview">
+              <span class="preset-heading">Aa</span>
+              <span class="preset-body">Modern</span>
+            </div>
+          </button>
+          
+          <button class="preset-option" data-preset="classic" title="Classic Typography">
+            <div class="preset-preview">
+              <span class="preset-heading">Ag</span>
+              <span class="preset-body">Classic</span>
+            </div>
+          </button>
+          
+          <button class="preset-option" data-preset="minimal" title="Minimal Typography">
+            <div class="preset-preview">
+              <span class="preset-heading">Aa</span>
+              <span class="preset-body">Minimal</span>
+            </div>
+          </button>
+          
+          <button class="preset-option" data-preset="editorial" title="Editorial Typography">
+            <div class="preset-preview">
+              <span class="preset-heading">Ag</span>
+              <span class="preset-body">Editorial</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% comment 'Accessibility Controls Section' %}
+  {% if show_advanced_controls %}
+  <div class="global-styles-section" id="accessibility-controls-section">
+    <div class="section-header">
+      <h3 class="section-title text-heading-4">Accessibility</h3>
+      <button class="section-toggle" data-target="accessibility-controls" aria-expanded="false">
+        <span class="sr-only">Toggle accessibility controls</span>
+        <svg class="toggle-icon" width="16" height="16" viewBox="0 0 16 16">
+          <path d="M8 12l-4-4h8z"/>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="section-content" id="accessibility-controls" style="display: none;">
+      <div class="control-group">
+        <label class="checkbox-control">
+          <input type="checkbox" id="high-contrast" name="high-contrast" 
+                 {% if settings.typography_high_contrast %}checked{% endif %}>
+          <span class="checkmark"></span>
+          <span class="text-caption">High Contrast Mode</span>
+        </label>
+      </div>
+      
+      <div class="control-group">
+        <label class="checkbox-control">
+          <input type="checkbox" id="large-text" name="large-text" 
+                 {% if settings.typography_large_text %}checked{% endif %}>
+          <span class="checkmark"></span>
+          <span class="text-caption">Large Text Support</span>
+        </label>
+      </div>
+      
+      <div class="control-group">
+        <label class="checkbox-control">
+          <input type="checkbox" id="reduced-motion" name="reduced-motion" 
+                 {% if settings.typography_reduce_motion %}checked{% endif %}>
+          <span class="checkmark"></span>
+          <span class="text-caption">Reduced Motion</span>
+        </label>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% comment 'Panel Actions' %}
+  <div class="global-styles-actions">
+    <button class="action-button primary" id="apply-styles" data-action="apply">
+      <span class="text-button">Apply Changes</span>
+    </button>
+    
+    <button class="action-button secondary" id="reset-styles" data-action="reset">
+      <span class="text-button">Reset to Default</span>
+    </button>
+    
+    {% if live_preview %}
+    <button class="action-button tertiary" id="toggle-preview" data-action="preview">
+      <span class="text-button">Toggle Preview</span>
+    </button>
+    {% endif %}
+  </div>
+
+  {% comment 'Live Preview Indicator' %}
+  {% if live_preview %}
+  <div class="live-preview-indicator">
+    <span class="indicator-dot"></span>
+    <span class="text-caption">Live Preview Active</span>
+  </div>
+  {% endif %}
+
+</div>
+
+{% comment 'Global Styles JavaScript Controller' %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const globalStylesPanel = document.getElementById('global-styles-control');
+  
+  if (!globalStylesPanel) return;
+  
+  // Initialize Global Styles Controller
+  const GlobalStylesController = {
+    init() {
+      this.setupEventListeners();
+      this.setupColorPickers();
+      this.setupFontPickers();
+      this.setupPresets();
+      this.setupAccessibility();
+      
+      {% if live_preview %}
+      this.enableLivePreview();
+      {% endif %}
+    },
+    
+    setupEventListeners() {
+      // Section toggles
+      document.querySelectorAll('.section-toggle').forEach(toggle => {
+        toggle.addEventListener('click', this.toggleSection.bind(this));
+      });
+      
+      // Adobe Fonts toggle
+      const adobeFontsToggle = document.getElementById('adobe-fonts-enabled');
+      if (adobeFontsToggle) {
+        adobeFontsToggle.addEventListener('change', this.toggleAdobeFonts.bind(this));
+      }
+      
+      // Action buttons
+      document.getElementById('apply-styles')?.addEventListener('click', this.applyStyles.bind(this));
+      document.getElementById('reset-styles')?.addEventListener('click', this.resetStyles.bind(this));
+      document.getElementById('toggle-preview')?.addEventListener('click', this.togglePreview.bind(this));
+    },
+    
+    setupColorPickers() {
+      document.querySelectorAll('.color-picker').forEach(picker => {
+        picker.addEventListener('input', (e) => {
+          const colorRole = e.target.dataset.colorRole;
+          const colorValue = e.target.value;
+          
+          // Update color value display
+          const valueDisplay = e.target.nextElementSibling;
+          if (valueDisplay && valueDisplay.classList.contains('color-value')) {
+            valueDisplay.textContent = colorValue;
+          }
+          
+          {% if live_preview %}
+          this.updateColorPreview(colorRole, colorValue);
+          {% endif %}
+        });
+      });
+    },
+    
+    setupFontPickers() {
+      document.querySelectorAll('.font-picker').forEach(picker => {
+        picker.addEventListener('change', (e) => {
+          const fontRole = e.target.dataset.fontRole;
+          const fontValue = e.target.value;
+          
+          {% if live_preview %}
+          this.updateFontPreview(fontRole, fontValue);
+          {% endif %}
+        });
+      });
+      
+      // Typography scale
+      const scaleInput = document.querySelector('[data-role="typography-scale"]');
+      if (scaleInput) {
+        scaleInput.addEventListener('input', (e) => {
+          const scaleValue = e.target.value;
+          const valueDisplay = e.target.nextElementSibling;
+          if (valueDisplay) {
+            valueDisplay.textContent = scaleValue + 'x';
+          }
+          
+          {% if live_preview %}
+          this.updateScalePreview(scaleValue);
+          {% endif %}
+        });
+      }
+    },
+    
+    setupPresets() {
+      document.querySelectorAll('.preset-option').forEach(preset => {
+        preset.addEventListener('click', (e) => {
+          e.preventDefault();
+          const presetType = e.currentTarget.dataset.preset;
+          const section = e.currentTarget.closest('.global-styles-section');
+          
+          if (section.id === 'color-controls-section') {
+            this.applyColorPreset(presetType);
+          } else if (section.id === 'typography-controls-section') {
+            this.applyTypographyPreset(presetType);
+          }
+        });
+      });
+    },
+    
+    setupAccessibility() {
+      document.querySelectorAll('#accessibility-controls input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', (e) => {
+          const feature = e.target.id;
+          const enabled = e.target.checked;
+          
+          {% if live_preview %}
+          this.updateAccessibilityPreview(feature, enabled);
+          {% endif %}
+        });
+      });
+    },
+    
+    toggleSection(e) {
+      const button = e.currentTarget;
+      const targetId = button.dataset.target;
+      const content = document.getElementById(targetId);
+      const isExpanded = button.getAttribute('aria-expanded') === 'true';
+      
+      button.setAttribute('aria-expanded', !isExpanded);
+      content.style.display = isExpanded ? 'none' : 'block';
+      button.classList.toggle('collapsed', isExpanded);
+    },
+    
+    toggleAdobeFonts(e) {
+      const settings = document.getElementById('adobe-fonts-settings');
+      if (settings) {
+        settings.style.display = e.target.checked ? 'block' : 'none';
+      }
+    },
+    
+    {% if live_preview %}
+    enableLivePreview() {
+      this.previewEnabled = true;
+      this.createPreviewStyles();
+    },
+    
+    createPreviewStyles() {
+      if (!this.previewStyleElement) {
+        this.previewStyleElement = document.createElement('style');
+        this.previewStyleElement.id = 'global-styles-preview';
+        document.head.appendChild(this.previewStyleElement);
+      }
+    },
+    
+    updateColorPreview(role, value) {
+      if (!this.previewEnabled) return;
+      
+      const cssVar = `--color-${role}`;
+      document.documentElement.style.setProperty(cssVar, value);
+    },
+    
+    updateFontPreview(role, value) {
+      if (!this.previewEnabled) return;
+      
+      const cssVar = `--font-${role}`;
+      document.documentElement.style.setProperty(cssVar, value);
+    },
+    
+    updateScalePreview(scale) {
+      if (!this.previewEnabled) return;
+      
+      document.documentElement.style.setProperty('--typography-scale-base', scale);
+    },
+    
+    updateAccessibilityPreview(feature, enabled) {
+      if (!this.previewEnabled) return;
+      
+      const body = document.body;
+      body.classList.toggle(`accessibility-${feature}`, enabled);
+    },
+    {% endif %}
+    
+    applyColorPreset(preset) {
+      const presets = {
+        modern: {
+          primary: '#007bff',
+          secondary: '#6c757d',
+          accent: '#28a745'
+        },
+        warm: {
+          primary: '#ff6b35',
+          secondary: '#f7931e',
+          accent: '#c5d86d'
+        },
+        cool: {
+          primary: '#4a90e2',
+          secondary: '#7b68ee',
+          accent: '#20b2aa'
+        },
+        monochrome: {
+          primary: '#333333',
+          secondary: '#666666',
+          accent: '#999999'
+        }
+      };
+      
+      const colors = presets[preset];
+      if (colors) {
+        Object.keys(colors).forEach(role => {
+          const picker = document.getElementById(`color-${role}`);
+          if (picker) {
+            picker.value = colors[role];
+            picker.dispatchEvent(new Event('input'));
+          }
+        });
+      }
+    },
+    
+    applyTypographyPreset(preset) {
+      const presets = {
+        modern: {
+          primary: 'helvetica_neue_n4',
+          heading: 'helvetica_neue_n4',
+          display: 'helvetica_neue_n4'
+        },
+        classic: {
+          primary: 'georgia_n4',
+          heading: 'georgia_n4',
+          display: 'georgia_n4'
+        },
+        minimal: {
+          primary: 'arial_n4',
+          heading: 'arial_n4',
+          display: 'arial_n4'
+        },
+        editorial: {
+          primary: 'georgia_n4',
+          heading: 'helvetica_neue_n4',
+          display: 'helvetica_neue_n4'
+        }
+      };
+      
+      const fonts = presets[preset];
+      if (fonts) {
+        Object.keys(fonts).forEach(role => {
+          const picker = document.getElementById(`font-${role}`);
+          if (picker) {
+            picker.value = fonts[role];
+            picker.dispatchEvent(new Event('change'));
+          }
+        });
+      }
+    },
+    
+    applyStyles() {
+      // Collect all current values and submit to Shopify settings
+      const formData = new FormData();
+      
+      // Color values
+      document.querySelectorAll('.color-picker').forEach(picker => {
+        formData.append(picker.name, picker.value);
+      });
+      
+      // Font values
+      document.querySelectorAll('.font-picker').forEach(picker => {
+        formData.append(picker.name, picker.value);
+      });
+      
+      // Typography scale
+      const scaleInput = document.querySelector('[data-role="typography-scale"]');
+      if (scaleInput) {
+        formData.append('typography_scale_base', scaleInput.value);
+      }
+      
+      // Adobe Fonts settings
+      const adobeEnabled = document.getElementById('adobe-fonts-enabled');
+      if (adobeEnabled) {
+        formData.append('typography_adobe_fonts_enabled', adobeEnabled.checked);
+      }
+      
+      const adobeKitId = document.getElementById('adobe-kit-id');
+      if (adobeKitId) {
+        formData.append('typography_adobe_fonts_kit_id', adobeKitId.value);
+      }
+      
+      // Submit changes
+      this.submitChanges(formData);
+    },
+    
+    resetStyles() {
+      if (confirm('Reset all global styles to default values?')) {
+        // Reset to default values
+        document.querySelectorAll('.color-picker').forEach(picker => {
+          picker.value = picker.dataset.default || '#000000';
+          picker.dispatchEvent(new Event('input'));
+        });
+        
+        document.querySelectorAll('.font-picker').forEach(picker => {
+          picker.selectedIndex = 0;
+          picker.dispatchEvent(new Event('change'));
+        });
+      }
+    },
+    
+    togglePreview() {
+      this.previewEnabled = !this.previewEnabled;
+      const indicator = document.querySelector('.live-preview-indicator');
+      if (indicator) {
+        indicator.style.display = this.previewEnabled ? 'flex' : 'none';
+      }
+    },
+    
+    submitChanges(formData) {
+      // Show loading state
+      const applyButton = document.getElementById('apply-styles');
+      const originalText = applyButton.textContent;
+      applyButton.textContent = 'Applying...';
+      applyButton.disabled = true;
+      
+      // Submit to Shopify theme settings
+      fetch(window.location.href, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Show success message
+          this.showMessage('Global styles updated successfully!', 'success');
+        } else {
+          this.showMessage('Error updating styles. Please try again.', 'error');
+        }
+      })
+      .catch(error => {
+        this.showMessage('Error updating styles. Please try again.', 'error');
+      })
+      .finally(() => {
+        applyButton.textContent = originalText;
+        applyButton.disabled = false;
+      });
+    },
+    
+    showMessage(text, type) {
+      const message = document.createElement('div');
+      message.className = `global-styles-message ${type}`;
+      message.textContent = text;
+      
+      globalStylesPanel.appendChild(message);
+      
+      setTimeout(() => {
+        message.remove();
+      }, 3000);
+    }
+  };
+  
+  // Initialize the controller
+  GlobalStylesController.init();
+});
+</script>
+
+{% comment 'Global Styles Panel CSS' %}
+<style>
+.global-styles-panel {
+  background: var(--color-surface, #f8f9fa);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+  border: 1px solid var(--color-border, #e9ecef);
+  max-width: 800px;
+}
+
+.global-styles-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border, #e9ecef);
+}
+
+.global-styles-title {
+  margin-bottom: 0.5rem;
+}
+
+.global-styles-description {
+  margin-bottom: 1rem;
+  opacity: 0.8;
+}
+
+.global-styles-status {
+  display: flex;
+  gap: 1rem;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-neutral, #ccc);
+}
+
+.status-indicator.active .status-dot {
+  background: var(--color-success, #28a745);
+}
+
+.global-styles-section {
+  margin-bottom: 2rem;
+  border: 1px solid var(--color-border, #e9ecef);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: var(--color-background, #fff);
+  border-bottom: 1px solid var(--color-border, #e9ecef);
+}
+
+.section-title {
+  margin: 0;
+}
+
+.section-toggle {
+  background: none;
+  border: none;
+  padding: 0.25rem;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+.section-toggle:hover {
+  background: var(--color-surface, #f8f9fa);
+}
+
+.section-toggle.collapsed .toggle-icon {
+  transform: rotate(-90deg);
+}
+
+.toggle-icon {
+  transition: transform 0.2s ease;
+}
+
+.section-content {
+  padding: 1.5rem;
+}
+
+.control-group {
+  margin-bottom: 2rem;
+}
+
+.control-label {
+  display: block;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+.color-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.color-picker {
+  width: 100%;
+  height: 40px;
+  border: 1px solid var(--color-border, #e9ecef);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.color-value {
+  text-align: center;
+  font-family: monospace;
+}
+
+.font-control {
+  margin-bottom: 1rem;
+}
+
+.font-picker,
+.text-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--color-border, #e9ecef);
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.checkbox-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.checkmark {
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--color-border, #e9ecef);
+  border-radius: 3px;
+  display: inline-block;
+  position: relative;
+}
+
+.checkbox-control input:checked + .checkmark {
+  background: var(--color-primary, #007bff);
+  border-color: var(--color-primary, #007bff);
+}
+
+.checkbox-control input:checked + .checkmark::after {
+  content: '✓';
+  color: white;
+  position: absolute;
+  top: -2px;
+  left: 2px;
+  font-size: 12px;
+}
+
+.preset-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 0.75rem;
+}
+
+.preset-option {
+  background: var(--color-background, #fff);
+  border: 1px solid var(--color-border, #e9ecef);
+  border-radius: 6px;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.preset-option:hover {
+  border-color: var(--color-primary, #007bff);
+  transform: translateY(-1px);
+}
+
+.preset-colors {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 0.5rem;
+}
+
+.preset-colors span {
+  flex: 1;
+  height: 20px;
+  border-radius: 2px;
+}
+
+.preset-name {
+  display: block;
+}
+
+.preview-text {
+  background: var(--color-background, #fff);
+  border: 1px solid var(--color-border, #e9ecef);
+  border-radius: 6px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+.preview-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.preview-item:last-child {
+  margin-bottom: 0;
+}
+
+.preview-label {
+  opacity: 0.6;
+}
+
+.scale-control {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.range-input {
+  flex: 1;
+}
+
+.scale-value {
+  min-width: 40px;
+  text-align: center;
+  font-family: monospace;
+}
+
+.adobe-fonts-settings {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border, #e9ecef);
+}
+
+.font-mapping-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.mapping-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.help-text {
+  opacity: 0.6;
+  margin-top: 0.25rem;
+}
+
+.global-styles-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border, #e9ecef);
+}
+
+.action-button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.action-button.primary {
+  background: var(--color-primary, #007bff);
+  color: white;
+}
+
+.action-button.primary:hover {
+  background: var(--color-primary-dark, #0056b3);
+}
+
+.action-button.secondary {
+  background: var(--color-surface, #f8f9fa);
+  color: var(--color-text, #333);
+  border: 1px solid var(--color-border, #e9ecef);
+}
+
+.action-button.secondary:hover {
+  background: var(--color-border, #e9ecef);
+}
+
+.action-button.tertiary {
+  background: none;
+  color: var(--color-primary, #007bff);
+}
+
+.action-button.tertiary:hover {
+  background: var(--color-surface, #f8f9fa);
+}
+
+.action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.live-preview-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  background: var(--color-success-light, #d4edda);
+  border-radius: 4px;
+}
+
+.indicator-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-success, #28a745);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.global-styles-message {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 1rem;
+  border-radius: 6px;
+  color: white;
+  font-weight: 500;
+  z-index: 1000;
+  animation: slideIn 0.3s ease;
+}
+
+.global-styles-message.success {
+  background: var(--color-success, #28a745);
+}
+
+.global-styles-message.error {
+  background: var(--color-error, #dc3545);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .global-styles-panel {
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+  
+  .color-grid,
+  .preset-grid,
+  .font-mapping-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .global-styles-actions {
+    flex-direction: column;
+  }
+  
+  .scale-control {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+</style>
+
+{% endif %}
