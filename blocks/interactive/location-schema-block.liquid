@@ -1,0 +1,468 @@
+{% comment %}
+  Location Schema Block (Google Maps Embed + LocalBusiness Schema)
+  File: blocks/interactive/location-schema-block.liquid
+  Version: 1.0.0
+  Dependencies: Global Typography System, Universal Block System
+  Purpose: SEO-optimized location block with Google Maps embed and auto-generated LocalBusiness schema
+{% endcomment %}
+
+{% liquid
+  assign block_id = 'location-block-' | append: block.id
+  assign layout_style = block.settings.layout_style | default: 'side-by-side'
+  assign map_position = block.settings.map_position | default: 'right'
+  assign show_contact_info = block.settings.show_contact_info | default: true
+  assign show_hours = block.settings.show_hours | default: true
+  assign enable_schema = block.settings.enable_schema | default: true
+  
+  comment 'Business Hours Processing'
+  assign days = 'monday,tuesday,wednesday,thursday,friday,saturday,sunday' | split: ','
+  assign day_labels = 'Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday' | split: ','
+  assign hours_data = ''
+  
+  for i in (0..6)
+    assign day = days[i]
+    assign open_setting = day | append: '_open'
+    assign close_setting = day | append: '_close'
+    assign closed_setting = day | append: '_closed'
+    assign open_time = block.settings[open_setting]
+    assign close_time = block.settings[close_setting]
+    assign is_closed = block.settings[closed_setting]
+    
+    if is_closed != true and open_time != blank and close_time != blank
+      assign day_schedule = day_labels[i] | append: ',' | append: open_time | append: ',' | append: close_time
+      if hours_data == blank
+        assign hours_data = day_schedule
+      else
+        assign hours_data = hours_data | append: '|' | append: day_schedule
+      endif
+    endif
+  endfor
+  
+  assign hours_list = hours_data | split: '|'
+%}
+
+<div class="location-schema-block layout-{{ layout_style }} map-{{ map_position }}" id="{{ block_id }}" {{ block.shopify_attributes }}>
+  
+  {% comment %} Block Header {% endcomment %}
+  {% if block.settings.business_name != blank or block.settings.block_description != blank %}
+    <div class="location-header">
+      {% if block.settings.business_name != blank %}
+        <h2 class="location-title tx-heading-2">{{ block.settings.business_name }}</h2>
+      {% endif %}
+      {% if block.settings.block_description != blank %}
+        <p class="location-description tx-body">{{ block.settings.block_description }}</p>
+      {% endif %}
+    </div>
+  {% endif %}
+  
+  {% comment %} Main Content Container {% endcomment %}
+  <div class="location-content">
+    
+    {% comment %} Business Information Panel {% endcomment %}
+    <div class="location-info-panel">
+      
+      {% comment %} Address Section {% endcomment %}
+      {% if block.settings.address != blank %}
+        <div class="location-address">
+          <h3 class="location-section-title tx-heading-4">📍 Address</h3>
+          <address class="address-text tx-body">
+            {{ block.settings.address | newline_to_br }}
+          </address>
+        </div>
+      {% endif %}
+      
+      {% comment %} Contact Information {% endcomment %}
+      {% if show_contact_info %}
+        <div class="location-contact">
+          <h3 class="location-section-title tx-heading-4">📞 Contact</h3>
+          
+          {% if block.settings.phone_number != blank %}
+            <div class="contact-item">
+              <span class="contact-label tx-body-small">Phone:</span>
+              <a href="tel:{{ block.settings.phone_number | remove: ' ' | remove: '-' | remove: '(' | remove: ')' }}" 
+                 class="contact-link tx-body">{{ block.settings.phone_number }}</a>
+            </div>
+          {% endif %}
+          
+          {% if block.settings.email != blank %}
+            <div class="contact-item">
+              <span class="contact-label tx-body-small">Email:</span>
+              <a href="mailto:{{ block.settings.email }}" 
+                 class="contact-link tx-body">{{ block.settings.email }}</a>
+            </div>
+          {% endif %}
+          
+          {% if block.settings.website_url != blank %}
+            <div class="contact-item">
+              <span class="contact-label tx-body-small">Website:</span>
+              <a href="{{ block.settings.website_url }}" 
+                 target="_blank" 
+                 rel="noopener noreferrer"
+                 class="contact-link tx-body">Visit Website</a>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+      
+      {% comment %} Business Hours {% endcomment %}
+      {% if show_hours and hours_list.size > 0 %}
+        <div class="location-hours">
+          <h3 class="location-section-title tx-heading-4">🕒 Hours</h3>
+          <div class="hours-list">
+            {% for hours_item in hours_list %}
+              {% assign hour_parts = hours_item | split: ',' %}
+              {% assign day = hour_parts[0] %}
+              {% assign open_time = hour_parts[1] %}
+              {% assign close_time = hour_parts[2] %}
+              
+              <div class="hours-day">
+                <span class="day-name tx-body-small">{{ day }}:</span>
+                <span class="day-hours tx-body">{{ open_time }} - {{ close_time }}</span>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+      
+      {% comment %} Additional Business Info {% endcomment %}
+      {% if block.settings.business_type != blank %}
+        <div class="location-business-type">
+          <h3 class="location-section-title tx-heading-4">🏢 Business Type</h3>
+          <p class="tx-body">{{ block.settings.business_type }}</p>
+        </div>
+      {% endif %}
+      
+    </div>
+    
+    {% comment %} Google Maps Embed {% endcomment %}
+    {% if block.settings.google_maps_embed != blank %}
+      <div class="location-map-container">
+        <div class="map-wrapper">
+          {{ block.settings.google_maps_embed }}
+        </div>
+        {% if block.settings.map_caption != blank %}
+          <p class="map-caption tx-body-small">{{ block.settings.map_caption }}</p>
+        {% endif %}
+      </div>
+    {% elsif request.design_mode %}
+      {% comment %} Design Mode Empty State {% endcomment %}
+      <div class="location-map-placeholder">
+        <div class="map-placeholder-content">
+          <h3 class="tx-heading-4">🗺️ Google Maps</h3>
+          <p class="tx-body">Paste your Google Maps embed code in the block settings.</p>
+          <details class="map-help">
+            <summary class="tx-body-small">How to get embed code</summary>
+            <ol class="tx-body-small">
+              <li>Go to Google Maps and find your location</li>
+              <li>Click "Share" button</li>
+              <li>Select "Embed a map" tab</li>
+              <li>Copy the iframe code</li>
+              <li>Paste it in the "Google Maps Embed Code" setting</li>
+            </ol>
+          </details>
+        </div>
+      </div>
+    {% endif %}
+    
+  </div>
+  
+</div>
+
+{% comment %} Auto-Generated LocalBusiness Schema {% endcomment %}
+{% if enable_schema and block.settings.business_name != blank %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": {{ block.settings.business_name | json }},
+    {% if block.settings.block_description != blank %}
+    "description": {{ block.settings.block_description | json }},
+    {% endif %}
+    {% if block.settings.address != blank %}
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": {{ block.settings.address | strip_newlines | json }}
+    },
+    {% endif %}
+    {% if block.settings.phone_number != blank %}
+    "telephone": {{ block.settings.phone_number | json }},
+    {% endif %}
+    {% if block.settings.email != blank %}
+    "email": {{ block.settings.email | json }},
+    {% endif %}
+    {% if block.settings.website_url != blank %}
+    "url": {{ block.settings.website_url | json }},
+    {% endif %}
+    {% if block.settings.business_type != blank %}
+    "@type": {{ block.settings.business_type | json }},
+    {% endif %}
+    {% if hours_list.size > 0 %}
+    "openingHours": [
+      {% for hours_item in hours_list %}
+        {% assign hour_parts = hours_item | split: ',' %}
+        {% assign day = hour_parts[0] %}
+        {% assign open_time = hour_parts[1] %}
+        {% assign close_time = hour_parts[2] %}
+        {% assign day_code = '' %}
+        {% case day %}
+          {% when 'Monday' %}
+            {% assign day_code = 'Mo' %}
+          {% when 'Tuesday' %}
+            {% assign day_code = 'Tu' %}
+          {% when 'Wednesday' %}
+            {% assign day_code = 'We' %}
+          {% when 'Thursday' %}
+            {% assign day_code = 'Th' %}
+          {% when 'Friday' %}
+            {% assign day_code = 'Fr' %}
+          {% when 'Saturday' %}
+            {% assign day_code = 'Sa' %}
+          {% when 'Sunday' %}
+            {% assign day_code = 'Su' %}
+        {% endcase %}
+        {{ day_code | append: ' ' | append: open_time | append: '-' | append: close_time | json }}{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ],
+    {% endif %}
+    "priceRange": "$$"
+  }
+  </script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Location + Schema",
+  "target": "section",
+  "available_if": true,
+  "templates": ["*"],
+  "presets": [
+    {
+      "name": "Location Block"
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "🏢 Business Information"
+    },
+    {
+      "type": "text",
+      "id": "business_name",
+      "label": "Business Name",
+      "info": "Used for schema markup and display"
+    },
+    {
+      "type": "textarea",
+      "id": "block_description", 
+      "label": "Description",
+      "info": "Brief description of your business"
+    },
+    {
+      "type": "textarea",
+      "id": "address",
+      "label": "Full Address",
+      "info": "Complete business address"
+    },
+    {
+      "type": "text",
+      "id": "phone_number",
+      "label": "Phone Number"
+    },
+    {
+      "type": "email",
+      "id": "email",
+      "label": "Email Address"
+    },
+    {
+      "type": "url",
+      "id": "website_url",
+      "label": "Website URL"
+    },
+    {
+      "type": "select",
+      "id": "business_type",
+      "label": "Business Type",
+      "options": [
+        {"value": "LocalBusiness", "label": "General Business"},
+        {"value": "Restaurant", "label": "Restaurant"},
+        {"value": "Store", "label": "Store/Shop"},
+        {"value": "Hotel", "label": "Hotel"},
+        {"value": "HealthAndBeautyBusiness", "label": "Health & Beauty"},
+        {"value": "ProfessionalService", "label": "Professional Service"},
+        {"value": "AutomotiveBusiness", "label": "Automotive"},
+        {"value": "HomeAndConstructionBusiness", "label": "Home & Construction"}
+      ],
+      "default": "LocalBusiness"
+    },
+    {
+      "type": "header",
+      "content": "🗺️ Google Maps"
+    },
+    {
+      "type": "html",
+      "id": "google_maps_embed",
+      "label": "Google Maps Embed Code",
+      "info": "Paste the full iframe embed code from Google Maps"
+    },
+    {
+      "type": "text",
+      "id": "map_caption",
+      "label": "Map Caption"
+    },
+    {
+      "type": "header",
+      "content": "🕒 Business Hours"
+    },
+    {
+      "type": "time",
+      "id": "monday_open",
+      "label": "Monday Open"
+    },
+    {
+      "type": "time", 
+      "id": "monday_close",
+      "label": "Monday Close"
+    },
+    {
+      "type": "checkbox",
+      "id": "monday_closed",
+      "label": "Closed Mondays"
+    },
+    {
+      "type": "time",
+      "id": "tuesday_open",
+      "label": "Tuesday Open"
+    },
+    {
+      "type": "time",
+      "id": "tuesday_close", 
+      "label": "Tuesday Close"
+    },
+    {
+      "type": "checkbox",
+      "id": "tuesday_closed",
+      "label": "Closed Tuesdays"
+    },
+    {
+      "type": "time",
+      "id": "wednesday_open",
+      "label": "Wednesday Open"
+    },
+    {
+      "type": "time",
+      "id": "wednesday_close",
+      "label": "Wednesday Close"
+    },
+    {
+      "type": "checkbox",
+      "id": "wednesday_closed",
+      "label": "Closed Wednesdays"
+    },
+    {
+      "type": "time",
+      "id": "thursday_open",
+      "label": "Thursday Open"
+    },
+    {
+      "type": "time",
+      "id": "thursday_close",
+      "label": "Thursday Close"
+    },
+    {
+      "type": "checkbox",
+      "id": "thursday_closed",
+      "label": "Closed Thursdays"
+    },
+    {
+      "type": "time",
+      "id": "friday_open",
+      "label": "Friday Open"
+    },
+    {
+      "type": "time",
+      "id": "friday_close",
+      "label": "Friday Close"
+    },
+    {
+      "type": "checkbox",
+      "id": "friday_closed",
+      "label": "Closed Fridays"
+    },
+    {
+      "type": "time",
+      "id": "saturday_open",
+      "label": "Saturday Open"
+    },
+    {
+      "type": "time",
+      "id": "saturday_close",
+      "label": "Saturday Close"
+    },
+    {
+      "type": "checkbox",
+      "id": "saturday_closed",
+      "label": "Closed Saturdays"
+    },
+    {
+      "type": "time",
+      "id": "sunday_open",
+      "label": "Sunday Open"
+    },
+    {
+      "type": "time",
+      "id": "sunday_close",
+      "label": "Sunday Close"
+    },
+    {
+      "type": "checkbox",
+      "id": "sunday_closed",
+      "label": "Closed Sundays"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Display Options"
+    },
+    {
+      "type": "select",
+      "id": "layout_style",
+      "label": "Layout Style",
+      "options": [
+        {"value": "side-by-side", "label": "Side by Side"},
+        {"value": "stacked", "label": "Stacked"},
+        {"value": "map-focus", "label": "Map Focus"}
+      ],
+      "default": "side-by-side"
+    },
+    {
+      "type": "select",
+      "id": "map_position",
+      "label": "Map Position",
+      "options": [
+        {"value": "left", "label": "Left"},
+        {"value": "right", "label": "Right"}
+      ],
+      "default": "right",
+      "info": "Only applies to side-by-side layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_contact_info",
+      "label": "Show Contact Information",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_hours",
+      "label": "Show Business Hours",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_schema",
+      "label": "Enable SEO Schema",
+      "default": true,
+      "info": "Generates LocalBusiness schema for search engines"
+    }
+  ]
+}
+{% endschema %}

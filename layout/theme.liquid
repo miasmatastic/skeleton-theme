@@ -6,6 +6,9 @@
 
     {% # Load and preload the critical CSS %}
     {{ 'critical.css' | asset_url | stylesheet_tag: preload: true }}
+    
+    {% # SEO Schema Blocks Styles %}
+    {{ 'seo-schema-blocks.css' | asset_url | stylesheet_tag }}
 
     {% # Social, title, etc. %}
     {% render 'meta-tags' %}
@@ -27,5 +30,8 @@
     {{ content_for_layout }}
 
     {% sections 'footer-group' %}
+
+    {% # SEO Schema Blocks JavaScript %}
+    <script src="{{ 'faq-schema-block.js' | asset_url }}" defer></script>
   </body>
 </html>

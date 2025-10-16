@@ -1,0 +1,446 @@
+{% comment %}
+  🙋 FAQ Schema Block - SEO-Optimized Accordion FAQ
+  ================================================
+  
+  Features:
+  - Individual question/answer controls (up to 20 FAQs)
+  - Collapsible accordion interface
+  - Auto-generated FAQPage JSON-LD schema
+  - SEO optimized for rich snippets
+  - Accessibility compliant
+  
+  Schema Reference: https://schema.org/FAQPage
+{% endcomment %}
+
+{% liquid
+  assign block_id = 'faq-block-' | append: block.id
+  assign accordion_style = block.settings.accordion_style | default: 'modern'
+  assign show_icons = block.settings.show_icons | default: true
+  assign open_first = block.settings.open_first | default: false
+  assign allow_multiple = block.settings.allow_multiple | default: false
+  assign animation_speed = block.settings.animation_speed | default: 'normal'
+  
+  comment 'FAQ Data Collection'
+  assign faq_items = ''
+  assign faq_count = 0
+  
+  for i in (1..20)
+    assign question_setting = 'faq_question_' | append: i
+    assign answer_setting = 'faq_answer_' | append: i
+    assign question = block.settings[question_setting]
+    assign answer = block.settings[answer_setting]
+    
+    if question != blank and answer != blank
+      assign faq_count = faq_count | plus: 1
+      assign faq_item = question | append: '|||' | append: answer
+      if faq_items == blank
+        assign faq_items = faq_item
+      else
+        assign faq_items = faq_items | append: '^^^' | append: faq_item
+      endif
+    endif
+  endfor
+  
+  comment 'Split FAQ items for processing'
+  assign faq_list = faq_items | split: '^^^'
+%}
+
+{% comment %} FAQ Block Container {% endcomment %}
+<div class="faq-schema-block {{ accordion_style }}" id="{{ block_id }}" {{ block.shopify_attributes }}>
+  
+  {% comment %} Block Header {% endcomment %}
+  {% if block.settings.block_title != blank or block.settings.block_description != blank %}
+    <div class="faq-header">
+      {% if block.settings.block_title != blank %}
+        <h2 class="faq-title tx-heading-2">{{ block.settings.block_title }}</h2>
+      {% endif %}
+      {% if block.settings.block_description != blank %}
+        <p class="faq-description tx-body">{{ block.settings.block_description }}</p>
+      {% endif %}
+    </div>
+  {% endif %}
+  
+  {% comment %} FAQ Accordion {% endcomment %}
+  {% if faq_count > 0 %}
+    <div class="faq-accordion" 
+         data-allow-multiple="{{ allow_multiple }}"
+         data-animation-speed="{{ animation_speed }}">
+      
+      {% for faq_item in faq_list %}
+        {% assign faq_parts = faq_item | split: '|||' %}
+        {% assign question = faq_parts[0] %}
+        {% assign answer = faq_parts[1] %}
+        {% assign item_index = forloop.index %}
+        {% assign item_id = block_id | append: '-item-' | append: item_index %}
+        {% assign is_first_open = open_first and forloop.first %}
+        
+        <div class="faq-item" data-faq-item="{{ item_index }}">
+          
+          {% comment %} Question Button {% endcomment %}
+          <button class="faq-question" 
+                  type="button"
+                  aria-expanded="{{ is_first_open }}"
+                  aria-controls="{{ item_id }}-answer"
+                  id="{{ item_id }}-question"
+                  data-faq-toggle="{{ item_index }}">
+            
+            <span class="faq-question-text tx-heading-4">{{ question }}</span>
+            
+            {% if show_icons %}
+              <span class="faq-icon" aria-hidden="true">
+                <svg class="faq-icon-plus" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <svg class="faq-icon-minus" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </span>
+            {% endif %}
+          </button>
+          
+          {% comment %} Answer Content {% endcomment %}
+          <div class="faq-answer" 
+               id="{{ item_id }}-answer"
+               aria-labelledby="{{ item_id }}-question"
+               data-faq-content="{{ item_index }}"
+               {% unless is_first_open %}hidden{% endunless %}>
+            <div class="faq-answer-content tx-body">
+              {{ answer | newline_to_br }}
+            </div>
+          </div>
+          
+        </div>
+      {% endfor %}
+      
+    </div>
+  {% else %}
+    {% comment %} Empty State (Design Mode) {% endcomment %}
+    {% if request.design_mode %}
+      <div class="faq-empty-state">
+        <div class="empty-state-content">
+          <h3 class="tx-heading-3">🙋 FAQ Block</h3>
+          <p class="tx-body">Add your first FAQ question and answer in the block settings to get started.</p>
+          <p class="tx-body-small">This block automatically generates SEO-optimized schema markup for search engines.</p>
+        </div>
+      </div>
+    {% endif %}
+  {% endif %}
+  
+</div>
+
+{% comment %} Auto-Generated FAQ Schema {% endcomment %}
+{% if faq_count > 0 %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    {% if block.settings.block_title != blank %}
+    "name": {{ block.settings.block_title | json }},
+    {% endif %}
+    {% if block.settings.block_description != blank %}
+    "description": {{ block.settings.block_description | json }},
+    {% endif %}
+    "mainEntity": [
+      {% for faq_item in faq_list %}
+        {% assign faq_parts = faq_item | split: '|||' %}
+        {% assign question = faq_parts[0] %}
+        {% assign answer = faq_parts[1] %}
+        {
+          "@type": "Question",
+          "name": {{ question | json }},
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": {{ answer | strip_html | json }}
+          }
+        }{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ]
+  }
+  </script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "🙋 FAQ (with Schema)",
+  "settings": [
+    {
+      "type": "header",
+      "content": "📝 FAQ Block Settings"
+    },
+    {
+      "type": "text",
+      "id": "block_title",
+      "label": "FAQ Section Title",
+      "placeholder": "Frequently Asked Questions",
+      "info": "Optional title for the entire FAQ section"
+    },
+    {
+      "type": "textarea",
+      "id": "block_description",
+      "label": "FAQ Description",
+      "placeholder": "Find answers to common questions about our products and services.",
+      "info": "Optional description text"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Display Settings"
+    },
+    {
+      "type": "select",
+      "id": "accordion_style",
+      "label": "Accordion Style",
+      "options": [
+        {"value": "minimal", "label": "Minimal"},
+        {"value": "modern", "label": "Modern"},
+        {"value": "card", "label": "Card Style"}
+      ],
+      "default": "modern"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_icons",
+      "label": "Show expand/collapse icons",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "open_first",
+      "label": "Open first FAQ by default",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "allow_multiple",
+      "label": "Allow multiple FAQs open",
+      "default": false,
+      "info": "If disabled, opening one FAQ will close others"
+    },
+    {
+      "type": "select",
+      "id": "animation_speed",
+      "label": "Animation Speed",
+      "options": [
+        {"value": "slow", "label": "Slow"},
+        {"value": "normal", "label": "Normal"},
+        {"value": "fast", "label": "Fast"}
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "header",
+      "content": "❓ FAQ Questions & Answers"
+    },
+    {
+      "type": "paragraph",
+      "content": "Add up to 20 FAQ items. Leave question blank to skip that slot."
+    },
+    {
+      "type": "text",
+      "id": "faq_question_1",
+      "label": "FAQ Question 1",
+      "placeholder": "What is your return policy?"
+    },
+    {
+      "type": "textarea",
+      "id": "faq_answer_1",
+      "label": "FAQ Answer 1",
+      "placeholder": "We offer a 30-day return policy on all items...",
+      "info": "Supports basic HTML formatting"
+    },
+    {
+      "type": "text",
+      "id": "faq_question_2",
+      "label": "FAQ Question 2",
+      "placeholder": "How long does shipping take?"
+    },
+    {
+      "type": "textarea",
+      "id": "faq_answer_2",
+      "label": "FAQ Answer 2",
+      "placeholder": "Standard shipping takes 3-5 business days..."
+    },
+    {
+      "type": "text",
+      "id": "faq_question_3",
+      "label": "FAQ Question 3",
+      "placeholder": "Do you offer international shipping?"
+    },
+    {
+      "type": "textarea",
+      "id": "faq_answer_3",
+      "label": "FAQ Answer 3",
+      "placeholder": "Yes, we ship to most countries worldwide..."
+    },
+    {
+      "type": "text",
+      "id": "faq_question_4",
+      "label": "FAQ Question 4"
+    },
+    {
+      "type": "textarea",
+      "id": "faq_answer_4",
+      "label": "FAQ Answer 4"
+    },
+    {
+      "type": "text",
+      "id": "faq_question_5",
+      "label": "FAQ Question 5"
+    },
+    {
+      "type": "textarea",
+      "id": "faq_answer_5",
+      "label": "FAQ Answer 5"
+    },
+    {
+      "type": "text",
+      "id": "faq_question_6",
+      "label": "FAQ Question 6"
+    },
+    {
+      "type": "textarea",
+      "id": "faq_answer_6",
+      "label": "FAQ Answer 6"
+    },
+    {
+      "type": "text",
+      "id": "faq_question_7",
+      "label": "FAQ Question 7"
+    },
+    {
+      "type": "textarea",
+      "id": "faq_answer_7",
+      "label": "FAQ Answer 7"
+    },
+    {
+      "type": "text",
+      "id": "faq_question_8",
+      "label": "FAQ Question 8"
+    },
+    {
+      "type": "textarea",
+      "id": "faq_answer_8",
+      "label": "FAQ Answer 8"
+    },
+    {
+      "type": "text",
+      "id": "faq_question_9",
+      "label": "FAQ Question 9"
+    },
+    {
+      "type": "textarea",
+      "id": "faq_answer_9",
+      "label": "FAQ Answer 9"
+    },
+    {
+      "type": "text",
+      "id": "faq_question_10",
+      "label": "FAQ Question 10"
+    },
+    {
+      "type": "textarea",
+      "id": "faq_answer_10",
+      "label": "FAQ Answer 10"
+    },
+    {
+      "type": "text",
+      "id": "faq_question_11",
+      "label": "FAQ Question 11"
+    },
+    {
+      "type": "textarea",
+      "id": "faq_answer_11",
+      "label": "FAQ Answer 11"
+    },
+    {
+      "type": "text",
+      "id": "faq_question_12",
+      "label": "FAQ Question 12"
+    },
+    {
+      "type": "textarea",
+      "id": "faq_answer_12",
+      "label": "FAQ Answer 12"
+    },
+    {
+      "type": "text",
+      "id": "faq_question_13",
+      "label": "FAQ Question 13"
+    },
+    {
+      "type": "textarea",
+      "id": "faq_answer_13",
+      "label": "FAQ Answer 13"
+    },
+    {
+      "type": "text",
+      "id": "faq_question_14",
+      "label": "FAQ Question 14"
+    },
+    {
+      "type": "textarea",
+      "id": "faq_answer_14",
+      "label": "FAQ Answer 14"
+    },
+    {
+      "type": "text",
+      "id": "faq_question_15",
+      "label": "FAQ Question 15"
+    },
+    {
+      "type": "textarea",
+      "id": "faq_answer_15",
+      "label": "FAQ Answer 15"
+    },
+    {
+      "type": "text",
+      "id": "faq_question_16",
+      "label": "FAQ Question 16"
+    },
+    {
+      "type": "textarea",
+      "id": "faq_answer_16",
+      "label": "FAQ Answer 16"
+    },
+    {
+      "type": "text",
+      "id": "faq_question_17",
+      "label": "FAQ Question 17"
+    },
+    {
+      "type": "textarea",
+      "id": "faq_answer_17",
+      "label": "FAQ Answer 17"
+    },
+    {
+      "type": "text",
+      "id": "faq_question_18",
+      "label": "FAQ Question 18"
+    },
+    {
+      "type": "textarea",
+      "id": "faq_answer_18",
+      "label": "FAQ Answer 18"
+    },
+    {
+      "type": "text",
+      "id": "faq_question_19",
+      "label": "FAQ Question 19"
+    },
+    {
+      "type": "textarea",
+      "id": "faq_answer_19",
+      "label": "FAQ Answer 19"
+    },
+    {
+      "type": "text",
+      "id": "faq_question_20",
+      "label": "FAQ Question 20"
+    },
+    {
+      "type": "textarea",
+      "id": "faq_answer_20",
+      "label": "FAQ Answer 20"
+    }
+  ]
+}
+{% endschema %}

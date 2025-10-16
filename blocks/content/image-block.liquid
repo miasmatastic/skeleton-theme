@@ -74,10 +74,8 @@
           mix-blend-mode: {{ blend_mode }};
         "
         {% if lazy_load %}loading="lazy"{% endif %}
-        {% if aspect_ratio == 'auto' %}
-          width="{{ image.width }}"
-          height="{{ image.height }}"
-        {% endif %}
+        width="800"
+        height="{{ image.height | divided_by: image.width | times: 800 | round }}"
       >
       
       {% comment %} Overlay {% endcomment %}
