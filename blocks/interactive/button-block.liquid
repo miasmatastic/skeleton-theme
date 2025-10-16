@@ -1,0 +1,270 @@
+{% comment %}
+  🔘 Button Block - Universal button block with advanced styling
+  
+  Features:
+  - Multiple button styles and sizes
+  - Icon support
+  - Link types (URL, email, phone, anchor)
+  - Accessibility optimized
+  - Animation effects
+{% endcomment %}
+
+{% liquid
+  assign button_text = block.settings.button_text | default: 'Button Text'
+  assign button_url = block.settings.button_url
+  assign button_style = block.settings.button_style | default: 'primary'
+  assign button_size = block.settings.button_size | default: 'medium'
+  assign button_width = block.settings.button_width | default: 'auto'
+  assign button_alignment = block.settings.button_alignment | default: 'left'
+  assign icon_name = block.settings.icon_name
+  assign icon_position = block.settings.icon_position | default: 'left'
+  assign open_in_new_tab = block.settings.open_in_new_tab | default: false
+  assign animation_type = block.settings.animation_type | default: 'none'
+  assign custom_color = block.settings.custom_color
+  assign custom_text_color = block.settings.custom_text_color
+%}
+
+<div class="block-button" 
+     data-block-id="{{ block.id }}"
+     data-animation="{{ animation_type }}"
+     style="text-align: {{ button_alignment }};">
+  
+  {% if button_text != blank %}
+    <a href="{{ button_url | default: '#' }}"
+       class="button button-{{ button_style }} button-{{ button_size }} button-{{ button_width }}"
+       {% if open_in_new_tab and button_url != blank %}
+         target="_blank" 
+         rel="noopener noreferrer"
+       {% endif %}
+       {% if button_url == blank %}
+         role="button"
+         tabindex="0"
+       {% endif %}
+       style="
+         {% if custom_color != blank %}
+           background-color: {{ custom_color }};
+           border-color: {{ custom_color }};
+         {% endif %}
+         {% if custom_text_color != blank %}
+           color: {{ custom_text_color }};
+         {% endif %}
+       ">
+      
+      {% comment %} Icon before text {% endcomment %}
+      {% if icon_name != blank and icon_position == 'left' %}
+        <span class="button-icon icon-{{ icon_name }}" aria-hidden="true">
+          {% case icon_name %}
+            {% when 'arrow-right' %}
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 0l8 8-8 8-1.5-1.5L12 9H0V7h12L6.5 1.5z"/>
+              </svg>
+            {% when 'arrow-left' %}
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 16L0 8l8-8 1.5 1.5L4 7h12v2H4l5.5 5.5z"/>
+              </svg>
+            {% when 'download' %}
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 12L3 7h3V0h4v7h3l-5 5zM0 14h16v2H0v-2z"/>
+              </svg>
+            {% when 'external' %}
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M6 2V0h8v8h-2V3.5L4.5 10 3 8.5 9.5 2H6z"/>
+                <path d="M2 4v10h10V9h2v7H0V2h7v2H2z"/>
+              </svg>
+            {% when 'play' %}
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M4 2l10 6-10 6V2z"/>
+              </svg>
+            {% when 'phone' %}
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M3.5 0A1.5 1.5 0 002 1.5v13A1.5 1.5 0 003.5 16h9a1.5 1.5 0 001.5-1.5v-13A1.5 1.5 0 0012.5 0h-9zM4 2h8v12H4V2z"/>
+              </svg>
+            {% when 'email' %}
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M0 4a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2H2a2 2 0 01-2-2V4zm2-1a1 1 0 00-1 1v.217l7 4.2 7-4.2V4a1 1 0 00-1-1H2zm13 2.383L8 9.833 1 5.383V12a1 1 0 001 1h12a1 1 0 001-1V5.383z"/>
+              </svg>
+          {% endcase %}
+        </span>
+      {% endif %}
+      
+      {% comment %} Button text {% endcomment %}
+      <span class="button-text">{{ button_text | escape }}</span>
+      
+      {% comment %} Icon after text {% endcomment %}
+      {% if icon_name != blank and icon_position == 'right' %}
+        <span class="button-icon icon-{{ icon_name }}" aria-hidden="true">
+          {% case icon_name %}
+            {% when 'arrow-right' %}
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 0l8 8-8 8-1.5-1.5L12 9H0V7h12L6.5 1.5z"/>
+              </svg>
+            {% when 'arrow-left' %}
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 16L0 8l8-8 1.5 1.5L4 7h12v2H4l5.5 5.5z"/>
+              </svg>
+            {% when 'download' %}
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 12L3 7h3V0h4v7h3l-5 5zM0 14h16v2H0v-2z"/>
+              </svg>
+            {% when 'external' %}
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M6 2V0h8v8h-2V3.5L4.5 10 3 8.5 9.5 2H6z"/>
+                <path d="M2 4v10h10V9h2v7H0V2h7v2H2z"/>
+              </svg>
+            {% when 'play' %}
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M4 2l10 6-10 6V2z"/>
+              </svg>
+            {% when 'phone' %}
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M3.5 0A1.5 1.5 0 002 1.5v13A1.5 1.5 0 003.5 16h9a1.5 1.5 0 001.5-1.5v-13A1.5 1.5 0 0012.5 0h-9zM4 2h8v12H4V2z"/>
+              </svg>
+            {% when 'email' %}
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M0 4a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2H2a2 2 0 01-2-2V4zm2-1a1 1 0 00-1 1v.217l7 4.2 7-4.2V4a1 1 0 00-1-1H2zm13 2.383L8 9.833 1 5.383V12a1 1 0 001 1h12a1 1 0 001-1V5.383z"/>
+              </svg>
+          {% endcase %}
+        </span>
+      {% endif %}
+    </a>
+  {% else %}
+    {% if request.design_mode %}
+      <div class="block-placeholder">
+        <p>🔘 Add button text to display button</p>
+      </div>
+    {% endif %}
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "🔘 Button Block",
+  "settings": [
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Click Me",
+      "info": "The text displayed on the button"
+    },
+    {
+      "type": "url",
+      "id": "button_url",
+      "label": "Button Link",
+      "info": "Where the button should link to"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_in_new_tab",
+      "label": "Open in New Tab",
+      "default": false,
+      "info": "Open the link in a new browser tab"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Button Style"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button Style",
+      "options": [
+        {"value": "primary", "label": "Primary (Solid)"},
+        {"value": "secondary", "label": "Secondary (Outline)"},
+        {"value": "ghost", "label": "Ghost (Text Only)"},
+        {"value": "gradient", "label": "Gradient"},
+        {"value": "custom", "label": "Custom Colors"}
+      ],
+      "default": "primary"
+    },
+    {
+      "type": "select",
+      "id": "button_size",
+      "label": "Button Size",
+      "options": [
+        {"value": "small", "label": "Small"},
+        {"value": "medium", "label": "Medium"},
+        {"value": "large", "label": "Large"},
+        {"value": "xl", "label": "Extra Large"}
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "select",
+      "id": "button_width",
+      "label": "Button Width",
+      "options": [
+        {"value": "auto", "label": "Auto (Fit Content)"},
+        {"value": "full", "label": "Full Width"},
+        {"value": "half", "label": "Half Width"}
+      ],
+      "default": "auto"
+    },
+    {
+      "type": "select",
+      "id": "button_alignment",
+      "label": "Button Alignment",
+      "options": [
+        {"value": "left", "label": "Left"},
+        {"value": "center", "label": "Center"},
+        {"value": "right", "label": "Right"}
+      ],
+      "default": "left"
+    },
+    {
+      "type": "color",
+      "id": "custom_color",
+      "label": "Custom Background Color",
+      "info": "Only applies when 'Custom Colors' style is selected"
+    },
+    {
+      "type": "color",
+      "id": "custom_text_color",
+      "label": "Custom Text Color",
+      "info": "Only applies when 'Custom Colors' style is selected"
+    },
+    {
+      "type": "header",
+      "content": "🎭 Icon Settings"
+    },
+    {
+      "type": "select",
+      "id": "icon_name",
+      "label": "Button Icon",
+      "options": [
+        {"value": "", "label": "No Icon"},
+        {"value": "arrow-right", "label": "→ Arrow Right"},
+        {"value": "arrow-left", "label": "← Arrow Left"},
+        {"value": "download", "label": "⬇ Download"},
+        {"value": "external", "label": "↗ External Link"},
+        {"value": "play", "label": "▶ Play"},
+        {"value": "phone", "label": "📞 Phone"},
+        {"value": "email", "label": "✉ Email"}
+      ],
+      "default": ""
+    },
+    {
+      "type": "select",
+      "id": "icon_position",
+      "label": "Icon Position",
+      "options": [
+        {"value": "left", "label": "Left of Text"},
+        {"value": "right", "label": "Right of Text"}
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "animation_type",
+      "label": "Animation",
+      "options": [
+        {"value": "none", "label": "None"},
+        {"value": "fade-in", "label": "Fade In"},
+        {"value": "slide-up", "label": "Slide Up"},
+        {"value": "scale-in", "label": "Scale In"}
+      ],
+      "default": "none"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,223 @@
+{% comment %}
+  📰 Heading Block - Universal heading block with advanced typography
+  
+  Features:
+  - H1-H6 heading levels
+  - Custom font selection
+  - Advanced styling options
+  - SEO optimized structure
+  - Accessibility compliant
+{% endcomment %}
+
+{% liquid
+  assign heading_level = block.settings.heading_level | default: 'h2'
+  assign heading_size = block.settings.heading_size | default: 'auto'
+  assign heading_weight = block.settings.heading_weight | default: 'semibold'
+  assign heading_align = block.settings.heading_align | default: 'left'
+  assign heading_color = block.settings.heading_color | default: 'inherit'
+  assign font_family = block.settings.font_family | default: 'primary'
+  assign text_transform = block.settings.text_transform | default: 'none'
+  assign letter_spacing = block.settings.letter_spacing | default: 'normal'
+  assign line_height = block.settings.line_height | default: '1.2'
+  assign animation_type = block.settings.animation_type | default: 'none'
+%}
+
+<div class="block-heading" 
+     data-block-id="{{ block.id }}"
+     data-heading-level="{{ heading_level }}"
+     data-animation="{{ animation_type }}"
+     style="text-align: {{ heading_align }};">
+  
+  {% if block.settings.heading != blank %}
+    <{{ heading_level }} class="heading-{{ heading_size }} weight-{{ heading_weight }} font-{{ font_family }}"
+        style="
+          color: {{ heading_color }};
+          text-transform: {{ text_transform }};
+          letter-spacing: {{ letter_spacing }};
+          line-height: {{ line_height }};
+        ">
+      {{ block.settings.heading | escape }}
+    </{{ heading_level }}>
+  {% else %}
+    {% if request.design_mode %}
+      <div class="block-placeholder">
+        <{{ heading_level }} class="placeholder-heading">
+          📰 Add your {{ heading_level | upcase }} heading here
+        </{{ heading_level }}>
+      </div>
+    {% endif %}
+  {% endif %}
+  
+  {% if block.settings.subheading != blank %}
+    <div class="heading-subtext" 
+         style="
+           text-align: {{ heading_align }};
+           color: {{ block.settings.subheading_color | default: 'var(--color-base-text-secondary)' }};
+         ">
+      {{ block.settings.subheading | escape }}
+    </div>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "📰 Heading Block",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading Text",
+      "default": "Your Heading Here",
+      "info": "Main heading content"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading (Optional)",
+      "placeholder": "Add a subtitle or description",
+      "info": "Supporting text below the main heading"
+    },
+    {
+      "type": "header",
+      "content": "🏷️ Heading Structure"
+    },
+    {
+      "type": "select",
+      "id": "heading_level",
+      "label": "Heading Level (SEO)",
+      "options": [
+        {"value": "h1", "label": "H1 (Page Title)"},
+        {"value": "h2", "label": "H2 (Section Title)"},
+        {"value": "h3", "label": "H3 (Subsection)"},
+        {"value": "h4", "label": "H4 (Minor Heading)"},
+        {"value": "h5", "label": "H5 (Small Heading)"},
+        {"value": "h6", "label": "H6 (Tiny Heading)"}
+      ],
+      "default": "h2",
+      "info": "Choose based on content hierarchy for SEO"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Visual Size",
+      "options": [
+        {"value": "auto", "label": "Auto (matches heading level)"},
+        {"value": "small", "label": "Small (18px)"},
+        {"value": "medium", "label": "Medium (24px)"},
+        {"value": "large", "label": "Large (32px)"},
+        {"value": "xl", "label": "Extra Large (40px)"},
+        {"value": "2xl", "label": "2X Large (48px)"},
+        {"value": "3xl", "label": "3X Large (60px)"}
+      ],
+      "default": "auto",
+      "info": "Visual size independent of SEO structure"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Typography"
+    },
+    {
+      "type": "select",
+      "id": "font_family",
+      "label": "Font Family",
+      "options": [
+        {"value": "primary", "label": "Primary Font"},
+        {"value": "secondary", "label": "Secondary Font"},
+        {"value": "adobe-heading", "label": "Adobe Heading Font"},
+        {"value": "adobe-display", "label": "Adobe Display Font"}
+      ],
+      "default": "primary"
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Font Weight",
+      "options": [
+        {"value": "light", "label": "Light (300)"},
+        {"value": "normal", "label": "Normal (400)"},
+        {"value": "medium", "label": "Medium (500)"},
+        {"value": "semibold", "label": "Semi Bold (600)"},
+        {"value": "bold", "label": "Bold (700)"},
+        {"value": "extrabold", "label": "Extra Bold (800)"}
+      ],
+      "default": "semibold"
+    },
+    {
+      "type": "select",
+      "id": "heading_align",
+      "label": "Text Alignment",
+      "options": [
+        {"value": "left", "label": "Left"},
+        {"value": "center", "label": "Center"},
+        {"value": "right", "label": "Right"}
+      ],
+      "default": "left"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "info": "Leave empty to use theme default"
+    },
+    {
+      "type": "color",
+      "id": "subheading_color",
+      "label": "Subheading Color",
+      "info": "Leave empty to use theme secondary text color"
+    },
+    {
+      "type": "header",
+      "content": "✨ Advanced Typography"
+    },
+    {
+      "type": "select",
+      "id": "text_transform",
+      "label": "Text Transform",
+      "options": [
+        {"value": "none", "label": "None"},
+        {"value": "uppercase", "label": "UPPERCASE"},
+        {"value": "lowercase", "label": "lowercase"},
+        {"value": "capitalize", "label": "Capitalize"}
+      ],
+      "default": "none"
+    },
+    {
+      "type": "select",
+      "id": "letter_spacing",
+      "label": "Letter Spacing",
+      "options": [
+        {"value": "normal", "label": "Normal"},
+        {"value": "0.05em", "label": "Tight"},
+        {"value": "0.1em", "label": "Wide"},
+        {"value": "0.15em", "label": "Extra Wide"}
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "select",
+      "id": "line_height",
+      "label": "Line Height",
+      "options": [
+        {"value": "1", "label": "Tight (1.0)"},
+        {"value": "1.2", "label": "Normal (1.2)"},
+        {"value": "1.4", "label": "Relaxed (1.4)"},
+        {"value": "1.6", "label": "Loose (1.6)"}
+      ],
+      "default": "1.2"
+    },
+    {
+      "type": "select",
+      "id": "animation_type",
+      "label": "Animation",
+      "options": [
+        {"value": "none", "label": "None"},
+        {"value": "fade-in", "label": "Fade In"},
+        {"value": "slide-up", "label": "Slide Up"},
+        {"value": "slide-left", "label": "Slide Left"},
+        {"value": "typewriter", "label": "Typewriter Effect"}
+      ],
+      "default": "none"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,37 @@
+{% comment %}
+  Block Text Renderer - Renders text blocks from the universal container
+{% endcomment %}
+
+{% liquid
+  assign text_size = block.settings.text_size | default: 'medium'
+  assign text_weight = block.settings.text_weight | default: 'normal'
+  assign text_align = block.settings.text_align | default: 'left'
+  assign text_color = block.settings.text_color | default: 'inherit'
+  assign max_width = block.settings.max_width | default: 'none'
+  assign animation_type = block.settings.animation_type | default: 'none'
+%}
+
+<div class="block-text" 
+     data-block-id="{{ block.id }}"
+     data-text-size="{{ text_size }}"
+     data-text-weight="{{ text_weight }}"
+     data-text-align="{{ text_align }}"
+     data-animation="{{ animation_type }}"
+     style="
+       color: {{ text_color }};
+       max-width: {{ max_width }};
+       text-align: {{ text_align }};
+     ">
+  
+  {% if block.settings.content != blank %}
+    <div class="block-text-content text-{{ text_size }} weight-{{ text_weight }}">
+      {{ block.settings.content }}
+    </div>
+  {% else %}
+    {% if request.design_mode %}
+      <div class="block-placeholder">
+        <p>📝 Add your text content here</p>
+      </div>
+    {% endif %}
+  {% endif %}
+</div>

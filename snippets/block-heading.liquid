@@ -1,0 +1,53 @@
+{% comment %}
+  Block Heading Renderer - Renders heading blocks from the universal container
+{% endcomment %}
+
+{% liquid
+  assign heading_level = block.settings.heading_level | default: 'h2'
+  assign heading_size = block.settings.heading_size | default: 'auto'
+  assign heading_weight = block.settings.heading_weight | default: 'semibold'
+  assign heading_align = block.settings.heading_align | default: 'left'
+  assign heading_color = block.settings.heading_color | default: 'inherit'
+  assign font_family = block.settings.font_family | default: 'primary'
+  assign text_transform = block.settings.text_transform | default: 'none'
+  assign letter_spacing = block.settings.letter_spacing | default: 'normal'
+  assign line_height = block.settings.line_height | default: '1.2'
+  assign animation_type = block.settings.animation_type | default: 'none'
+%}
+
+<div class="block-heading" 
+     data-block-id="{{ block.id }}"
+     data-heading-level="{{ heading_level }}"
+     data-animation="{{ animation_type }}"
+     style="text-align: {{ heading_align }};">
+  
+  {% if block.settings.heading != blank %}
+    <{{ heading_level }} class="heading-{{ heading_size }} weight-{{ heading_weight }} font-{{ font_family }}"
+        style="
+          color: {{ heading_color }};
+          text-transform: {{ text_transform }};
+          letter-spacing: {{ letter_spacing }};
+          line-height: {{ line_height }};
+        ">
+      {{ block.settings.heading | escape }}
+    </{{ heading_level }}>
+  {% else %}
+    {% if request.design_mode %}
+      <div class="block-placeholder">
+        <{{ heading_level }} class="placeholder-heading">
+          📰 Add your {{ heading_level | upcase }} heading here
+        </{{ heading_level }}>
+      </div>
+    {% endif %}
+  {% endif %}
+  
+  {% if block.settings.subheading != blank %}
+    <div class="heading-subtext" 
+         style="
+           text-align: {{ heading_align }};
+           color: {{ block.settings.subheading_color | default: 'var(--color-base-text-secondary)' }};
+         ">
+      {{ block.settings.subheading | escape }}
+    </div>
+  {% endif %}
+</div>

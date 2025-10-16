@@ -1,0 +1,181 @@
+{% comment %}
+  📏 Spacer Block - Universal spacing control block
+  
+  Features:
+  - Responsive spacing controls
+  - Desktop and mobile specific spacing
+  - Visual spacing indicators in editor
+  - Accessibility compliant
+{% endcomment %}
+
+{% liquid
+  assign spacing_desktop = block.settings.spacing_desktop | default: 40
+  assign spacing_mobile = block.settings.spacing_mobile | default: 20
+  assign spacing_unit = block.settings.spacing_unit | default: 'px'
+  assign background_color = block.settings.background_color
+  assign show_divider = block.settings.show_divider | default: false
+  assign divider_style = block.settings.divider_style | default: 'solid'
+  assign divider_color = block.settings.divider_color | default: 'var(--color-base-border)'
+%}
+
+<div class="block-spacer" 
+     data-block-id="{{ block.id }}"
+     style="
+       height: {{ spacing_desktop }}{{ spacing_unit }};
+       {% if background_color != blank %}
+         background-color: {{ background_color }};
+       {% endif %}
+       {% if show_divider %}
+         border-top: 1px {{ divider_style }} {{ divider_color }};
+         display: flex;
+         align-items: center;
+       {% endif %}
+     ">
+  
+  {% if request.design_mode %}
+    <div class="spacer-indicator" 
+         style="
+           width: 100%;
+           height: 100%;
+           border: 1px dashed var(--color-base-text-secondary);
+           border-radius: 4px;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           color: var(--color-base-text-secondary);
+           font-size: 0.75rem;
+           background: rgba(0,0,0,0.05);
+           position: relative;
+         ">
+      <span>📏 {{ spacing_desktop }}{{ spacing_unit }} spacer</span>
+      <div style="
+        position: absolute;
+        top: 2px;
+        right: 4px;
+        font-size: 0.6rem;
+        opacity: 0.7;
+      ">
+        Mobile: {{ spacing_mobile }}{{ spacing_unit }}
+      </div>
+    </div>
+  {% else %}
+    {% if show_divider and block.settings.divider_text != blank %}
+      <div style="
+        width: 100%;
+        text-align: center;
+        position: relative;
+      ">
+        <span style="
+          background: {{ background_color | default: 'var(--color-base-background)' }};
+          padding: 0 1rem;
+          color: var(--color-base-text-secondary);
+          font-size: 0.875rem;
+        ">
+          {{ block.settings.divider_text }}
+        </span>
+      </div>
+    {% endif %}
+  {% endif %}
+</div>
+
+<style>
+  @media (max-width: 768px) {
+    .block-spacer[data-block-id="{{ block.id }}"] {
+      height: {{ spacing_mobile }}{{ spacing_unit }} !important;
+    }
+    
+    {% if request.design_mode %}
+    .block-spacer[data-block-id="{{ block.id }}"] .spacer-indicator span::after {
+      content: " ({{ spacing_mobile }}{{ spacing_unit }} on mobile)";
+      font-size: 0.6rem;
+      opacity: 0.7;
+    }
+    {% endif %}
+  }
+</style>
+
+{% schema %}
+{
+  "name": "📏 Spacer Block",
+  "settings": [
+    {
+      "type": "header",
+      "content": "📐 Spacing Controls"
+    },
+    {
+      "type": "range",
+      "id": "spacing_desktop",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "label": "Desktop Spacing",
+      "default": 40,
+      "info": "Spacing amount for desktop screens"
+    },
+    {
+      "type": "range",
+      "id": "spacing_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "label": "Mobile Spacing",
+      "default": 20,
+      "info": "Spacing amount for mobile screens"
+    },
+    {
+      "type": "select",
+      "id": "spacing_unit",
+      "label": "Spacing Unit",
+      "options": [
+        {"value": "px", "label": "Pixels (px)"},
+        {"value": "rem", "label": "Relative (rem)"},
+        {"value": "vh", "label": "Viewport Height (vh)"},
+        {"value": "%", "label": "Percentage (%)"}
+      ],
+      "default": "px"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Styling"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "info": "Leave empty for transparent spacer"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_divider",
+      "label": "Show Divider Line",
+      "default": false,
+      "info": "Add a horizontal line through the spacer"
+    },
+    {
+      "type": "select",
+      "id": "divider_style",
+      "label": "Divider Style",
+      "options": [
+        {"value": "solid", "label": "Solid Line"},
+        {"value": "dashed", "label": "Dashed Line"},
+        {"value": "dotted", "label": "Dotted Line"},
+        {"value": "double", "label": "Double Line"}
+      ],
+      "default": "solid"
+    },
+    {
+      "type": "color",
+      "id": "divider_color",
+      "label": "Divider Color",
+      "info": "Leave empty to use theme border color"
+    },
+    {
+      "type": "text",
+      "id": "divider_text",
+      "label": "Divider Text (Optional)",
+      "placeholder": "Section break text",
+      "info": "Text to display in the center of the divider"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,558 @@
+{% comment %}
+  📦 Universal Container - Flexible block layout system
+  
+  Features:
+  - Accepts any block type (@theme, @app, custom blocks)
+  - Multiple layout options (stack, grid, flex, masonry)
+  - Responsive design controls
+  - Advanced spacing and alignment
+  - Color scheme integration
+  - Animation support
+{% endcomment %}
+
+{% comment %} Load Universal Blocks CSS {% endcomment %}
+{{ 'universal-blocks.css' | asset_url | stylesheet_tag }}
+
+{% liquid
+  assign layout_type = section.settings.layout_type | default: 'stack'
+  assign container_width = section.settings.container_width | default: 'full'
+  assign content_alignment = section.settings.content_alignment | default: 'center'
+  assign vertical_spacing = section.settings.vertical_spacing | default: 'medium'
+  assign horizontal_spacing = section.settings.horizontal_spacing | default: 'medium'
+  assign background_color = section.settings.background_color
+  assign background_gradient = section.settings.background_gradient
+  assign text_color = section.settings.text_color
+  assign border_radius = section.settings.border_radius | default: 0
+  assign animation_type = section.settings.animation_type | default: 'none'
+  
+  comment 'Grid settings'
+  assign grid_columns_desktop = section.settings.grid_columns_desktop | default: 3
+  assign grid_columns_tablet = section.settings.grid_columns_tablet | default: 2
+  assign grid_columns_mobile = section.settings.grid_columns_mobile | default: 1
+  assign grid_gap = section.settings.grid_gap | default: 'medium'
+  
+  comment 'Flex settings'
+  assign flex_direction = section.settings.flex_direction | default: 'row'
+  assign flex_justify = section.settings.flex_justify | default: 'center'
+  assign flex_align = section.settings.flex_align | default: 'center'
+  assign flex_wrap = section.settings.flex_wrap | default: true
+  
+  comment 'Spacing values'
+  assign spacing_values = 'none:0, small:1rem, medium:2rem, large:3rem, xl:4rem' | split: ', '
+  assign v_spacing = '2rem'
+  assign h_spacing = '2rem'
+  
+  for spacing in spacing_values
+    assign spacing_pair = spacing | split: ':'
+    if spacing_pair[0] == vertical_spacing
+      assign v_spacing = spacing_pair[1]
+    endif
+    if spacing_pair[0] == horizontal_spacing
+      assign h_spacing = spacing_pair[1]
+    endif
+  endfor
+  
+  comment 'Gap values'
+  assign gap_values = 'none:0, small:0.5rem, medium:1rem, large:1.5rem, xl:2rem' | split: ', '
+  assign gap_value = '1rem'
+  
+  for gap in gap_values
+    assign gap_pair = gap | split: ':'
+    if gap_pair[0] == grid_gap
+      assign gap_value = gap_pair[1]
+    endif
+  endfor
+%}
+
+<section 
+  id="section-{{ section.id }}"
+  class="universal-container section-{{ section.id }}"
+  data-section-type="universal-container"
+  data-layout-type="{{ layout_type }}"
+  data-animation="{{ animation_type }}"
+  style="
+    {% if background_color != blank %}
+      background-color: {{ background_color }};
+    {% endif %}
+    {% if background_gradient != blank %}
+      background: {{ background_gradient }};
+    {% endif %}
+    {% if text_color != blank %}
+      color: {{ text_color }};
+    {% endif %}
+    padding: {{ v_spacing }} {{ h_spacing }};
+    border-radius: {{ border_radius }}px;
+  ">
+  
+  <div class="container container-{{ container_width }}" 
+       style="text-align: {{ content_alignment }};">
+    
+    {% comment %} Section Header {% endcomment %}
+    {% if section.settings.section_title != blank or section.settings.section_subtitle != blank %}
+      <div class="section-header" style="margin-bottom: {{ gap_value }};">
+        {% if section.settings.section_title != blank %}
+          <h2 class="section-title">{{ section.settings.section_title | escape }}</h2>
+        {% endif %}
+        {% if section.settings.section_subtitle != blank %}
+          <div class="section-subtitle">{{ section.settings.section_subtitle }}</div>
+        {% endif %}
+      </div>
+    {% endif %}
+    
+    {% comment %} Blocks Container {% endcomment %}
+    {% if section.blocks.size > 0 %}
+      <div class="blocks-container layout-{{ layout_type }}"
+           {% case layout_type %}
+             {% when 'grid' %}
+               style="
+                 display: grid;
+                 grid-template-columns: repeat({{ grid_columns_desktop }}, 1fr);
+                 gap: {{ gap_value }};
+               "
+             {% when 'flex' %}
+               style="
+                 display: flex;
+                 flex-direction: {{ flex_direction }};
+                 justify-content: {{ flex_justify }};
+                 align-items: {{ flex_align }};
+                 gap: {{ gap_value }};
+                 {% if flex_wrap %}flex-wrap: wrap;{% endif %}
+               "
+             {% when 'masonry' %}
+               style="
+                 columns: {{ grid_columns_desktop }};
+                 column-gap: {{ gap_value }};
+               "
+             {% when 'stack' %}
+               style="
+                 display: flex;
+                 flex-direction: column;
+                 gap: {{ gap_value }};
+               "
+           {% endcase %}
+      >
+        
+        {% comment %} Render Blocks {% endcomment %}
+        {% for block in section.blocks %}
+          <div class="block-wrapper" 
+               data-block-type="{{ block.type }}"
+               data-block-id="{{ block.id }}"
+               {{ block.shopify_attributes }}
+               {% if layout_type == 'masonry' %}
+                 style="break-inside: avoid; margin-bottom: {{ gap_value }};"
+               {% endif %}
+          >
+            
+            {% comment %} Block Renderer {% endcomment %}
+            {% case block.type %}
+              {% when 'text' %}
+                {% render 'block-text', block: block %}
+              {% when 'heading' %}
+                {% render 'block-heading', block: block %}
+              {% when 'image' %}
+                {% render 'block-image', block: block %}
+              {% when 'video' %}
+                {% render 'block-video', block: block %}
+              {% when 'spacer' %}
+                {% render 'block-spacer', block: block %}
+              {% when 'button' %}
+                {% render 'block-button', block: block %}
+              {% when 'product-card' %}
+                {% render 'block-product-card', block: block %}
+              {% when 'collection-grid' %}
+                {% render 'block-collection-grid', block: block %}
+              {% when 'accordion' %}
+                {% render 'block-accordion', block: block %}
+              {% when 'tabs' %}
+                {% render 'block-tabs', block: block %}
+              {% else %}
+                {% comment %} Fallback for unknown block types {% endcomment %}
+                {% if request.design_mode %}
+                  <div class="block-fallback" 
+                       style="
+                         padding: 1rem;
+                         border: 2px dashed var(--color-base-text-secondary);
+                         border-radius: 8px;
+                         text-align: center;
+                         color: var(--color-base-text-secondary);
+                       ">
+                    <p>⚠️ Unknown block type: {{ block.type }}</p>
+                    <small>This block type is not yet supported</small>
+                  </div>
+                {% endif %}
+            {% endcase %}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      {% comment %} Empty State {% endcomment %}
+      {% if request.design_mode %}
+        <div class="empty-state" 
+             style="
+               padding: 3rem 1rem;
+               text-align: center;
+               border: 2px dashed var(--color-base-border);
+               border-radius: 12px;
+               color: var(--color-base-text-secondary);
+             ">
+          <h3>📦 Universal Container</h3>
+          <p>Add blocks to build your custom layout</p>
+          <small>Click "Add block" to get started</small>
+        </div>
+      {% endif %}
+    {% endif %}
+  </div>
+</section>
+
+{% comment %} Responsive CSS {% endcomment %}
+<style>
+  .section-{{ section.id }} .container-narrow { max-width: 800px; margin: 0 auto; }
+  .section-{{ section.id }} .container-medium { max-width: 1200px; margin: 0 auto; }
+  .section-{{ section.id }} .container-wide { max-width: 1600px; margin: 0 auto; }
+  .section-{{ section.id }} .container-full { width: 100%; }
+  
+  {% comment %} Grid responsive behavior {% endcomment %}
+  @media (max-width: 1024px) {
+    .section-{{ section.id }} .layout-grid {
+      grid-template-columns: repeat({{ grid_columns_tablet }}, 1fr) !important;
+    }
+    .section-{{ section.id }} .layout-masonry {
+      columns: {{ grid_columns_tablet }} !important;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .section-{{ section.id }} .layout-grid {
+      grid-template-columns: repeat({{ grid_columns_mobile }}, 1fr) !important;
+    }
+    .section-{{ section.id }} .layout-masonry {
+      columns: {{ grid_columns_mobile }} !important;
+    }
+    .section-{{ section.id }} .layout-flex {
+      flex-direction: column !important;
+    }
+  }
+  
+  {% comment %} Animation styles {% endcomment %}
+  {% if animation_type != 'none' %}
+    .section-{{ section.id }}[data-animation="{{ animation_type }}"] {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.6s ease;
+    }
+    
+    .section-{{ section.id }}[data-animation="{{ animation_type }}"].animate-in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  {% endif %}
+</style>
+
+{% comment %} Animation JavaScript {% endcomment %}
+{% if animation_type != 'none' %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const section = document.getElementById('section-{{ section.id }}');
+    if (!section) return;
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-in');
+        }
+      });
+    }, { threshold: 0.1 });
+    
+    observer.observe(section);
+  });
+</script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "📦 Universal Container",
+  "tag": "section",
+  "class": "universal-container",
+  "settings": [
+    {
+      "type": "header",
+      "content": "📋 Section Content"
+    },
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Section Title",
+      "placeholder": "Optional section heading"
+    },
+    {
+      "type": "richtext",
+      "id": "section_subtitle",
+      "label": "Section Subtitle",
+      "info": "Optional section description"
+    },
+    {
+      "type": "header",
+      "content": "📐 Layout Settings"
+    },
+    {
+      "type": "select",
+      "id": "layout_type",
+      "label": "Layout Type",
+      "options": [
+        {"value": "stack", "label": "📚 Stack (Vertical)"},
+        {"value": "grid", "label": "⚏ Grid"},
+        {"value": "flex", "label": "🔄 Flexible"},
+        {"value": "masonry", "label": "🧱 Masonry"}
+      ],
+      "default": "stack",
+      "info": "How blocks should be arranged"
+    },
+    {
+      "type": "select",
+      "id": "container_width",
+      "label": "Container Width",
+      "options": [
+        {"value": "narrow", "label": "Narrow (800px)"},
+        {"value": "medium", "label": "Medium (1200px)"},
+        {"value": "wide", "label": "Wide (1600px)"},
+        {"value": "full", "label": "Full Width"}
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "label": "Content Alignment",
+      "options": [
+        {"value": "left", "label": "Left"},
+        {"value": "center", "label": "Center"},
+        {"value": "right", "label": "Right"}
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "⚏ Grid Layout (when Grid is selected)"
+    },
+    {
+      "type": "range",
+      "id": "grid_columns_desktop",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "label": "Desktop Columns",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "grid_columns_tablet",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "label": "Tablet Columns",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "grid_columns_mobile",
+      "min": 1,
+      "max": 2,
+      "step": 1,
+      "label": "Mobile Columns",
+      "default": 1
+    },
+    {
+      "type": "header",
+      "content": "🔄 Flex Layout (when Flexible is selected)"
+    },
+    {
+      "type": "select",
+      "id": "flex_direction",
+      "label": "Flex Direction",
+      "options": [
+        {"value": "row", "label": "Horizontal"},
+        {"value": "column", "label": "Vertical"},
+        {"value": "row-reverse", "label": "Horizontal Reverse"},
+        {"value": "column-reverse", "label": "Vertical Reverse"}
+      ],
+      "default": "row"
+    },
+    {
+      "type": "select",
+      "id": "flex_justify",
+      "label": "Horizontal Alignment",
+      "options": [
+        {"value": "flex-start", "label": "Start"},
+        {"value": "center", "label": "Center"},
+        {"value": "flex-end", "label": "End"},
+        {"value": "space-between", "label": "Space Between"},
+        {"value": "space-around", "label": "Space Around"},
+        {"value": "space-evenly", "label": "Space Evenly"}
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "flex_align",
+      "label": "Vertical Alignment",
+      "options": [
+        {"value": "flex-start", "label": "Top"},
+        {"value": "center", "label": "Center"},
+        {"value": "flex-end", "label": "Bottom"},
+        {"value": "stretch", "label": "Stretch"}
+      ],
+      "default": "center"
+    },
+    {
+      "type": "checkbox",
+      "id": "flex_wrap",
+      "label": "Allow Wrapping",
+      "default": true,
+      "info": "Allow items to wrap to new lines"
+    },
+    {
+      "type": "header",
+      "content": "📏 Spacing"
+    },
+    {
+      "type": "select",
+      "id": "vertical_spacing",
+      "label": "Vertical Spacing",
+      "options": [
+        {"value": "none", "label": "None"},
+        {"value": "small", "label": "Small"},
+        {"value": "medium", "label": "Medium"},
+        {"value": "large", "label": "Large"},
+        {"value": "xl", "label": "Extra Large"}
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "select",
+      "id": "horizontal_spacing",
+      "label": "Horizontal Spacing",
+      "options": [
+        {"value": "none", "label": "None"},
+        {"value": "small", "label": "Small"},
+        {"value": "medium", "label": "Medium"},
+        {"value": "large", "label": "Large"},
+        {"value": "xl", "label": "Extra Large"}
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "select",
+      "id": "grid_gap",
+      "label": "Gap Between Blocks",
+      "options": [
+        {"value": "none", "label": "None"},
+        {"value": "small", "label": "Small"},
+        {"value": "medium", "label": "Medium"},
+        {"value": "large", "label": "Large"},
+        {"value": "xl", "label": "Extra Large"}
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Styling"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color"
+    },
+    {
+      "type": "color_background",
+      "id": "background_gradient",
+      "label": "Background Gradient",
+      "info": "Overrides background color when set"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "label": "Border Radius",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "✨ Animation"
+    },
+    {
+      "type": "select",
+      "id": "animation_type",
+      "label": "Section Animation",
+      "options": [
+        {"value": "none", "label": "None"},
+        {"value": "fade-in", "label": "Fade In"},
+        {"value": "slide-up", "label": "Slide Up"},
+        {"value": "scale-in", "label": "Scale In"}
+      ],
+      "default": "none"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "📝 Text Block",
+      "limit": 10
+    },
+    {
+      "type": "heading",
+      "name": "📰 Heading Block",
+      "limit": 5
+    },
+    {
+      "type": "image",
+      "name": "🖼️ Image Block",
+      "limit": 10
+    },
+    {
+      "type": "video",
+      "name": "🎬 Video Block",
+      "limit": 5
+    },
+    {
+      "type": "spacer",
+      "name": "📏 Spacer Block",
+      "limit": 10
+    },
+    {
+      "type": "button",
+      "name": "🔘 Button Block",
+      "limit": 5
+    },
+    {
+      "type": "product-card",
+      "name": "🛍️ Product Card Block",
+      "limit": 10
+    }
+  ],
+  "presets": [
+    {
+      "name": "📦 Universal Container",
+      "category": "Layout",
+      "blocks": [
+        {
+          "type": "heading"
+        },
+        {
+          "type": "text"
+        }
+      ]
+    }
+  ],
+  "disabled_on": {
+    "groups": ["header", "footer", "aside"]
+  }
+}
+{% endschema %}

@@ -1,0 +1,63 @@
+{% comment %}
+  Block Button Renderer - Renders button blocks from the universal container
+{% endcomment %}
+
+{% liquid
+  assign button_text = block.settings.button_text | default: 'Button Text'
+  assign button_url = block.settings.button_url
+  assign button_style = block.settings.button_style | default: 'primary'
+  assign button_size = block.settings.button_size | default: 'medium'
+  assign button_width = block.settings.button_width | default: 'auto'
+  assign button_alignment = block.settings.button_alignment | default: 'left'
+  assign icon_name = block.settings.icon_name
+  assign icon_position = block.settings.icon_position | default: 'left'
+  assign open_in_new_tab = block.settings.open_in_new_tab | default: false
+  assign animation_type = block.settings.animation_type | default: 'none'
+  assign custom_color = block.settings.custom_color
+  assign custom_text_color = block.settings.custom_text_color
+%}
+
+<div class="block-button" 
+     data-block-id="{{ block.id }}"
+     data-animation="{{ animation_type }}"
+     style="text-align: {{ button_alignment }};">
+  
+  {% if button_text != blank %}
+    <a href="{{ button_url | default: '#' }}"
+       class="button button-{{ button_style }} button-{{ button_size }} button-{{ button_width }}"
+       {% if open_in_new_tab and button_url != blank %}
+         target="_blank" 
+         rel="noopener noreferrer"
+       {% endif %}
+       {% if button_url == blank %}
+         role="button"
+         tabindex="0"
+       {% endif %}
+       style="
+         {% if custom_color != blank %}
+           background-color: {{ custom_color }};
+           border-color: {{ custom_color }};
+         {% endif %}
+         {% if custom_text_color != blank %}
+           color: {{ custom_text_color }};
+         {% endif %}
+       ">
+      
+      {% if icon_name != blank and icon_position == 'left' %}
+        <span class="button-icon" aria-hidden="true">→</span>
+      {% endif %}
+      
+      <span class="button-text">{{ button_text | escape }}</span>
+      
+      {% if icon_name != blank and icon_position == 'right' %}
+        <span class="button-icon" aria-hidden="true">→</span>
+      {% endif %}
+    </a>
+  {% else %}
+    {% if request.design_mode %}
+      <div class="block-placeholder">
+        <p>🔘 Add button text to display button</p>
+      </div>
+    {% endif %}
+  {% endif %}
+</div>

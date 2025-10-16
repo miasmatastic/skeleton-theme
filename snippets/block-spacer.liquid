@@ -1,0 +1,63 @@
+{% comment %}
+  Block Spacer Renderer - Renders spacer blocks from the universal container
+{% endcomment %}
+
+{% liquid
+  assign spacing_desktop = block.settings.spacing_desktop | default: 40
+  assign spacing_mobile = block.settings.spacing_mobile | default: 20
+  assign spacing_unit = block.settings.spacing_unit | default: 'px'
+  assign background_color = block.settings.background_color
+  assign show_divider = block.settings.show_divider | default: false
+  assign divider_style = block.settings.divider_style | default: 'solid'
+  assign divider_color = block.settings.divider_color | default: 'var(--color-base-border)'
+%}
+
+<div class="block-spacer" 
+     data-block-id="{{ block.id }}"
+     style="
+       height: {{ spacing_desktop }}{{ spacing_unit }};
+       {% if background_color != blank %}
+         background-color: {{ background_color }};
+       {% endif %}
+       {% if show_divider %}
+         border-top: 1px {{ divider_style }} {{ divider_color }};
+         display: flex;
+         align-items: center;
+       {% endif %}
+     ">
+  
+  {% if request.design_mode %}
+    <div class="spacer-indicator" 
+         style="
+           width: 100%;
+           height: 100%;
+           border: 1px dashed var(--color-base-text-secondary);
+           border-radius: 4px;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           color: var(--color-base-text-secondary);
+           font-size: 0.75rem;
+           background: rgba(0,0,0,0.05);
+         ">
+      <span>📏 {{ spacing_desktop }}{{ spacing_unit }} spacer</span>
+    </div>
+  {% else %}
+    {% if show_divider and block.settings.divider_text != blank %}
+      <div style="
+        width: 100%;
+        text-align: center;
+        position: relative;
+      ">
+        <span style="
+          background: {{ background_color | default: 'var(--color-base-background)' }};
+          padding: 0 1rem;
+          color: var(--color-base-text-secondary);
+          font-size: 0.875rem;
+        ">
+          {{ block.settings.divider_text }}
+        </span>
+      </div>
+    {% endif %}
+  {% endif %}
+</div>

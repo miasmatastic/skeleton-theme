@@ -1,0 +1,94 @@
+{% comment %}
+  Block Video Renderer - Renders video blocks from the universal container
+{% endcomment %}
+
+{% liquid
+  assign video_type = block.settings.video_type | default: 'upload'
+  assign video_file = block.settings.video_file
+  assign youtube_id = block.settings.youtube_id
+  assign vimeo_id = block.settings.vimeo_id
+  assign poster_image = block.settings.poster_image
+  assign aspect_ratio = block.settings.aspect_ratio | default: '16/9'
+  assign autoplay = block.settings.autoplay | default: false
+  assign muted = block.settings.muted | default: true
+  assign loop = block.settings.loop | default: false
+  assign controls = block.settings.controls | default: true
+  assign animation_type = block.settings.animation_type | default: 'none'
+%}
+
+<div class="block-video" 
+     data-block-id="{{ block.id }}"
+     data-video-type="{{ video_type }}"
+     data-animation="{{ animation_type }}">
+  
+  <div class="video-container" 
+       style="
+         aspect-ratio: {{ aspect_ratio }};
+         border-radius: {{ block.settings.border_radius | default: 0 }}px;
+         overflow: hidden;
+         position: relative;
+       ">
+    
+    {% case video_type %}
+      {% when 'upload' %}
+        {% if video_file != blank %}
+          <video 
+            class="block-video-element"
+            style="width: 100%; height: 100%; object-fit: cover;"
+            {% if poster_image != blank %}poster="{{ poster_image | image_url: width: 1200 }}"{% endif %}
+            {% if autoplay %}autoplay{% endif %}
+            {% if muted %}muted{% endif %}
+            {% if loop %}loop{% endif %}
+            {% if controls %}controls{% endif %}
+            preload="metadata"
+            aria-label="{{ block.settings.video_title | default: 'Video content' | escape }}"
+          >
+            <source src="{{ video_file | file_url }}" type="video/mp4">
+            <p>Your browser doesn't support video playback.</p>
+          </video>
+        {% else %}
+          {% if request.design_mode %}
+            <div class="video-placeholder">
+              <p>🎬 Upload a video file</p>
+            </div>
+          {% endif %}
+        {% endif %}
+      
+      {% when 'youtube' %}
+        {% if youtube_id != blank %}
+          <iframe 
+            class="block-video-element"
+            src="https://www.youtube.com/embed/{{ youtube_id }}?{% if autoplay %}autoplay=1&{% endif %}{% if muted %}mute=1&{% endif %}{% if loop %}loop=1&playlist={{ youtube_id }}&{% endif %}{% unless controls %}controls=0&{% endunless %}rel=0&modestbranding=1"
+            style="width: 100%; height: 100%; border: 0;"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            title="{{ block.settings.video_title | default: 'YouTube video' | escape }}"
+          ></iframe>
+        {% else %}
+          {% if request.design_mode %}
+            <div class="video-placeholder">
+              <p>🎬 Add YouTube video ID</p>
+            </div>
+          {% endif %}
+        {% endif %}
+      
+      {% when 'vimeo' %}
+        {% if vimeo_id != blank %}
+          <iframe 
+            class="block-video-element"
+            src="https://player.vimeo.com/video/{{ vimeo_id }}?{% if autoplay %}autoplay=1&{% endif %}{% if muted %}muted=1&{% endif %}{% if loop %}loop=1&{% endif %}title=0&byline=0&portrait=0"
+            style="width: 100%; height: 100%; border: 0;"
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowfullscreen
+            title="{{ block.settings.video_title | default: 'Vimeo video' | escape }}"
+          ></iframe>
+        {% else %}
+          {% if request.design_mode %}
+            <div class="video-placeholder">
+              <p>🎬 Add Vimeo video ID</p>
+            </div>
+          {% endif %}
+        {% endif %}
+    {% endcase %}
+  </div>
+</div>

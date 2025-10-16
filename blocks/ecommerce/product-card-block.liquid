@@ -1,0 +1,309 @@
+{% comment %}
+  🛍️ Product Card Block - Display individual products
+  
+  Features:
+  - Product selection from store catalog
+  - Multiple display styles
+  - Price and variant information
+  - Quick add to cart functionality
+  - Badge support (sale, new, featured)
+{% endcomment %}
+
+{% liquid
+  assign product = all_products[block.settings.product] | default: block.settings.product
+  assign show_vendor = block.settings.show_vendor | default: true
+  assign show_price = block.settings.show_price | default: true
+  assign show_compare_price = block.settings.show_compare_price | default: true
+  assign show_badges = block.settings.show_badges | default: true
+  assign image_aspect_ratio = block.settings.image_aspect_ratio | default: 'square'
+  assign card_style = block.settings.card_style | default: 'standard'
+  assign text_alignment = block.settings.text_alignment | default: 'left'
+%}
+
+<div class="block-product-card" 
+     data-block-id="{{ block.id }}"
+     data-card-style="{{ card_style }}">
+  
+  {% if product != blank %}
+    <div class="product-card card-{{ card_style }}" 
+         style="text-align: {{ text_alignment }};">
+      
+      {% comment %} Product Image {% endcomment %}
+      <div class="product-card-image" 
+           style="
+             aspect-ratio: {% case image_aspect_ratio %}
+               {% when 'square' %}1/1
+               {% when 'portrait' %}3/4
+               {% when 'landscape' %}4/3
+               {% else %}auto
+             {% endcase %};
+             overflow: hidden;
+             position: relative;
+           ">
+        
+        {% if product.featured_media %}
+          <img 
+            src="{{ product.featured_media | image_url: width: 400 }}"
+            srcset="{{ product.featured_media | image_url: width: 200 }} 200w,
+                    {{ product.featured_media | image_url: width: 400 }} 400w,
+                    {{ product.featured_media | image_url: width: 600 }} 600w"
+            sizes="(max-width: 768px) 50vw, 25vw"
+            alt="{{ product.featured_media.alt | default: product.title | escape }}"
+            width="{{ product.featured_media.width }}"
+            height="{{ product.featured_media.height }}"
+            loading="lazy"
+            style="width: 100%; height: 100%; object-fit: cover;"
+          >
+        {% else %}
+          <div class="product-placeholder" 
+               style="
+                 width: 100%;
+                 height: 100%;
+                 background: var(--color-base-border);
+                 display: flex;
+                 align-items: center;
+                 justify-content: center;
+                 color: var(--color-base-text-secondary);
+               ">
+            <span>No Image</span>
+          </div>
+        {% endif %}
+        
+        {% comment %} Product Badges {% endcomment %}
+        {% if show_badges %}
+          <div class="product-badges" 
+               style="
+                 position: absolute;
+                 top: 0.5rem;
+                 left: 0.5rem;
+                 display: flex;
+                 flex-direction: column;
+                 gap: 0.25rem;
+               ">
+            
+            {% if product.compare_at_price > product.price %}
+              <span class="product-badge badge-sale" 
+                    style="
+                      background: var(--color-product-sale);
+                      color: white;
+                      padding: 0.25rem 0.5rem;
+                      border-radius: 4px;
+                      font-size: 0.75rem;
+                      font-weight: 600;
+                    ">
+                Sale
+              </span>
+            {% endif %}
+            
+            {% if block.settings.show_new_badge and product.created_at > 'now' | date: '%s' | minus: 2592000 %}
+              <span class="product-badge badge-new" 
+                    style="
+                      background: var(--color-product-new);
+                      color: white;
+                      padding: 0.25rem 0.5rem;
+                      border-radius: 4px;
+                      font-size: 0.75rem;
+                      font-weight: 600;
+                    ">
+                New
+              </span>
+            {% endif %}
+            
+            {% unless product.available %}
+              <span class="product-badge badge-sold-out" 
+                    style="
+                      background: var(--color-product-sold-out);
+                      color: white;
+                      padding: 0.25rem 0.5rem;
+                      border-radius: 4px;
+                      font-size: 0.75rem;
+                      font-weight: 600;
+                    ">
+                Sold Out
+              </span>
+            {% endunless %}
+          </div>
+        {% endif %}
+      </div>
+      
+      {% comment %} Product Info {% endcomment %}
+      <div class="product-card-info" style="padding: 1rem 0;">
+        
+        {% if show_vendor and product.vendor != blank %}
+          <div class="product-vendor" 
+               style="
+                 font-size: 0.75rem;
+                 color: var(--color-base-text-secondary);
+                 text-transform: uppercase;
+                 letter-spacing: 0.05em;
+                 margin-bottom: 0.25rem;
+               ">
+            {{ product.vendor }}
+          </div>
+        {% endif %}
+        
+        <h3 class="product-title" 
+            style="
+              margin: 0 0 0.5rem 0;
+              font-size: 1rem;
+              font-weight: 600;
+              line-height: 1.4;
+            ">
+          <a href="{{ product.url }}" 
+             style="
+               text-decoration: none;
+               color: inherit;
+             ">
+            {{ product.title }}
+          </a>
+        </h3>
+        
+        {% if show_price %}
+          <div class="product-price" 
+               style="
+                 font-weight: 600;
+                 color: var(--brand-primary);
+               ">
+            
+            {% if product.compare_at_price > product.price and show_compare_price %}
+              <span class="price-compare" 
+                    style="
+                      text-decoration: line-through;
+                      color: var(--color-base-text-secondary);
+                      margin-right: 0.5rem;
+                    ">
+                {{ product.compare_at_price | money }}
+              </span>
+            {% endif %}
+            
+            <span class="price-current">
+              {% if product.price_varies %}
+                From {{ product.price_min | money }}
+              {% else %}
+                {{ product.price | money }}
+              {% endif %}
+            </span>
+          </div>
+        {% endif %}
+        
+        {% if block.settings.show_description and product.description != blank %}
+          <div class="product-description" 
+               style="
+                 margin-top: 0.5rem;
+                 font-size: 0.875rem;
+                 color: var(--color-base-text-secondary);
+                 line-height: 1.4;
+               ">
+            {{ product.description | strip_html | truncate: 100 }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  {% else %}
+    {% if request.design_mode %}
+      <div class="block-placeholder">
+        <p>🛍️ Select a product to display</p>
+        <small>Choose from your product catalog</small>
+      </div>
+    {% endif %}
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "🛍️ Product Card Block",
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Product",
+      "info": "Select a product from your catalog"
+    },
+    {
+      "type": "header",
+      "content": "🖼️ Display Options"
+    },
+    {
+      "type": "select",
+      "id": "card_style",
+      "label": "Card Style",
+      "options": [
+        {"value": "standard", "label": "Standard"},
+        {"value": "minimal", "label": "Minimal"},
+        {"value": "detailed", "label": "Detailed"}
+      ],
+      "default": "standard"
+    },
+    {
+      "type": "select",
+      "id": "image_aspect_ratio",
+      "label": "Image Aspect Ratio",
+      "options": [
+        {"value": "auto", "label": "Original"},
+        {"value": "square", "label": "Square (1:1)"},
+        {"value": "portrait", "label": "Portrait (3:4)"},
+        {"value": "landscape", "label": "Landscape (4:3)"}
+      ],
+      "default": "square"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text Alignment",
+      "options": [
+        {"value": "left", "label": "Left"},
+        {"value": "center", "label": "Center"},
+        {"value": "right", "label": "Right"}
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "📋 Information Display"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show Product Vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price",
+      "label": "Show Price",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_compare_price",
+      "label": "Show Compare At Price",
+      "default": true,
+      "info": "Shows original price when product is on sale"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Show Product Description",
+      "default": false,
+      "info": "Shows truncated product description"
+    },
+    {
+      "type": "header",
+      "content": "🏷️ Badges"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_badges",
+      "label": "Show Product Badges",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_new_badge",
+      "label": "Show 'New' Badge",
+      "default": true,
+      "info": "Shows 'New' badge for products added in the last 30 days"
+    }
+  ]
+}
+{% endschema %}

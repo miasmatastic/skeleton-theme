@@ -1,0 +1,131 @@
+{% comment %}
+  📝 Text Block - Universal text content block
+  
+  Features:
+  - Rich text content with HTML support
+  - Typography controls (size, weight, alignment)
+  - Color scheme integration
+  - Responsive text scaling
+  - Accessibility optimized
+{% endcomment %}
+
+{% liquid
+  assign text_size = block.settings.text_size | default: 'medium'
+  assign text_weight = block.settings.text_weight | default: 'normal'
+  assign text_align = block.settings.text_align | default: 'left'
+  assign text_color = block.settings.text_color | default: 'inherit'
+  assign max_width = block.settings.max_width | default: 'none'
+  assign animation_type = block.settings.animation_type | default: 'none'
+%}
+
+<div class="block-text" 
+     data-block-id="{{ block.id }}"
+     data-text-size="{{ text_size }}"
+     data-text-weight="{{ text_weight }}"
+     data-text-align="{{ text_align }}"
+     data-animation="{{ animation_type }}"
+     style="
+       color: {{ text_color }};
+       max-width: {{ max_width }};
+       text-align: {{ text_align }};
+     ">
+  
+  {% if block.settings.content != blank %}
+    <div class="block-text-content text-{{ text_size }} weight-{{ text_weight }}">
+      {{ block.settings.content }}
+    </div>
+  {% else %}
+    {% if request.design_mode %}
+      <div class="block-placeholder">
+        <p>📝 Add your text content here</p>
+      </div>
+    {% endif %}
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "📝 Text Block",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "content",
+      "label": "Text Content",
+      "default": "<p>Enter your text content here. You can use <strong>bold</strong>, <em>italic</em>, and other formatting.</p>",
+      "info": "Supports HTML formatting and line breaks"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Typography"
+    },
+    {
+      "type": "select",
+      "id": "text_size",
+      "label": "Text Size",
+      "options": [
+        {"value": "small", "label": "Small (14px)"},
+        {"value": "medium", "label": "Medium (16px)"},
+        {"value": "large", "label": "Large (18px)"},
+        {"value": "xl", "label": "Extra Large (20px)"},
+        {"value": "2xl", "label": "2X Large (24px)"}
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "select",
+      "id": "text_weight",
+      "label": "Font Weight",
+      "options": [
+        {"value": "light", "label": "Light (300)"},
+        {"value": "normal", "label": "Normal (400)"},
+        {"value": "medium", "label": "Medium (500)"},
+        {"value": "semibold", "label": "Semi Bold (600)"},
+        {"value": "bold", "label": "Bold (700)"}
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "select",
+      "id": "text_align",
+      "label": "Text Alignment",
+      "options": [
+        {"value": "left", "label": "Left"},
+        {"value": "center", "label": "Center"},
+        {"value": "right", "label": "Right"},
+        {"value": "justify", "label": "Justify"}
+      ],
+      "default": "left"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "info": "Leave empty to use theme default"
+    },
+    {
+      "type": "header",
+      "content": "📐 Layout"
+    },
+    {
+      "type": "text",
+      "id": "max_width",
+      "label": "Maximum Width",
+      "placeholder": "600px, 50%, none",
+      "info": "Limit text width for better readability"
+    },
+    {
+      "type": "select",
+      "id": "animation_type",
+      "label": "Animation",
+      "options": [
+        {"value": "none", "label": "None"},
+        {"value": "fade-in", "label": "Fade In"},
+        {"value": "slide-up", "label": "Slide Up"},
+        {"value": "slide-left", "label": "Slide Left"},
+        {"value": "scale-in", "label": "Scale In"}
+      ],
+      "default": "none"
+    }
+  ]
+}
+{% endschema %}

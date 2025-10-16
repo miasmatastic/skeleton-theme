@@ -1,0 +1,316 @@
+{% comment %}
+  🖼️ Image Block - Universal image block with advanced features
+  
+  Features:
+  - Responsive image handling
+  - WebP optimization
+  - Aspect ratio control
+  - Overlay effects and blend modes
+  - Lazy loading support
+  - Accessibility optimized
+{% endcomment %}
+
+{% liquid
+  assign image = block.settings.image
+  assign image_size = block.settings.image_size | default: 'medium'
+  assign aspect_ratio = block.settings.aspect_ratio | default: 'auto'
+  assign image_fit = block.settings.image_fit | default: 'cover'
+  assign image_alignment = block.settings.image_alignment | default: 'center'
+  assign border_radius = block.settings.border_radius | default: '0'
+  assign overlay_color = block.settings.overlay_color
+  assign overlay_opacity = block.settings.overlay_opacity | default: 0
+  assign blend_mode = block.settings.blend_mode | default: 'normal'
+  assign animation_type = block.settings.animation_type | default: 'none'
+  assign lazy_load = block.settings.lazy_load | default: true
+  
+  assign sizes = '(max-width: 768px) 100vw, 50vw'
+  case image_size
+    when 'small'
+      assign sizes = '(max-width: 768px) 50vw, 25vw'
+    when 'medium'
+      assign sizes = '(max-width: 768px) 100vw, 50vw'
+    when 'large'
+      assign sizes = '(max-width: 768px) 100vw, 75vw'
+    when 'full'
+      assign sizes = '100vw'
+  endcase
+%}
+
+<div class="block-image" 
+     data-block-id="{{ block.id }}"
+     data-image-size="{{ image_size }}"
+     data-aspect-ratio="{{ aspect_ratio }}"
+     data-animation="{{ animation_type }}"
+     style="
+       text-align: {{ image_alignment }};
+       border-radius: {{ border_radius }};
+     ">
+  
+  {% if image != blank %}
+    <div class="image-container" 
+         style="
+           {% if aspect_ratio != 'auto' %}
+             aspect-ratio: {{ aspect_ratio }};
+           {% endif %}
+           border-radius: {{ border_radius }};
+           overflow: hidden;
+           position: relative;
+         ">
+      
+      {% comment %} Main Image {% endcomment %}
+      <img 
+        src="{{ image | image_url: width: 800 }}"
+        srcset="{{ image | image_url: width: 400 }} 400w,
+                {{ image | image_url: width: 800 }} 800w,
+                {{ image | image_url: width: 1200 }} 1200w,
+                {{ image | image_url: width: 1600 }} 1600w"
+        sizes="{{ sizes }}"
+        alt="{{ block.settings.alt_text | default: image.alt | escape }}"
+        class="block-image-element"
+        style="
+          width: 100%;
+          height: 100%;
+          object-fit: {{ image_fit }};
+          mix-blend-mode: {{ blend_mode }};
+        "
+        {% if lazy_load %}loading="lazy"{% endif %}
+        {% if aspect_ratio == 'auto' %}
+          width="{{ image.width }}"
+          height="{{ image.height }}"
+        {% endif %}
+      >
+      
+      {% comment %} Overlay {% endcomment %}
+      {% if overlay_color != blank and overlay_opacity > 0 %}
+        <div class="image-overlay"
+             style="
+               position: absolute;
+               top: 0;
+               left: 0;
+               width: 100%;
+               height: 100%;
+               background-color: {{ overlay_color }};
+               opacity: {{ overlay_opacity | divided_by: 100.0 }};
+               pointer-events: none;
+             "></div>
+      {% endif %}
+      
+      {% comment %} Caption {% endcomment %}
+      {% if block.settings.caption != blank %}
+        <div class="image-caption" 
+             style="
+               position: absolute;
+               bottom: 0;
+               left: 0;
+               right: 0;
+               background: linear-gradient(transparent, rgba(0,0,0,0.7));
+               color: white;
+               padding: 1rem;
+               font-size: 0.875rem;
+             ">
+          {{ block.settings.caption | escape }}
+        </div>
+      {% endif %}
+    </div>
+    
+    {% comment %} External Caption {% endcomment %}
+    {% if block.settings.external_caption != blank %}
+      <div class="image-external-caption" 
+           style="
+             margin-top: 0.5rem;
+             font-size: 0.875rem;
+             color: var(--color-base-text-secondary);
+             text-align: {{ image_alignment }};
+           ">
+        {{ block.settings.external_caption }}
+      </div>
+    {% endif %}
+    
+  {% else %}
+    {% if request.design_mode %}
+      <div class="block-placeholder" 
+           style="
+             min-height: 200px;
+             background: var(--color-base-border);
+             border: 2px dashed var(--color-base-text-secondary);
+             border-radius: {{ border_radius }};
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             color: var(--color-base-text-secondary);
+           ">
+        <div style="text-align: center;">
+          <p>🖼️ Add an image</p>
+          <small>Click to select an image from your media library</small>
+        </div>
+      </div>
+    {% endif %}
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "🖼️ Image Block",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image",
+      "info": "Recommended: High-resolution images for best quality"
+    },
+    {
+      "type": "text",
+      "id": "alt_text",
+      "label": "Alt Text (Accessibility)",
+      "placeholder": "Describe the image for screen readers",
+      "info": "Important for SEO and accessibility. Leave empty to use image alt text."
+    },
+    {
+      "type": "header",
+      "content": "📐 Image Sizing"
+    },
+    {
+      "type": "select",
+      "id": "image_size",
+      "label": "Image Size",
+      "options": [
+        {"value": "small", "label": "Small (25% width)"},
+        {"value": "medium", "label": "Medium (50% width)"},
+        {"value": "large", "label": "Large (75% width)"},
+        {"value": "full", "label": "Full Width (100%)"}
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "Aspect Ratio",
+      "options": [
+        {"value": "auto", "label": "Auto (Original)"},
+        {"value": "1/1", "label": "Square (1:1)"},
+        {"value": "4/3", "label": "Standard (4:3)"},
+        {"value": "3/2", "label": "Classic (3:2)"},
+        {"value": "16/9", "label": "Widescreen (16:9)"},
+        {"value": "21/9", "label": "Ultrawide (21:9)"},
+        {"value": "2/3", "label": "Portrait (2:3)"},
+        {"value": "3/4", "label": "Portrait Classic (3:4)"}
+      ],
+      "default": "auto"
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "Image Fit",
+      "options": [
+        {"value": "cover", "label": "Cover (Fill container)"},
+        {"value": "contain", "label": "Contain (Fit within)"},
+        {"value": "fill", "label": "Fill (Stretch to fit)"},
+        {"value": "scale-down", "label": "Scale Down"}
+      ],
+      "default": "cover",
+      "info": "How the image should fit within its container"
+    },
+    {
+      "type": "select",
+      "id": "image_alignment",
+      "label": "Image Alignment",
+      "options": [
+        {"value": "left", "label": "Left"},
+        {"value": "center", "label": "Center"},
+        {"value": "right", "label": "Right"}
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Styling"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "label": "Border Radius",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay Color",
+      "info": "Add a color overlay on top of the image"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Overlay Opacity",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "blend_mode",
+      "label": "Blend Mode",
+      "options": [
+        {"value": "normal", "label": "Normal"},
+        {"value": "multiply", "label": "Multiply"},
+        {"value": "screen", "label": "Screen"},
+        {"value": "overlay", "label": "Overlay"},
+        {"value": "soft-light", "label": "Soft Light"},
+        {"value": "hard-light", "label": "Hard Light"},
+        {"value": "color-dodge", "label": "Color Dodge"},
+        {"value": "color-burn", "label": "Color Burn"},
+        {"value": "difference", "label": "Difference"},
+        {"value": "exclusion", "label": "Exclusion"}
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "header",
+      "content": "📝 Captions"
+    },
+    {
+      "type": "text",
+      "id": "caption",
+      "label": "Overlay Caption",
+      "placeholder": "Caption text over the image",
+      "info": "Appears as overlay on bottom of image"
+    },
+    {
+      "type": "text",
+      "id": "external_caption",
+      "label": "External Caption",
+      "placeholder": "Caption text below the image",
+      "info": "Appears below the image"
+    },
+    {
+      "type": "header",
+      "content": "⚙️ Performance"
+    },
+    {
+      "type": "checkbox",
+      "id": "lazy_load",
+      "label": "Enable Lazy Loading",
+      "default": true,
+      "info": "Improves page load speed by loading images when needed"
+    },
+    {
+      "type": "select",
+      "id": "animation_type",
+      "label": "Animation",
+      "options": [
+        {"value": "none", "label": "None"},
+        {"value": "fade-in", "label": "Fade In"},
+        {"value": "slide-up", "label": "Slide Up"},
+        {"value": "scale-in", "label": "Scale In"},
+        {"value": "parallax", "label": "Parallax Scroll"}
+      ],
+      "default": "none"
+    }
+  ]
+}
+{% endschema %}
