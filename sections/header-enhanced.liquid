@@ -99,6 +99,7 @@
   assign menu_hover_color = section.settings.menu_hover_color | default: '#007acc'
   assign cart_count_bg = section.settings.cart_count_bg | default: '#ff4444'
   assign logo_max_width_mobile = section.settings.logo_max_width_mobile | default: 120
+  assign logo_alignment = section.settings.logo_alignment | default: 'left'
 -%}
 
 <style>
@@ -111,6 +112,7 @@
     --cart-count-bg: {{ cart_count_bg }};
     --header-height-mobile: {{ header_height_mobile }}px;
     --logo-max-width-mobile: {{ logo_max_width_mobile }}px;
+    --logo-alignment: {{ logo_alignment }};
     
     height: var(--header-height);
     display: flex;
@@ -141,6 +143,7 @@
 
   .header__brand {
     flex-shrink: 0;
+    text-align: var(--logo-alignment);
   }
 
   .header__title {
@@ -340,6 +343,18 @@
       "step": 10,
       "unit": "px",
       "default": 120
+    },
+    {
+      "type": "select",
+      "id": "logo_alignment",
+      "label": "Logo Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left",
+      "info": "Horizontal alignment of the logo"
     },
     {
       "type": "header",

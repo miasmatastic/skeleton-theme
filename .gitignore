@@ -15,3 +15,22 @@ node_modules/
 ## Release files
 release
 *.zip
+
+# Backup files
+*.backup
+*.bak
+*~
+*.swp
+*.swo
+
+# Editor files
+.vscode/
+.idea/
+*.sublime-*
+*.sublime-workspace
+*.sublime-project
+
+# Temporary files
+tmp/
+temp/
+*.tmp
